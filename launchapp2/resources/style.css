@@ -1,0 +1,156 @@
+* {
+    outline: none;
+}
+
+Window {
+    min-width: 580px;
+    min-height: 300px;
+    height: 350px;
+}
+
+Window #header {
+    background: white;
+    border-bottom: 1px solid #ccc;
+}
+
+Window #pages QTableView {
+    border: 0;
+    margin-bottom: 5px;
+}
+
+Window #apps {
+    min-width: 300px;
+}
+
+Window #extraContainer {
+    background: white;
+    min-height: 23px;
+}
+
+Window #extraContainer QLineEdit {
+    border: 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+Window #extraRequirements {
+    min-width: 10px;
+    width: 10px;
+}
+
+Window #extraRequirementsPrefix, #extraRequirementsSuffix {
+    color: #aaa;
+}
+
+QHeaderView {
+    qproperty-defaultAlignment: AlignLeft;
+    font-weight: 10;
+}
+
+QHeaderView::section {
+    border: 0;
+    padding: 5px;
+}
+
+DockWidget #help {
+    background: transparent;
+    border: none;
+    padding: 5px;
+    /*max-height: 32px;*/
+}
+
+Window #header QLabel {
+    padding: 0;
+}
+
+Window #header QComboBox {
+    padding: 0;
+}
+
+Window #header #projectBtn {
+    background: transparent;
+    border: 1px solid #aaa;
+    padding: 0;
+}
+
+Window #header #projectName {
+    background: none;
+    border: none;
+}
+
+Window #header QPushButton[type=toggle] {
+}
+
+Window #logo {
+    max-width: 32px;
+    max-height: 32px;
+
+    padding: 8px;
+}
+
+Console {
+    min-width: 200px;
+    min-height: 100px;
+}
+
+Options QTableView {
+    background: transparent;
+    border: none;
+}
+
+Options #label {
+    font-size: 15px;
+}
+
+QToolBar {
+    border: none;   
+}
+
+QToolButton {
+    min-height: 35px;
+}
+
+QTableView {
+    /*background: transparent;*/
+    /*border: none;*/
+}
+
+#launchBtn {
+    height: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+#launchOptionsBtn {
+    width: 30px;
+    max-height: 30px;
+    min-height: 30px;
+    min-width: 30px;
+}
+
+#busyIndicator {
+    min-height: 5px;
+    max-height: 5px;
+    background: #ef6363;
+}
+
+QTableView {
+    selection-background-color: #ddd;
+    selection-color: #111;
+}
+
+QTableView::item:selected {
+    border: none;
+}
+
+QTableView::item:selected:!active {
+    background: transparent;
+}
+
+QTableView::item:selected:active, QTableView::item:selected:!focus {
+    background: #add9f2;
+}
+
+QFrame {
+    border: none;
+}

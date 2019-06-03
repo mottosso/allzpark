@@ -1,0 +1,675 @@
+"""Orchestrates view.py and model.py
+
+### Data Flow
+  ______    _________   _____
+ |      |  |         | |     |
+ | Disk |  | Network | | Rez |
+ |______|  |_________| |_____|
+    |___       |        __|
+   _____|______|_______|____
+  |                         |
+  |       control.py        |
+  |_________________________|
+          _|      |__
+     ____|____   ____|_____
+    |         | |          |
+    | view.py | | model.py |
+    |_________| |__________|
+
+It is the only module with access to disk and network - either directly or
+indirectly - and can be used independently from both model and view, like an
+API to launchapp2. This also means that the view may access the controller,
+but not vice versa as that would implicate a view when using it standalone.
+
+### Architecture
+
+1. Projects are `os.listdir` from disk
+2. A project is chosen by the user, e.g. ATC
+3. The "ATC" Rez package is discovered and queried for "apps"
+4. Each "app" is resolved alongside the current project,
+    providing dependencies, environment, label, icon and
+    ultimately a context within which to launch a given
+    application.
+
+"""
+
+import os
+import logging
+import threading
+import traceback
+import subprocess
+
+from collections import OrderedDict as odict
+
+from .vendor.Qt import QtCore
+from .vendor import transitions
+from . import model, util
+
+# Third-party dependencies
+from rez.packages_ import iter_packages
+from rez.resolved_context import ResolvedContext
+import rez.exceptions
+import rez.package_filter
+
+log = logging.getLogger(__name__)
+
+
+class State(dict):
+    """Transient, persistent and machine for state
+
+    The state is used to keep track of which application
+    is the "current" one, along with managing the current
+    "state" such as whether the application is busy loading,
+    whether it's ready for user input. It also manages persistent
+    data, the kind that is stored until the next time the
+    application is launched.
+
+    """
+
+    def __init__(self, ctrl, storage):
+        super(State, self).__init__({
+            "projectName": storage.value("startupProject"),
+            "projectVersion": None,
+            "appName": storage.value("startupApplication"),
+            "appVersion": None,
+            "extraRequirements": [],
+
+            # Current error, if any
+            "error": None,
+
+            # Optional explicit tool
+            "tool": None,
+            "tools": [],
+
+            # Currently commands applications
+            "commands": [],
+
+            # Previously loaded project Rez packages
+            "rezProjects": {},
+
+            # Currently loaded Rez contexts
+            "rezContexts": {},
+            "rezApps": odict(),
+        })
+
+        self._ctrl = ctrl
+        self._storage = storage
+
+    def store(self, key, value):
+        """Write to persistent storage
+
+        Arguments:
+            key (str): Name of variable
+            value (object): Any datatype
+
+        """
+
+        self._storage.setValue(key, value)
+
+    def retrieve(self, key):
+        """Read from persistent storage
+
+        Arguments:
+            key (str): Name of variable
+
+        """
+
+        return self._storage.value(key)
+
+    def on_enter_booting(self):
+        self._ctrl.info("Booting..")
+
+    def on_enter_selectproject(self):
+        pass
+
+    def on_enter_resolving(self):
+        pass
+
+    def on_enter_launching(self):
+        self._ctrl.info("Application is being launched..")
+        util.delay(self.to_ready, 500)
+
+    def on_enter_noapps(self):
+        project = self["projectName"]
+        self._ctrl.info("No applications were found for %s" % project)
+
+    def on_enter_loading(self):
+        self._ctrl.info("Loading..")
+
+    def on_enter_ready(self):
+        self._ctrl.info("Ready")
+
+
+class _State(transitions.State):
+    def __init__(self, *args, **kwargs):
+        help = kwargs.pop("help", "")
+        super(_State, self).__init__(*args, **kwargs)
+        self.help = help
+
+    def __str__(self):
+        return self.name
+
+    def __eq__(self, other):
+        if isinstance(other, type(self)):
+            return self.name == other.name
+        return self.name == other
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class Controller(QtCore.QObject):
+    state_changed = QtCore.Signal(_State)
+    logged = QtCore.Signal(str, int)  # message, level
+    project_changed = QtCore.Signal(str, str)  # before, after
+
+    states = [
+        _State("booting", help="launchapp is booting, hold on"),
+        _State("resolving", help="Rez is busy resolving a context"),
+        _State("loading", help="Something is taking a moment"),
+        _State("errored", help="Something has gone wrong"),
+        _State("launching", help="An application is launching"),
+        _State("ready", help="Awaiting user input"),
+        _State("noapps", help="There were no applications to choose from"),
+        _State("notresolved", help="Rez couldn't resolve a request"),
+        _State("pkgnotfound", help="One or more packages was not found"),
+    ]
+
+    def __init__(self, storage, parent=None):
+        super(Controller, self).__init__(parent)
+
+        state = State(self, storage)
+
+        models = {
+            "main": model.Main(),
+
+            "projectVersions": QtCore.QStringListModel(),
+            "apps": model.ApplicationModel(),
+
+            # Docks
+            "packages": model.PackagesModel(),
+            "context": model.JsonModel(),
+            "environment": model.JsonModel(),
+            "commands": model.CommandsModel(),
+        }
+
+        timers = {
+            "commandsPoller": QtCore.QTimer(self),
+        }
+
+        timers["commandsPoller"].timeout.connect(self.on_tasks_polled)
+        timers["commandsPoller"].start(500)
+
+        # Initialize the state machine
+        self._machine = transitions.Machine(
+            model=state,
+            states=self.states,
+            initial="booting",
+            after_state_change=[self.on_state_changed],
+
+            # Add "on_enter_<state name>" to model
+            auto_transitions=True,
+        )
+
+        self._models = models
+        self._storage = storage
+        self._state = state
+        self._name_to_state = {
+            state.name: state
+            for state in self.states
+        }
+
+        state.on_enter_booting()
+
+    # ----------------
+    # Data
+    # ----------------
+
+    @property
+    def models(self):
+        return self._models
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
+    def current_error(self):
+        return self._state["error"]
+
+    @property
+    def current_project(self):
+        return self._state["projectName"]
+
+    @property
+    def current_application(self):
+        return self._state["appName"]
+
+    @property
+    def current_tool(self):
+        return self._state["tool"]
+
+    def context(self, app_name):
+        return self._state["rezContexts"][app_name].to_dict()
+
+    def environ(self, app_name):
+        return self._state["rezContexts"][app_name].get_environ()
+
+    def tools(self, app_name):
+        return self._state["tools"]
+
+    def resolved_packages(self, app_name):
+        return self._state["rezContexts"][app_name].resolved_packages
+
+    def find(self, package_name, callback=lambda result: None):
+        return util.defer(
+            iter_packages, args=[package_name],
+            on_success=callback
+        )
+
+    # ----------------
+    # Events
+    # ----------------
+
+    def on_tasks_polled(self):
+        self._models["commands"].poll()
+
+    def on_state_changed(self):
+        state = self._name_to_state[self._state.state]
+        self.state_changed.emit(state)
+
+    def on_unhandled_exception(self, type, value, tb):
+        """From sys.excepthook
+
+        Exceptions are normally handled close to the caller,
+        but some exceptions are better handled globally. For
+        example, if a PackageCommandError occurs, there is
+        little a caller can do. The problem must be addressed
+        by the user, outside of the entire program, so best we
+        can do is let them know as nicely as possible.
+
+        Arguments:
+            type (Exception): Subclass of Exception
+            value (str): Message to the user
+            tb (str): Full traceback
+
+        Returns:
+            handled (bool): True is the application dealt
+                with it, False otherwise. An unhandled exception
+                is raised to the command-line/caller.
+
+        """
+
+        RexUndefinedVariableError = rez.exceptions.RexUndefinedVariableError
+
+        if rez.exceptions.RexError is type:
+            # These are re-raised as a more specific
+            # exception, e.g. RexUndefinedVariableError
+            pass
+
+        if RexUndefinedVariableError is type:
+            pass
+
+        if rez.exceptions.PackageCommandError is type:
+            pass
+
+        self.error("".join(traceback.format_tb(tb)))
+        self.error(str(value))
+        self._state.to_errored()
+
+    # ----------------
+    # Methods
+    # ----------------
+
+    @util.async_
+    def reset(self, root=None, on_success=lambda: None):
+        """Initialise controller with `root`
+
+        Projects are listed at `root` and matched
+        with its corresponding Rez package.
+
+        Arguments:
+            root (str): Absolute path to projects on disk
+
+        """
+
+        self.info("Resetting..")
+        root = root or self._state["root"]
+        assert root, "Tried resetting without a root, this is a bug"
+
+        def do():
+            # On resetting after startup, there will be a
+            # currently selected project that may differ from
+            # the startup project.
+            current_project = self._state["projectName"]
+
+            # Find last used project from user preferences
+            if not current_project:
+                current_project = self._state.retrieve("startupProject")
+
+            # The user has never opened the GUI before,
+            # or user preferences has been wiped.
+            if not current_project:
+                try:
+                    projects = self.list_projects(root)
+                    current_project = projects[-1]
+
+                except (IndexError, OSError):
+                    self.error("Couldn't find any projects @ '%s'" % root)
+                    current_project = ""
+
+            self._state["projectName"] = current_project
+            self._state["root"] = root
+
+            self._state.to_ready()
+            self.select_project(current_project)
+
+            # Trigger callback
+            on_success()
+
+        self._state.to_booting()
+        util.delay(do)
+
+    # @util.async_
+    # def resolve(self):
+    #     def do():
+    #         self._state.to_read()
+
+    #     thread = threading.Thread(target=do)
+    #     thread.daemon = True
+    #     thread.start()
+
+    #     self._state.to_resolving()
+
+    @util.async_
+    def launch(self):
+        def do():
+            app_name = self._state["appName"]
+            rez_context = self._state["rezContexts"][app_name]
+            rez_app = self._state["rezApps"][app_name]
+
+            self.info("Found app: %s=%s" % (
+                rez_app.name, rez_app.version
+            ))
+
+            tool_name = self._state["tool"] or self._state["defaultTool"]
+
+            if not tool_name:
+                self.error("No tool found for %s" % app_name)
+                return self._state.to_errored()
+
+            self.info("Launching %s.." % tool_name)
+
+            cmd = Command(
+                context=rez_context,
+                command=tool_name,
+                package=rez_app,
+                parent=self
+            )
+
+            cmd.stdout.connect(self.info)
+            cmd.stderr.connect(self.error)
+
+            self._state["commands"].append(cmd)
+            self._models["commands"].append(cmd)
+
+            self._state.store("startupApplication", app_name)
+            self._state.to_launching()
+
+        self._state.to_loading()
+        util.delay(do)
+
+    def debug(self, message):
+        log.debug(message)
+        self.logged.emit(message, logging.DEBUG)
+
+    def info(self, message):
+        log.info(message)
+        self.logged.emit(message, logging.INFO)
+
+    def warning(self, message):
+        log.warning(message)
+        self.logged.emit(message, logging.WARNING)
+
+    def error(self, message):
+        log.error(message)
+        self.logged.emit(message, logging.ERROR)
+
+    @util.cached
+    def list_projects(self, root=None):
+        root = root or self._state["root"]
+
+        try:
+            _, dirs, files = next(os.walk(root))
+        except StopIteration:
+            self.error("Could not find projects in %s" % root)
+            return []
+
+        # Packages use _ in place of -
+        projects = [p.replace("-", "_") for p in dirs]
+
+        return projects
+
+    @util.async_
+    def select_project(self, project_name, version=None):
+        def do():
+            to_state = self._state.to_ready
+            before = self._state["projectName"] or ""
+            project = self._find_project(project_name, version)
+
+            if project:
+                try:
+                    apps = self._find_apps(project)
+                    self._models["apps"].reset(apps)
+
+                except rez.exceptions.PackageNotFoundError as e:
+                    self._state["error"] = e.value
+                    self.error(e.value)
+                    to_state = self._state.to_pkgnotfound
+
+                except rez.exceptions.ResolveError as e:
+                    self._state["error"] = e.value
+                    self.error(e.value)
+                    to_state = self._state.to_notresolved
+
+                except rez.vendor.version.util.VersionError as e:
+                    self._state["error"] = str(e)
+                    self.error(str(e))
+                    to_state = self._state.to_notresolved
+
+            else:
+                to_state = self._state.to_noapps
+
+            self._state["projectName"] = project_name
+            self.project_changed.emit(before, project_name)
+
+            to_state()
+
+        self._state.to_loading()
+
+        # Wipe existing data
+        self._models["apps"].reset()
+        self._models["context"].reset()
+        self._models["environment"].reset()
+        self._models["projectVersions"].setStringList([])
+
+        util.delay(do)
+
+    def select_application(self, app_name):
+        self._state["appName"] = app_name
+        self.info("%s selected" % app_name)
+
+        # Clear existing data, in case any of
+        # the below commands throw an exception
+        self._models["packages"].reset()
+        self._models["context"].reset()
+        self._models["environment"].reset()
+
+        context = self.context(app_name)
+        environ = self.environ(app_name)
+        packages = self.resolved_packages(app_name)
+
+        self._models["packages"].reset(packages)
+        self._models["context"].load(context)
+        self._models["environment"].load(environ)
+
+        rez_pkg = self._state["rezApps"][app_name]
+        tools = getattr(rez_pkg, "tools", [])
+
+        if not tools:
+            tools = [app_name]
+            self.debug("No default tool found for %s, "
+                       "using package name" % app_name)
+
+        self._state["tool"] = tools[0]
+        self._state["tools"] = tools
+
+    def select_tool(self, tool_name):
+        self._state["tool"] = tool_name
+
+    def edit_requirements(self, requirements):
+        """Override requirements in project with `requirements`
+
+        Arguments:
+            requirements (list): Rez-requirements, e.g. ["six>=1.21"]
+
+        """
+
+        if requirements == self._state["extraRequirements"]:
+            return
+
+        self.info("Editing requirements..")
+        self._state["extraRequirements"] = requirements
+
+        # Re-select project to re-evaluate context resolve
+        self.select_project(self._state["projectName"])
+
+    def _find_project(self, project_name, version):
+        try:
+            versions = self._state["rezProjects"][project_name]
+
+        except KeyError:
+            it = iter_packages(project_name)
+            versions = sorted(it, key=lambda x: x.version, reverse=True)
+
+            # Store for next time
+            self._state["rezProjects"][project_name] = versions
+
+        try:
+            latest = versions[0]
+        except IndexError:
+            return None
+
+        # Protect against malformed project packages
+        if not hasattr(latest, "_apps"):
+            self.warning("%s does not have and `_apps`" % latest.name)
+            latest._apps = getattr(latest, "_apps", [])
+
+        self._models["projectVersions"].setStringList([
+            str(pkg.version) for pkg in versions
+        ])
+
+        return latest
+
+    def _find_apps(self, project):
+        # Each app has a unique context relative the current project
+        # Find it, and keep track of it.
+        apps = project._apps
+        extra = self._state["extraRequirements"]
+
+        # Clear existing
+        self._state["rezContexts"] = {}
+
+        # TODO: Separate this, it may take a while if not memcached,
+        #   and the user needs to know what's going on.
+        contexts = odict()
+        with util.timing() as t:
+            for app_name in apps:
+                request = [project.name, app_name] + extra
+                self.debug("Resolving request: %s" % " ".join(request))
+
+                rule = rez.package_filter.Rule.parse_rule("*.beta")
+                PackageFilterList = rez.package_filter.PackageFilterList
+                package_filter = PackageFilterList.singleton.copy()
+                package_filter.add_exclusion(rule)
+
+                context = ResolvedContext(request,
+                                          package_filter=package_filter)
+
+                if not context.success:
+                    description = context.failure_description
+                    raise rez.exceptions.ResolveError(description)
+
+                contexts[app_name] = context
+
+        # Associate a Rez package with an app
+        for app_name, rez_context in contexts.items():
+            rez_pkg = next(pkg for pkg in rez_context.resolved_packages
+                           if pkg.name == app_name)
+            self._state["rezApps"][app_name] = rez_pkg
+
+        self.debug("Resolved all contexts in %.2f seconds" % t.duration)
+
+        # Find resolved app version
+        # E.g. maya -> maya-2018.0.1
+        app_packages = []
+        for app_name, context in contexts.items():
+            for package in context.resolved_packages:
+                if package.name in apps:
+                    app_packages += [package]
+                    break
+
+        self._state["rezContexts"] = contexts
+        return app_packages
+
+
+class BrokenPackage(object):
+    def __str__(self):
+        return self.name
+
+    def __init__(self, name):
+        self.name = name
+
+
+class Command(QtCore.QObject):
+    stdout = QtCore.Signal(str)
+    stderr = QtCore.Signal(str)
+    killed = QtCore.Signal()
+
+    def __str__(self):
+        return "Command('%s')" % self.cmd
+
+    def __init__(self, context, command, package, parent=None):
+        super(Command, self).__init__(parent)
+        self.context = context
+        self.app = package
+
+        # `cmd` rather than `command`, to distinguish
+        # between class and argument
+        self.cmd = command
+
+        kwargs = {
+            "command": command,
+            "stdout": subprocess.PIPE,
+            "stderr": subprocess.PIPE,
+        }
+
+        self.popen = context.execute_shell(**kwargs)
+
+        for target in (self.listen_on_stdout,
+                       self.listen_on_stderr):
+            thread = threading.Thread(target=target)
+            thread.daemon = True
+            thread.start()
+
+    def is_running(self):
+        return self.popen.poll() is None
+
+    def listen_on_stdout(self):
+        for line in iter(self.popen.stdout.readline, ""):
+            self.stdout.emit(line.rstrip())
+        self.killed.emit()
+
+    def listen_on_stderr(self):
+        for line in iter(self.popen.stderr.readline, ""):
+            self.stderr.emit(line.rstrip())
