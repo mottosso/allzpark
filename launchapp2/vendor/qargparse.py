@@ -146,7 +146,7 @@ class QArgument(QtCore.QObject):
         self._data[key] = value
 
     def create(self):
-        pass
+        return QtWidgets.QLabel(), QtWidgets.QWidget()
 
     def read(self):
         pass
@@ -245,7 +245,7 @@ class Float(Number):
     pass
 
 
-class Range(QArgument):
+class Range(Number):
     pass
 
 
@@ -266,11 +266,11 @@ class String(QArgument):
         return label, widget
 
 
-class Info(QArgument):
+class Info(String):
     pass
 
 
-class Color(QArgument):
+class Color(String):
     pass
 
 
@@ -305,10 +305,10 @@ class Toggle(Button):
     pass
 
 
-class MultiString(QArgument):
+class List(QArgument):
     def __init__(self, name, **kwargs):
         kwargs["items"] = kwargs.get("items", ["No items"])
-        super(MultiString, self).__init__(name, **kwargs)
+        super(List, self).__init__(name, **kwargs)
 
     def create(self):
         label = QtWidgets.QLabel(self["name"])
@@ -422,7 +422,7 @@ def _demo():
     ], default=2, help="Your class")
 
     parser.add_argument("options", type=Separator)
-    parser.add_argument("paths", type=MultiString, items=[
+    parser.add_argument("paths", type=List, items=[
         "Value A",
         "Value B",
         "Some other value",

@@ -1,37 +1,4 @@
-"""Orchestrates view.py and model.py
-
-### Data Flow
-  ______    _________   _____
- |      |  |         | |     |
- | Disk |  | Network | | Rez |
- |______|  |_________| |_____|
-    |___       |        __|
-   _____|______|_______|____
-  |                         |
-  |       control.py        |
-  |_________________________|
-          _|      |__
-     ____|____   ____|_____
-    |         | |          |
-    | view.py | | model.py |
-    |_________| |__________|
-
-It is the only module with access to disk and network - either directly or
-indirectly - and can be used independently from both model and view, like an
-API to launchapp2. This also means that the view may access the controller,
-but not vice versa as that would implicate a view when using it standalone.
-
-### Architecture
-
-1. Projects are `os.listdir` from disk
-2. A project is chosen by the user, e.g. ATC
-3. The "ATC" Rez package is discovered and queried for "apps"
-4. Each "app" is resolved alongside the current project,
-    providing dependencies, environment, label, icon and
-    ultimately a context within which to launch a given
-    application.
-
-"""
+"""Orchestrates view.py and model.py"""
 
 import os
 import logging
