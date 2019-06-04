@@ -527,11 +527,6 @@ class Controller(QtCore.QObject):
         except IndexError:
             return None
 
-        # Protect against malformed project packages
-        if not hasattr(latest, "_apps"):
-            self.warning("%s does not have and `_apps`" % latest.name)
-            latest._apps = getattr(latest, "_apps", [])
-
         self._models["projectVersions"].setStringList([
             str(pkg.version) for pkg in versions
         ])
@@ -541,7 +536,14 @@ class Controller(QtCore.QObject):
     def _find_apps(self, project):
         # Each app has a unique context relative the current project
         # Find it, and keep track of it.
-        apps = project._apps
+
+        apps = []
+        for req in project.requires:
+            if not req.weak:
+                continue
+
+            apps += [req.name]
+
         extra = self._state["extraRequirements"]
 
         # Clear existing
@@ -560,12 +562,18 @@ class Controller(QtCore.QObject):
                 package_filter = PackageFilterList.singleton.copy()
                 package_filter.add_exclusion(rule)
 
-                context = ResolvedContext(request,
-                                          package_filter=package_filter)
+                try:
+                    context = ResolvedContext(request,
+                                              package_filter=package_filter)
+                except rez.exceptions.RezError as e:
+                    self.error(str(e))
+                    continue
 
                 if not context.success:
                     description = context.failure_description
-                    raise rez.exceptions.ResolveError(description)
+                    self.error(description)
+                    continue
+                    # raise rez.exceptions.ResolveError(description)
 
                 contexts[app_name] = context
 

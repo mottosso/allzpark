@@ -60,9 +60,9 @@ class QHonestTreeModel(QtCore.QAbstractItemModel):
 
     promiseFulfilled = QtCore.Signal()
 
-    def __init__(self, parent=None):
+    def __init__(self, root, parent=None):
         super(QHonestTreeModel, self).__init__(parent)
-        self._root = QHonestItem("root")
+        self._root = root or QHonestItem("root")
 
     def flags(self, index):
         if not index.isValid():
@@ -441,7 +441,7 @@ class QPromiseItem(QHonestItem):
     def make(self, onSuccess=None, onFailure=None):
         self.made = True
 
-        def defer():
+        def _defer():
             defer(
                 self._func,
                 args=self._args,
@@ -450,7 +450,7 @@ class QPromiseItem(QHonestItem):
                 on_failure=onFailure or default_failure,
             )
 
-        delay(defer, 10)
+        delay(_defer, 10)
 
         return self
 
