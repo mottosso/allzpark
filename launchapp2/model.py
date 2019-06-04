@@ -77,29 +77,37 @@ class Root(qhonestmodel.QHonestItem):
     """Hosts one or more Project items"""
     def __init__(self, path):
         super(Root, self).__init__("root")
-        self[DisplayRole][1] = ""  # 2 columns
-        self[PathRole][0] = path
+
+        self.setData(path, PathRole)
+        self.setData("", DisplayRole, column=1)
 
         projects = qhonestmodel.QHonestItem("projects")
-        projects[DisplayRole][1] = "Available projects on disk"
+        projects.setData("Available projects on disk", DisplayRole, 1)
         projects.appendChild(
             qhonestmodel.QPromiseItem("...", func=self.fetch)
         )
 
         commands = qhonestmodel.QHonestItem("commands")
-        commands[DisplayRole][1] = "Currently running commands"
+        commands.setData("Currently running commands", DisplayRole, 1)
 
         settings = qhonestmodel.QHonestItem("settings")
-        settings[DisplayRole][1] = "User preferences"
+        settings.setData("User preferences", DisplayRole, 1)
 
         self.appendChild(projects)
         self.appendChild(commands)
         self.appendChild(settings)
 
+    def __repr__(self):
+        return "{module}.{type}<{path}>".format(
+            module=self.__module__,
+            type=type(self).__name__,
+            path=self.data(PathRole)
+        )
+
     @util.cached
     def fetch(self):
         print("Fetching projects..")
-        path = self[PathRole][0]
+        path = self.data(PathRole, 0)
 
         try:
             _, dirs, files = next(os.walk(path))
@@ -117,24 +125,25 @@ class Root(qhonestmodel.QHonestItem):
 class Project(qhonestmodel.QHonestItem):
     def __init__(self, text):
         super(Project, self).__init__(text)
-        self[DisplayRole][1] = ""
-        self[DefaultRole][1] = text
-        self[LoadedRole][0] = False
+        self.setData("", DisplayRole, 1)
+        self.setData(text, DefaultRole, 1)
+        self.setData(False, LoadedRole, 0)
 
-        versions = qhonestmodel.QPromiseItem("Loading versions...", func=self.fetch)
-        self.appendChild(versions)
+        self.appendChild(
+            qhonestmodel.QPromiseItem("Loading versions...", func=self.fetch)
+        )
 
     def flags(self, index):
         flags = super(Project, self).flags(index)
 
         # Let the user edit the version of this package
-        if self[LoadedRole][0] and index.column() == 1:
+        if self.data(LoadedRole, 0) and index.column() == 1:
             flags |= QtCore.Qt.ItemIsEditable
 
         return flags
 
     def fetch(self, count=5):
-        request = self[DisplayRole][0]
+        request = self.data(DisplayRole, 0)
         it = rez.packages_.iter_packages(request)
 
         package = None
@@ -142,9 +151,9 @@ class Project(qhonestmodel.QHonestItem):
             yield ProjectVersion(package)
 
         if package:
-            self[DisplayRole][1] = str(package.version)
+            self.setData(str(package.version), DisplayRole, 1)
 
-        self[LoadedRole][0] = True
+        self.setData(True, LoadedRole, 0)
 
         yield Finish
 
@@ -152,13 +161,14 @@ class Project(qhonestmodel.QHonestItem):
 class ProjectVersion(qhonestmodel.QHonestItem):
     def __init__(self, package):
         super(ProjectVersion, self).__init__(str(package.version))
-        self[PackageRole][0] = package
+        self.setData(package, PackageRole, 0)
 
-        apps = qhonestmodel.QPromiseItem("Loading applications...", func=self.fetch)
-        self.appendChild(apps)
+        self.appendChild(
+            qhonestmodel.QPromiseItem("Loading apps...", func=self.fetch)
+        )
 
     def fetch(self):
-        package = self[PackageRole][0]
+        package = self.data(PackageRole, 0)
         apps = getattr(package, "_apps", [])
 
         for app in apps:
@@ -170,28 +180,29 @@ class ProjectVersion(qhonestmodel.QHonestItem):
 class Application(qhonestmodel.QHonestItem):
     def __init__(self, text):
         super(Application, self).__init__(text)
-        self[PackageRole][0] = None
-        self[IconRole][0] = None
-        self[ContextRole][0] = None
-        self[VersionRole][0] = None
-        self[LoadedRole][0] = False
+        self.setData(None, PackageRole, 0)
+        self.setData(None, IconRole, 0)
+        self.setData(None, ContextRole, 0)
+        self.setData(None, VersionRole, 0)
+        self.setData(False, LoadedRole, 0)
 
-        context = qhonestmodel.QPromiseItem("Resolving context...", func=self.fetch)
-        self.appendChild(context)
+        self.appendChild(
+            qhonestmodel.QPromiseItem("Resolving context...", func=self.fetch)
+        )
 
     def flags(self, index):
         flags = super(Application, self).flags(index)
 
         # Let the user edit the version of this package
-        if self[LoadedRole][0] and index.column() == 1:
+        if self.data(LoadedRole, 0) and index.column() == 1:
             flags |= QtCore.Qt.ItemIsEditable
 
         return flags
 
     def fetch(self):
-        app_name = self[DisplayRole][0]
-        project_version = self.parent()[DisplayRole][0]
-        project_name = self.parent().parent()[DisplayRole][0]
+        app_name = self.data(DisplayRole)
+        project_version = self.parent().data(DisplayRole)
+        project_name = self.parent().parent().data(DisplayRole)
         request = ["%s-%s" % (project_name, project_version), app_name]
 
         rule = rez.package_filter.Rule.parse_rule("*.beta")
@@ -221,10 +232,10 @@ class Application(qhonestmodel.QHonestItem):
 
         # Append package metadata
         for role, value in _parse_package(package).items():
-            self[role][0] = value
+            self.setData(value, role, 0)
 
-        self[ContextRole][0] = context
-        self[DisplayRole][1] = str(package.version)
+        self.setData(context, ContextRole, 0)
+        self.setData(str(package.version), DisplayRole, 1)
 
         environ = {}
         for key, value in context.get_environ().items():
@@ -242,7 +253,7 @@ class Application(qhonestmodel.QHonestItem):
         for package in context.resolved_packages:
 
             # Needless
-            if package == self[PackageRole][0]:
+            if package == self.data(PackageRole, 0):
                 continue
 
             if package.name == project_name:
@@ -252,7 +263,7 @@ class Application(qhonestmodel.QHonestItem):
 
         yield packages
 
-        self[LoadedRole][0] = True
+        self.setData(True, LoadedRole, 0)
 
         yield Finish
 
@@ -279,14 +290,15 @@ class Package(qhonestmodel.QHonestItem):
 
     def __init__(self, package):
         super(Package, self).__init__(package.qualified_package_name)
-        self[DisplayRole][1] = str(package.version)
-        self[DefaultRole][1] = str(package.version)
+        self.setData(str(package.version), DisplayRole, 1)
+        self.setData(str(package.version), DefaultRole, 1)
 
         for role, value in _parse_package(package).items():
-            self[role][0] = value
+            self.setData(value, role, 0)
 
-        context = qhonestmodel.QPromiseItem("Loading versions...", func=self.fetch)
-        self.appendChild(context)
+        self.appendChild(
+            qhonestmodel.QPromiseItem("Loading versions...", func=self.fetch)
+        )
 
     def flags(self, index):
         flags = super(Package, self).flags(index)
@@ -298,7 +310,7 @@ class Package(qhonestmodel.QHonestItem):
         return flags
 
     def fetch(self):
-        request = self[PackageRole][0].name
+        request = self.data(PackageRole, 0).name
         it = rez.packages_.iter_packages(request)
 
         for index, package in enumerate(it):
@@ -401,7 +413,8 @@ class ApplicationModel(AbstractTableModel):
 
         for app in applications:
             root = os.path.dirname(app.uri)
-            icons = getattr(app, "_icons", {})
+            icons = getattr(app, "_data", {}).get("icons")
+            icons = icons or getattr(app, "_icons", {})  # backwards comp
             item = {
                 "name": app.name,
                 "version": str(app.version),

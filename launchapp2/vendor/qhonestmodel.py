@@ -18,6 +18,13 @@ _usercount = itertools.count(1)
 _threads = []
 
 
+try:
+    from queue import Queue
+except ImportError:
+    # Python 2
+    from Queue import Queue
+
+
 def UserRole():
     """Guarantee unique indices per user role"""
     return QtCore.Qt.UserRole + next(_usercount)
@@ -30,6 +37,7 @@ IconRole = QtCore.Qt.DecorationRole
 MadeRole = UserRole()
 HasFetchedRole = UserRole()
 LoadedRole = UserRole()
+CurrentRowRole = UserRole()
 Finish = None
 
 
@@ -60,9 +68,14 @@ class QHonestTreeModel(QtCore.QAbstractItemModel):
 
     promiseFulfilled = QtCore.Signal()
 
-    def __init__(self, root, parent=None):
+    def __init__(self, root=None, parent=None):
         super(QHonestTreeModel, self).__init__(parent)
-        self._root = root or QHonestItem("root")
+        self._root = root
+
+    def setRoot(self, root):
+        self.beginResetModel()
+        self._root = root
+        self.endResetModel()
 
     def flags(self, index):
         if not index.isValid():
@@ -105,22 +118,22 @@ class QHonestTreeModel(QtCore.QAbstractItemModel):
 
     def onPromiseFulfilled(self, promise, child):
         parent = promise.parent() or self._root
-        index = self.createIndex(0, 0, parent)
+        parentIndex = self.createIndex(0, 0, parent)
         self.layoutAboutToBeChanged.emit()
 
         # Remove promise on finish
         if child is Finish:
-            self.removeChild(index, promise)
+            self.removeChild(parentIndex, promise)
 
             # Special case of a promise not delivering any items
             if not parent.childCount():
-                self.appendChild(index, QHonestItem("Empty"))
+                self.appendChild(parentIndex, QHonestItem("Empty"))
 
             self.layoutChanged.emit()
             self.promiseFulfilled.emit()
             return
 
-        self.insertChild(index, -1, child)
+        self.insertChild(parentIndex, promise.row(), child)
         self.layoutChanged.emit()
 
     def onPromiseBroken(self, promise, error):
@@ -243,7 +256,7 @@ class QHonestTreeModel(QtCore.QAbstractItemModel):
             parentItem = parent.internalPointer()
 
         for child in parentItem.children():
-            if child[role][column] == text:
+            if child.data(role, column) == text:
                 yield child
 
     def findRowItem(self,
@@ -290,27 +303,29 @@ class QHonestTreeModel(QtCore.QAbstractItemModel):
         return parentItem.columnCount()
 
 
-class QHonestItem(collections.defaultdict):
+class QHonestItem(QtCore.QObject):
     def __init__(self, text):
-        super(QHonestItem, self).__init__(dict)
-        self[DisplayRole][0] = text
-        self[DisplayRole][1] = ""
-
+        super(QHonestItem, self).__init__(parent=None)
+        self._data = collections.defaultdict(dict)
         self._parent = None
         self._children = list()
 
+        self.setData(text, DisplayRole, 0)
+        self.setData("", DisplayRole, 1)
+        self.setData(0, CurrentRowRole)
+
     def __str__(self):
-        return self[DisplayRole][0]
+        return self.data(DisplayRole)
 
     def __repr__(self):
         return "{module}.{type}<{name}>".format(
             module=self.__module__,
             type=type(self).__name__,
-            name=self[DisplayRole][0]
+            name=self.data(DisplayRole)
         )
 
     def text(self, column=0):
-        return self[DisplayRole][column]
+        return self._data[DisplayRole][column]
 
     def flags(self, index):
         return (
@@ -319,11 +334,11 @@ class QHonestItem(collections.defaultdict):
         )
 
     def data(self, role, column=0):
-        if role not in self:
+        if role not in self._data:
             return
 
         try:
-            return self[role][column]
+            return self._data[role][column]
 
         except KeyError:
             # No such role
@@ -334,8 +349,7 @@ class QHonestItem(collections.defaultdict):
             pass
 
     def setData(self, value, role, column=0):
-        print("Setting %s.%s[%s] = %s" % (self, role, column, value))
-        self[role][column] = value
+        self._data[role][column] = value
 
     def findChild(self, value, role=DisplayRole):
         pass
@@ -388,7 +402,7 @@ class QHonestItem(collections.defaultdict):
         return len(self._children)
 
     def columnCount(self):
-        return len(self[DisplayRole])
+        return len(self._data[DisplayRole])
 
     def row(self):
         return (
@@ -412,7 +426,7 @@ class QHonestItem(collections.defaultdict):
                 rootItem.appendChild(child)
 
         else:
-            rootItem[DisplayRole][1] = str(data)
+            rootItem.setData(str(data), DisplayRole, 1)
 
         return rootItem
 
@@ -435,24 +449,39 @@ class QPromiseItem(QHonestItem):
         self._func = func
         self._args = args or []
         self._kwargs = kwargs or {}
+        self._result = Queue()
 
         self.made = False
 
     def make(self, onSuccess=None, onFailure=None):
         self.made = True
 
+        def _onSuccess(*result):
+            self._result.put(result)
+            return (onSuccess or default_success)(*result)
+
+        def _onFailure(*result):
+            self._result.put(result)
+            return (onFailure or default_failure)(*result)
+
         def _defer():
             defer(
                 self._func,
                 args=self._args,
                 kwargs=self._kwargs,
-                on_success=onSuccess or default_success,
-                on_failure=onFailure or default_failure,
+                on_success=_onSuccess,
+                on_failure=_onFailure,
             )
 
         delay(_defer, 10)
 
         return self
+
+    def get(self):
+        return self._result.get()
+
+    def wait(self):
+        self._result.get()
 
 
 if USE_THREADING:
