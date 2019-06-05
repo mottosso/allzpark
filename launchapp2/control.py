@@ -356,10 +356,13 @@ class Controller(QtCore.QObject):
 
             self.info("Launching %s.." % tool_name)
 
+            overrides = self._models["packages"]._overrides
+
             cmd = Command(
                 context=rez_context,
                 command=tool_name,
                 package=rez_app,
+                overrides=overrides,
                 parent=self
             )
 
@@ -604,7 +607,7 @@ class Command(QtCore.QObject):
     def __str__(self):
         return "Command('%s')" % self.cmd
 
-    def __init__(self, context, command, package, parent=None):
+    def __init__(self, context, command, package, overrides, parent=None):
         super(Command, self).__init__(parent)
         self.context = context
         self.app = package
@@ -619,7 +622,49 @@ class Command(QtCore.QObject):
             "stderr": subprocess.PIPE,
         }
 
-        self.popen = context.execute_shell(**kwargs)
+        # Apply overrides
+        o_context = context.copy()
+        o_packages = o_context.resolved_packages[:]
+
+        name_to_package_lut = {
+            package.name: package
+            for package in o_packages
+        }
+
+        for name, version in overrides.items():
+            try:
+                original = name_to_package_lut[name]
+            except KeyError:
+                # Override not part of this context, that's fine
+                continue
+
+            replacement = {
+                package.name: package
+                for package in rez.packages_.iter_packages(name, version)
+            }[name]
+
+            # It's bound to only have 1 variant
+            variants = list(replacement.iter_variants())
+
+            if len(variants) != 1:
+                log.warning(map(str, variants))
+                log.warning(
+                    "Multiple variants found for %s, "
+                    "this is currently unsupported, using last." % name
+                )
+
+            replacement = variants[-1]
+
+            o_packages.remove(original)
+            o_packages.append(replacement)
+
+            log.info("Overriding %s.%s -> %s.%s" % (
+                name, original.version,
+                name, replacement.version
+            ))
+
+        o_context.resolved_packages[:] = o_packages
+        self.popen = o_context.execute_shell(**kwargs)
 
         for target in (self.listen_on_stdout,
                        self.listen_on_stderr):
