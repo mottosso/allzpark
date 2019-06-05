@@ -883,8 +883,8 @@ class Packages(DockWidget):
         layout.addWidget(widgets["view"])
 
         widgets["view"].setStretch(1)
-        # widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
-        # widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
+        widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
+        widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
         widgets["view"].verticalHeader().setDefaultSectionSize(px(20))
         widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         # widgets["view"].customContextMenuRequested.connect(self.on_right_click)

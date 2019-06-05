@@ -337,17 +337,6 @@ class Controller(QtCore.QObject):
         self._state.to_booting()
         util.delay(do)
 
-    # @util.async_
-    # def resolve(self):
-    #     def do():
-    #         self._state.to_read()
-
-    #     thread = threading.Thread(target=do)
-    #     thread.daemon = True
-    #     thread.start()
-
-    #     self._state.to_resolving()
-
     @util.async_
     def launch(self):
         def do():
@@ -466,15 +455,16 @@ class Controller(QtCore.QObject):
         self._state["appName"] = app_name
         self.info("%s selected" % app_name)
 
-        # Clear existing data, in case any of
-        # the below commands throw an exception
-        self._models["packages"].reset()
-        self._models["context"].reset()
-        self._models["environment"].reset()
+        try:
+            context = self.context(app_name)
+            environ = self.environ(app_name)
+            packages = self.resolved_packages(app_name)
 
-        context = self.context(app_name)
-        environ = self.environ(app_name)
-        packages = self.resolved_packages(app_name)
+        except Exception:
+            self._models["packages"].reset()
+            self._models["context"].reset()
+            self._models["environment"].reset()
+            raise
 
         self._models["packages"].reset(packages)
         self._models["context"].load(context)

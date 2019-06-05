@@ -64,16 +64,22 @@ KwargsRole = qhonestmodel.UserRole()
 PathRole = qhonestmodel.UserRole()
 LabelRole = qhonestmodel.UserRole()
 ContextRole = qhonestmodel.UserRole()
+ProjectsRole = qhonestmodel.UserRole()
 VersionRole = qhonestmodel.UserRole()
 VersionsRole = qhonestmodel.UserRole()
 OverriddenRole = qhonestmodel.UserRole()
+ChildrenRole = qhonestmodel.UserRole()
 
 
 class Main(qhonestmodel.QHonestTreeModel):
     pass
 
 
-class Root(qhonestmodel.QHonestItem):
+class Item(qhonestmodel.QHonestItem):
+    pass
+
+
+class Root(Item):
     """Hosts one or more Project items"""
     def __init__(self, path):
         super(Root, self).__init__("root")
@@ -122,7 +128,7 @@ class Root(qhonestmodel.QHonestItem):
         yield Finish
 
 
-class Project(qhonestmodel.QHonestItem):
+class Project(Item):
     def __init__(self, text):
         super(Project, self).__init__(text)
         self.setData("", DisplayRole, 1)
@@ -158,7 +164,7 @@ class Project(qhonestmodel.QHonestItem):
         yield Finish
 
 
-class ProjectVersion(qhonestmodel.QHonestItem):
+class ProjectVersion(Item):
     def __init__(self, package):
         super(ProjectVersion, self).__init__(str(package.version))
         self.setData(package, PackageRole, 0)
@@ -169,7 +175,13 @@ class ProjectVersion(qhonestmodel.QHonestItem):
 
     def fetch(self):
         package = self.data(PackageRole, 0)
-        apps = getattr(package, "_apps", [])
+
+        apps = []
+        for req in package.requires:
+            if not req.weak:
+                continue
+
+            apps += [req.name]
 
         for app in apps:
             assert isinstance(app, _basestring)
@@ -177,7 +189,7 @@ class ProjectVersion(qhonestmodel.QHonestItem):
         yield Finish
 
 
-class Application(qhonestmodel.QHonestItem):
+class Application(Item):
     def __init__(self, text):
         super(Application, self).__init__(text)
         self.setData(None, PackageRole, 0)
@@ -285,7 +297,7 @@ def _parse_package(package):
     }
 
 
-class Package(qhonestmodel.QHonestItem):
+class Package(Item):
     """TODO: This could be a singleton"""
 
     def __init__(self, package):
@@ -318,7 +330,7 @@ class Package(qhonestmodel.QHonestItem):
         yield Finish
 
 
-class PackageVersion(qhonestmodel.QHonestItem):
+class PackageVersion(Item):
     def childCount(self):
         return 0
 
@@ -448,6 +460,11 @@ class PackagesModel(AbstractTableModel):
         "version",
     ]
 
+    def __init__(self, parent=None):
+        super(PackagesModel, self).__init__(parent)
+
+        self._overrides = {}
+
     def reset(self, packages=None):
         packages = packages or []
 
@@ -460,11 +477,12 @@ class PackagesModel(AbstractTableModel):
             item = {
                 "name": pkg.name,
                 "version": str(pkg.version),
-                "override": False,
+                "default": str(pkg.version),
                 "icon": QtGui.QIcon(
                     icons.get("32x32", "").format(root=root)
                 ),
                 "package": pkg,
+                "override": self._overrides.get(pkg.name),
                 "context": None,
                 "active": True,
             }
@@ -482,9 +500,7 @@ class PackagesModel(AbstractTableModel):
         except IndexError:
             return None
 
-        override = data["override"]
-
-        if override:
+        if data["override"] is not None:
             if role == QtCore.Qt.DisplayRole and col == 1:
                 return data["override"]
 
@@ -497,7 +513,12 @@ class PackagesModel(AbstractTableModel):
                 return QtGui.QColor("darkorange")
 
         try:
+            if role == "versions":
+                versions = list(rez.packages_.iter_packages(data["name"]))
+                return [str(v.version) for v in versions]
+
             return data[role]
+
         except KeyError:
             try:
                 key = self.ColumnToKey[col][role]
@@ -507,7 +528,12 @@ class PackagesModel(AbstractTableModel):
         return data[key]
 
     def setData(self, index, value, role):
-        print("Setting packages data..")
+        if value and role == "override":
+            index1 = self.index(0, 0, parent=index.parent())
+            package = self.data(index1, DisplayRole)
+            self._overrides[package] = value
+            log.info("Storing permanent override %s.%s" % (package, value))
+
         return super(PackagesModel, self).setData(index, value, role)
 
     def flags(self, index):

@@ -118,3 +118,39 @@ class DelegateProxy(QtWidgets.QStyledItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         return self._forward(
             "updateEditorGeometry", index, args=[editor, option, index])
+
+
+class Package(QtWidgets.QStyledItemDelegate):
+    def __init__(self, view, model, parent=None):
+        super(Package, self).__init__(parent)
+
+        self._view = view
+        self._model = model
+
+    def createEditor(self, parent, option, index):
+        if index.column() != 1:
+            return
+
+        editor = QtWidgets.QComboBox(parent)
+
+        return editor
+
+    def setEditorData(self, editor, index):
+        model = index.model()
+        options = model.data(index, "versions")
+        default = index.data(QtCore.Qt.DisplayRole)
+
+        editor.addItems(options)
+        editor.setCurrentIndex(options.index(default))
+
+    def setModelData(self, editor, model, index):
+        model = index.model()
+        options = model.data(index, "versions")
+        default = model.data(index, "default")
+        selected = options[editor.currentIndex()]
+
+        if selected == default:
+            # Reset to default
+            selected = None
+
+        model.setData(index, selected, "override")
