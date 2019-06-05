@@ -200,6 +200,9 @@ class Window(QtWidgets.QMainWindow):
             # Store reference for showEvent
             dock.toggle = toggle
 
+            # Store reference for update_advanced_controls
+            toggle.dock = dock
+
             # Create two-way connection; when dock is programatically
             # closed, or closed by other means, update toggle to reflect this.
             dock.visibilityChanged.connect(
@@ -285,6 +288,7 @@ class Window(QtWidgets.QMainWindow):
         # self.setup_menus()
         self.setup_docks()
         self.on_state_changed("booting")
+        self.update_advanced_controls()
 
     def createPopupMenu(self):
         """Null; defaults to checkboxes for docks and toolbars"""
@@ -322,6 +326,23 @@ class Window(QtWidgets.QMainWindow):
         menu.addAction(developer_mode)
 
         menu = bar.addMenu("&Help")
+
+    def update_advanced_controls(self):
+        shown = self._ctrl.state.retrieve("showAdvancedControls")
+        self._widgets["projectVersions"].setVisible(shown)
+
+        # Update dock toggles
+        toggles = self._widgets["dockToggles"].layout()
+        for index in range(toggles.count()):
+            item = toggles.itemAt(index)
+            widget = item.widget()
+            dock = widget.dock
+
+            visible = (not dock.advanced) or shown
+            widget.setVisible(visible)
+
+            if not visible:
+                dock.hide()
 
     def on_tool_changed(self, action):
         self.tell("%s triggered" % action.text())
@@ -369,6 +390,26 @@ class Window(QtWidgets.QMainWindow):
 
     def on_continue_clicked(self):
         self._ctrl.state.to_ready()
+
+    def on_setting_changed(self, argument):
+        if isinstance(argument, qargparse.Button):
+            if argument["name"] == "resetLayout":
+                self.tell("Restoring layout..")
+                geometry = self._ctrl.state.retrieve("default/geometry")
+                window = self._ctrl.state.retrieve("default/windowState")
+                self.restoreGeometry(geometry)
+                self.restoreState(window)
+            return
+
+        key = argument["name"]
+        value = argument.read()
+
+        self.tell("Storing %s = %s" % (key, value))
+        self._ctrl.state.store(argument["name"], argument.read())
+
+        # Subsequent settings are stored to disk
+        if key == "showAdvancedControls":
+            self.update_advanced_controls()
 
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
@@ -543,6 +584,7 @@ class Window(QtWidgets.QMainWindow):
             launch_btn.setText("Failed to resolve")
 
         self._widgets["stateIndicator"].setText(str(state))
+        self.update_advanced_controls()
 
     def on_launch_clicked(self):
         self._ctrl.launch()
@@ -682,6 +724,7 @@ class DockWidget(QtWidgets.QDockWidget):
     """Default HTML <b>docs</b>"""
 
     icon = ""
+    advanced = False
 
     def __init__(self, title, parent=None):
         super(DockWidget, self).__init__(title, parent)
@@ -874,6 +917,7 @@ class Packages(DockWidget):
     """Packages associated with the currently selected application"""
 
     icon = "File_Archive_32"
+    advanced = True
 
     def __init__(self, ctrl, parent=None):
         super(Packages, self).__init__("Packages", parent)
@@ -950,6 +994,7 @@ class Context(DockWidget):
     """Full context relative the currently selected application"""
 
     icon = "App_Generic_4_32"
+    advanced = True
 
     def __init__(self, parent=None):
         super(Context, self).__init__("Context", parent)
@@ -981,6 +1026,7 @@ class Environment(DockWidget):
     """Full environment relative the currently selected application"""
 
     icon = "App_Heidi_32"
+    advanced = True
 
     def __init__(self, parent=None):
         super(Environment, self).__init__("Environment", parent)
@@ -1012,6 +1058,7 @@ class Commands(DockWidget):
     """Currently running commands"""
 
     icon = "App_Pulse_32"
+    advanced = True
 
     def __init__(self, parent=None):
         super(Commands, self).__init__("Commands", parent)
@@ -1053,33 +1100,6 @@ class Commands(DockWidget):
         self._widgets["view"].setModel(model)
 
 
-class _Option(dict):
-    def __init__(self, name, **kwargs):
-        super(_Option, self).__init__(name=name, **kwargs)
-
-        self["label"] = name
-
-
-class Boolean(_Option):
-    pass
-
-
-class String(_Option):
-    pass
-
-
-class Info(_Option):
-    pass
-
-
-class Color(_Option):
-    pass
-
-
-class Button(_Option):
-    pass
-
-
 class Preferences(DockWidget):
     """Preferred settings relative the current user"""
 
@@ -1114,7 +1134,7 @@ class Preferences(DockWidget):
         qargparse.Boolean("allowMultipleDocks", help=(
             "Allow more than one dock to exist at a time"
         )),
-        qargparse.Boolean("developerMode", enabled=False, help=(
+        qargparse.Boolean("showAdvancedControls", help=(
             "Show developer-centric controls"
         )),
 
@@ -1167,17 +1187,7 @@ class Preferences(DockWidget):
         self.setWidget(panels["scrollarea"])
 
     def handler(self, argument):
-        if argument["name"] == "resetLayout":
-            self._window.tell("Restoring layout..")
-            geometry = self._ctrl.state.retrieve("default/geometry")
-            window = self._ctrl.state.retrieve("default/windowState")
-            self._window.restoreGeometry(geometry)
-            self._window.restoreState(window)
-
-        else:
-            self._window.tell("Storing %s = %s" % (argument["name"],
-                                                   argument.read()))
-            self._ctrl.state.store(argument["name"], argument.read())
+        self._window.on_setting_changed(argument)
 
 
 class SlimTableView(QtWidgets.QTableView):
