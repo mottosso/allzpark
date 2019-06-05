@@ -471,6 +471,14 @@ class Controller(QtCore.QObject):
 
         self._models["packages"].reset(packages)
         self._models["context"].load(context)
+
+        # Convert PATH environment variables to lists
+        # for improved viewing experience
+        for key, value in environ.copy().items():
+            if os.pathsep in value:
+                value = value.split(os.pathsep)
+            environ[key] = value
+
         self._models["environment"].load(environ)
 
         rez_pkg = self._state["rezApps"][app_name]
