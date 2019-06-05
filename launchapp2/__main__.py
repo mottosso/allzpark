@@ -93,6 +93,7 @@ defaults = {
     "rezPackagesPath": config.packages_path,
     "rezLocalPath": config.local_packages_path.split(os.pathsep),
     "rezReleasePath": config.release_packages_path.split(os.pathsep),
+    "settingsPath": storage.fileName(),
 }
 
 for key, value in defaults.items():

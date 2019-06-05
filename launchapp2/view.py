@@ -379,7 +379,7 @@ class Window(QtWidgets.QMainWindow):
         # Handle the easy cases first
         app = QtWidgets.QApplication.instance()
         ctrl_held = app.keyboardModifiers() & QtCore.Qt.ControlModifier
-        allow_multiple = self._ctrl.state.retrieve("allowMultipleDocks")
+        allow_multiple = int(self._ctrl.state.retrieve("allowMultipleDocks"))
 
         if ctrl_held or not allow_multiple:
             for d in self._docks.values():
@@ -1128,10 +1128,11 @@ class Preferences(DockWidget):
         qargparse.Info("qtBindingVersion"),
         qargparse.Info("rezLocation"),
         qargparse.Info("rezVersion"),
+        qargparse.Info("memcachedURI"),
         qargparse.InfoList("rezPackagesPath"),
         qargparse.InfoList("rezLocalPath"),
         qargparse.InfoList("rezReleasePath"),
-        qargparse.Info("memcachedURI"),
+        qargparse.Info("settingsPath"),
     ]
 
     def __init__(self, window, ctrl, parent=None):
