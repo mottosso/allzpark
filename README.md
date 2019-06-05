@@ -4,6 +4,8 @@
 
 The Rez-based application launcher for film and games.
 
+> "launchapp2" is a working title, to change once having reached some level of maturity
+
 <br>
 
 ### Features
@@ -79,6 +81,17 @@ set REZ_MEMCACHED_URI=127.0.0.1:11211
 
 <br>
 
+### Beta versus Stable
+
+LA2 distinguishes between packages suffixed with `.beta` and those that aren't.
+
+- `texteditor-1.0.0`
+- `texteditor-1.1.0.beta`
+
+Per default, these beta-versions are invisible and must be explicitly required. The idea is to facilitate the development of new versions, without affecting a stable environment. Beta versions are opt-in, meaning a user is able to gamble with an environment so long as it's intended.
+
+<br>
+
 ### Debugging
 
 Launch App accesses files and network using threads to avoid locking up the interface. Sometimes, threads can cause issues and so this flag can be used to disable use of threads alltogether. Under normal circumstances, you should find actions running quicker without threads, at the expense of user interactivity.
@@ -93,3 +106,8 @@ $ set LAUNCHAPP_NOTHREADING=True
 
 ![launchapp_2](https://user-images.githubusercontent.com/2152766/58943970-be4c2f80-8778-11e9-9344-66007ba5cb5b.gif)
 ![launchapp_3](https://user-images.githubusercontent.com/2152766/58943973-bee4c600-8778-11e9-809a-cf2aaf7c94c0.gif)
+![launchapp_4](https://user-images.githubusercontent.com/2152766/58946617-3cf79b80-877e-11e9-8887-df9a92cb1851.gif)
+![launchapp_5](https://user-images.githubusercontent.com/2152766/58949561-a5e21200-8784-11e9-8796-d99736c84835.gif)
+![launchapp_6](https://user-images.githubusercontent.com/2152766/58950543-f5c1d880-8786-11e9-88f2-08204f5ac1d9.gif)
+![launchapp2_7](https://user-images.githubusercontent.com/2152766/58956502-5ad0fa80-8796-11e9-9596-01ca80d32317.gif)
+![launchapp_8](https://user-images.githubusercontent.com/2152766/58959026-16485d80-879c-11e9-8964-e277490dbf5f.gif)
