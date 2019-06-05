@@ -1,53 +1,74 @@
+![launchapp_1](https://user-images.githubusercontent.com/2152766/58943971-bee4c600-8778-11e9-8117-f50fe260cee0.gif)
+
+### launchapp2
+
+The Rez-based application launcher for film and games.
+
+<br>
+
+### Features
+
+- Complete control over dependencies per-project
+- Integration with Rez package management
+- Per-package metadata, such as icons and label
+
+<br>
+
 ### Prerequisities
 
-This project requires Rez and memcached to be setup.
-
 ```bash
-c:\python27\python pip install pip bleeding-rez -U --user
-rez bind python
+pip install bleeding-rez PySide
 ```
 
-Next, setup your environmen. This can (and should) be stored in a `.bat` script of sorts.
+Next, setup your environment. This can (and should) be stored in a `.bat` script of sorts.
 
 ```bash
-set LOCAL_PACKAGES=%userprofile%\packages
-set SERVER_PACKAGE_ROOT=\\studioanima.local\Main\common\tools\packages
-set TD_PACKAGES=%SERVER_PACKAGE_ROOT%\td
-set INTERNAL_PACKAGES=%SERVER_PACKAGE_ROOT%\int
-set EXTERNAL_PACKAGES=%SERVER_PACKAGE_ROOT%\ext
-set CONVERTED_PACKAGES=%SERVER_PACKAGE_ROOT%\converted
-set REZ_PACKAGES_PATH=%LOCAL_PACKAGES%;%TD_PACKAGES%;%INTERNAL_PACKAGES%;%EXTERNAL_PACKAGES%;%CONVERTED_PACKAGES%
-```
+:: Set these to something appropriate
+set _LOCAL_PACKAGES=%userprofile%\packages
+set _SERVER_PACKAGES=%userprofile%\.rez\packages
 
-Finally, tell Rez about where to find memcached. Without this, resolving packages go from 0.1 seconds to 10+ seconds.
-
-```bash
-set REZ_MEMCACHED_URI=10.100.50.81:11211
+set REZ_PACKAGES_PATH=%_LOCAL_PACKAGES%;%_SERVER_PACKAGES%
 ```
 
 <br>
 
 ### Usage
 
-The project currently resides within a branch.
-
 ```bash
-git clone https://gitlab.studioanima.co.jp/ishikawa_y/standalone-launchapp.git
-cd standalone-launchapp
-git checkout launchapp2
+git clone https://github.com/mottosso/launchapp2.git
+cd launchapp2
+./launchapp2.bat
 ```
 
-Finally, launch!
+<br>
+
+### Options
+
+- Set `LAUNCHAPP_ROOT` to where your projects reside, defaults to `~/projects`
+- Set `LAUNCHAPP_REQUIRE` to which requirements you'd like for launchapp2 to use.
+
+**Requirements**
+
+launchapp2 can be run with these versions.
+
+- Python `2.7,3.6+`
+- Qt `4,5`
+- Qt-binding `PySide, PySide2, PyQt4 or PyQt5`
+
+<br>
+
+### Performance
+
+Resolving packages can take some time, so to accelerate this process requests for packages can be cached within a server-side application called "memcached". Once you've got it running, resolving packages go from 0.1 seconds to 10+ seconds.
+
+
+Prior to launching launchapp2, append this to your environment.
 
 ```bash
-rez env PySide six -- python -m launchapp2 --root \\studioanima.local\Main\ANIMA\projects --verbose
+set REZ_MEMCACHED_URI=127.0.0.1:11211
 ```
 
-Details:
-
-- `rez env` establishes an environment with requirements
-- Anything after `--` are commands run within that environment
-- `PySide` and `six` are coming from the globally shared package repository, at `REZ_PACKAGES_PATH`.
+> This would typically reside at a network address.
 
 <br>
 
@@ -66,3 +87,10 @@ Launch App accesses files and network using threads to avoid locking up the inte
 ```bash
 $ set LAUNCHAPP_NOTHREADING=True
 ```
+
+<br>
+
+### More Gifs
+
+![launchapp_2](https://user-images.githubusercontent.com/2152766/58943970-be4c2f80-8778-11e9-9344-66007ba5cb5b.gif)
+![launchapp_3](https://user-images.githubusercontent.com/2152766/58943973-bee4c600-8778-11e9-809a-cf2aaf7c94c0.gif)
