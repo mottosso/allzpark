@@ -373,19 +373,24 @@ class Window(QtWidgets.QMainWindow):
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
-        # Override any currently visible dock if CTRL is held
+        if not visible:
+            return
+
+        # Handle the easy cases first
         app = QtWidgets.QApplication.instance()
-        if app.keyboardModifiers() & QtCore.Qt.ControlModifier:
+        ctrl_held = app.keyboardModifiers() & QtCore.Qt.ControlModifier
+        allow_multiple = self._ctrl.state.retrieve("allowMultipleDocks")
+
+        if ctrl_held or not allow_multiple:
             for d in self._docks.values():
                 d.setVisible(d == dock)
             return
 
+        # Otherwise we'll want to make the newly visible dock the active tab.
+
         # Turns out to not be that easy
         # https://forum.qt.io/topic/42044/
         # tabbed-qdockwidgets-how-to-fetch-the-qwidgets-under-a-qtabbar/10
-
-        if not visible:
-            return
 
         # TabBar's are dynamically created as the user
         # moves docks around, and not all of them are
@@ -1103,13 +1108,13 @@ class Preferences(DockWidget):
 
         qargparse.Separator("Settings"),
 
-        qargparse.Boolean("smallIcons", help=(
+        qargparse.Boolean("smallIcons", enabled=False, help=(
             "Draw small icons"
         )),
         qargparse.Boolean("allowMultipleDocks", help=(
             "Allow more than one dock to exist at a time"
         )),
-        qargparse.Boolean("developerMode", help=(
+        qargparse.Boolean("developerMode", enabled=False, help=(
             "Show developer-centric controls"
         )),
 
@@ -1123,9 +1128,9 @@ class Preferences(DockWidget):
         qargparse.Info("qtBindingVersion"),
         qargparse.Info("rezLocation"),
         qargparse.Info("rezVersion"),
-        qargparse.Info("rezPackagesPath"),
-        qargparse.Info("rezLocalPath"),
-        qargparse.Info("rezReleasePath"),
+        qargparse.InfoList("rezPackagesPath"),
+        qargparse.InfoList("rezLocalPath"),
+        qargparse.InfoList("rezReleasePath"),
         qargparse.Info("memcachedURI"),
     ]
 

@@ -90,9 +90,9 @@ defaults = {
     "qtBindingVersion": Qt.__qt_version__,
     "rezLocation": os.path.dirname(_rez_location),
     "rezVersion": _rez_version,
-    "rezPackagesPath": ", ".join(config.packages_path),
-    "rezLocalPath": config.local_packages_path,
-    "rezReleasePath": config.release_packages_path,
+    "rezPackagesPath": config.packages_path,
+    "rezLocalPath": config.local_packages_path.split(os.pathsep),
+    "rezReleasePath": config.release_packages_path.split(os.pathsep),
 }
 
 for key, value in defaults.items():
