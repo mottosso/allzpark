@@ -198,7 +198,7 @@ class Boolean(QArgument):
                 "2": QtCore.Qt.Checked,
             }
         else:
-            self.read = lambda: int(widget.checkState())
+            self.read = lambda: bool(widget.checkState())
             state = {
                 0: QtCore.Qt.Unchecked,
                 1: QtCore.Qt.Checked,
@@ -321,15 +321,11 @@ class InfoList(QArgument):
         label = QtWidgets.QLabel(self["name"])
         label.setAlignment(QtCore.Qt.AlignBottom)
 
-        def on_edited(topleft, bottomright, roles=None):
-            self.changed.emit()
-
         class Model(QtCore.QStringListModel):
             def data(self, index, role):
                 return super(Model, self).data(index, role)
 
         model = QtCore.QStringListModel(self["default"])
-        model.dataChanged.connect(on_edited)
         widget = QtWidgets.QListView()
         widget.setModel(model)
         widget.setEditTriggers(widget.NoEditTriggers)
