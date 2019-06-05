@@ -485,6 +485,7 @@ class PackagesModel(AbstractTableModel):
                 "override": self._overrides.get(pkg.name),
                 "context": None,
                 "active": True,
+                "versions": None
             }
 
             self.items.append(item)
@@ -513,9 +514,9 @@ class PackagesModel(AbstractTableModel):
                 return QtGui.QColor("darkorange")
 
         try:
-            if role == "versions":
+            if role == "versions" and data["versions"] is None:
                 versions = list(rez.packages_.iter_packages(data["name"]))
-                return [str(v.version) for v in versions]
+                data["versions"] = sorted([str(v.version) for v in versions])
 
             return data[role]
 
@@ -529,10 +530,14 @@ class PackagesModel(AbstractTableModel):
 
     def setData(self, index, value, role):
         if value and role == "override":
-            index1 = self.index(0, 0, parent=index.parent())
-            package = self.data(index1, DisplayRole)
-            self._overrides[package] = value
-            log.info("Storing permanent override %s.%s" % (package, value))
+            default = self.data(index, "default")
+            package = self.data(index, "package").name
+
+            if value != default:
+                log.info("Storing permanent override %s.%s" % (package, value))
+            else:
+                log.info("Resetting to default")
+                value = None
 
         return super(PackagesModel, self).setData(index, value, role)
 

@@ -373,11 +373,16 @@ class Window(QtWidgets.QMainWindow):
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
+        # Override any currently visible dock if CTRL is held
+        app = QtWidgets.QApplication.instance()
+        if app.keyboardModifiers() & QtCore.Qt.ControlModifier:
+            for d in self._docks.values():
+                d.setVisible(d == dock)
+            return
+
         # Turns out to not be that easy
         # https://forum.qt.io/topic/42044/
         # tabbed-qdockwidgets-how-to-fetch-the-qwidgets-under-a-qtabbar/10
-
-        uid = dock.windowTitle()  # note: This must be unique
 
         if not visible:
             return
@@ -389,6 +394,8 @@ class Window(QtWidgets.QMainWindow):
 
         # The children of a QTabBar isn't the dock directly, but rather
         # the buttons in the tab, which are of type QToolButton.
+
+        uid = dock.windowTitle()  # note: This must be unique
 
         # Find which tab is associated to this QDockWidget, if any
         def find_dock(bar):
@@ -887,7 +894,7 @@ class Packages(DockWidget):
         widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
         widgets["view"].verticalHeader().setDefaultSectionSize(px(20))
         widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        # widgets["view"].customContextMenuRequested.connect(self.on_right_click)
+        widgets["view"].customContextMenuRequested.connect(self.on_right_click)
 
         self._ctrl = ctrl
         self._widgets = widgets
@@ -895,35 +902,43 @@ class Packages(DockWidget):
     def set_model(self, model):
         self._widgets["view"].setModel(model)
 
-    # def on_right_click(self, position):
-    #     view = self._widgets["view"]
-    #     index = view.indexAt(position)
+    def on_right_click(self, position):
+        view = self._widgets["view"]
+        index = view.indexAt(position)
 
-    #     menu = QtWidgets.QMenu(self)
-    #     edit = QtWidgets.QAction("Edit")
-    #     reset = QtWidgets.QAction("Reset")
-    #     latest = QtWidgets.QAction("Set to latest")
-    #     earliest = QtWidgets.QAction("Set to earliest")
+        menu = QtWidgets.QMenu(self)
+        edit = QtWidgets.QAction("Edit")
+        default = QtWidgets.QAction("Set to default")
+        latest = QtWidgets.QAction("Set to latest")
+        earliest = QtWidgets.QAction("Set to earliest")
 
-    #     menu.addAction(edit)
-    #     menu.addAction(reset)
-    #     menu.addAction(latest)
-    #     menu.addAction(earliest)
-    #     menu.move(QtGui.QCursor.pos())
+        menu.addAction(edit)
+        menu.addAction(default)
+        menu.addAction(latest)
+        menu.addAction(earliest)
+        menu.move(QtGui.QCursor.pos())
 
-    #     picked = menu.exec_()
+        picked = menu.exec_()
 
-    #     if picked is None:
-    #         return  # Cancelled
+        if picked is None:
+            return  # Cancelled
 
-    #     if picked == edit:
-    #         self.edit_version(index)
+        if picked == edit:
+            self._widgets["view"].edit(index)
 
-    # def on_double_click(self, index):
-    #     self.edit_version(index, popup=True)
+        if picked == default:
+            model = index.model()
+            model.setData(index, None, "override")
 
-    # def on_version_edited(self, index):
-    #     print("")
+        if picked == earliest:
+            model = index.model()
+            versions = model.data(index, "versions")
+            model.setData(index, versions[0], "override")
+
+        if picked == latest:
+            model = index.model()
+            versions = model.data(index, "versions")
+            model.setData(index, versions[-1], "override")
 
 
 class Context(DockWidget):
