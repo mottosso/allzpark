@@ -26,7 +26,6 @@ Next, setup your environment. This can (and should) be stored in a `.bat` script
 :: Set these to something appropriate
 set _LOCAL_PACKAGES=%userprofile%\packages
 set _SERVER_PACKAGES=%userprofile%\.rez\packages
-
 set REZ_PACKAGES_PATH=%_LOCAL_PACKAGES%;%_SERVER_PACKAGES%
 ```
 
@@ -59,7 +58,7 @@ launchapp2 can be run with these versions.
 
 ### Performance
 
-Resolving packages can take some time, so to accelerate this process requests for packages can be cached within a server-side application called "memcached". Once you've got it running, resolving packages go from 0.1 seconds to 10+ seconds.
+Resolving packages can take some time, so to accelerate this process requests for packages can be cached within a server-side application called "memcached". Once you've got it running, resolving packages go from 10+ seconds to 0.1+ seconds.
 
 
 Prior to launching launchapp2, append this to your environment.
