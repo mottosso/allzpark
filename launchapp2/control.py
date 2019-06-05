@@ -81,7 +81,20 @@ class State(dict):
 
         """
 
-        return self._storage.value(key)
+        value = self._storage.value(key)
+
+        # Account for poor serialisation format
+        # TODO: Implement a better format
+        true = ["2", "1", "true", True, 1, 2]
+        false = ["0", "false", False, 0]
+
+        if value in true:
+            value = True
+
+        if value in false:
+            value = False
+
+        return value
 
     def on_enter_booting(self):
         self._ctrl.info("Booting..")
