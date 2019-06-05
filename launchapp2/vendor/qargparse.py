@@ -198,10 +198,15 @@ class Boolean(QArgument):
                 "2": QtCore.Qt.Checked,
             }
         else:
-            self.read = lambda: bool(widget.checkState())
+            self.read = lambda: int(widget.checkState())
             state = {
                 0: QtCore.Qt.Unchecked,
                 1: QtCore.Qt.Checked,
+                2: QtCore.Qt.Checked,
+
+                "0": QtCore.Qt.Unchecked,
+                "1": QtCore.Qt.Checked,
+                "2": QtCore.Qt.Checked,
 
                 # May be stored as string, if used with QSettings(..IniFormat)
                 "false": QtCore.Qt.Unchecked,
