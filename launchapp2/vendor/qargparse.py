@@ -105,6 +105,7 @@ class QArgumentParser(QtWidgets.QWidget):
             widget.setObjectName(arg["name"])  # useful in CSS
             widget.setProperty("type", type(arg).__name__)
             widget.setAttribute(QtCore.Qt.WA_StyledBackground)
+            widget.setEnabled(arg["enabled"])
 
         layout.addWidget(c0, self._row, 0, QtCore.Qt.AlignTop)
         layout.addWidget(c1, self._row, 1)
@@ -136,6 +137,7 @@ class QArgument(QtCore.QObject):
         kwargs["help"] = kwargs.get("help", "")
         kwargs["read"] = kwargs.get("read")
         kwargs["write"] = kwargs.get("write")
+        kwargs["enabled"] = bool(kwargs.get("enabled", True))
 
         self._data = kwargs
 
@@ -305,10 +307,10 @@ class Toggle(Button):
     pass
 
 
-class List(QArgument):
+class InfoList(QArgument):
     def __init__(self, name, **kwargs):
-        kwargs["items"] = kwargs.get("items", ["No items"])
-        super(List, self).__init__(name, **kwargs)
+        kwargs["default"] = kwargs.get("default", ["Empty"])
+        super(InfoList, self).__init__(name, **kwargs)
 
     def create(self):
         label = QtWidgets.QLabel(self["name"])
@@ -321,10 +323,11 @@ class List(QArgument):
             def data(self, index, role):
                 return super(Model, self).data(index, role)
 
-        model = QtCore.QStringListModel(self["items"] + [""])
+        model = QtCore.QStringListModel(self["default"])
         model.dataChanged.connect(on_edited)
         widget = QtWidgets.QListView()
         widget.setModel(model)
+        widget.setEditTriggers(widget.NoEditTriggers)
 
         self.read = lambda: model.stringList()
         self.write = lambda value: model.setStringList(value)
@@ -422,7 +425,7 @@ def _demo():
     ], default=2, help="Your class")
 
     parser.add_argument("options", type=Separator)
-    parser.add_argument("paths", type=List, items=[
+    parser.add_argument("paths", type=InfoList, items=[
         "Value A",
         "Value B",
         "Some other value",
