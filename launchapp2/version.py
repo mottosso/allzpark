@@ -1,18 +1,35 @@
-import os as _os
-import subprocess as _subprocess
+"""Version includes the Git revision number
+
+This module separates between deployed and development versions of launchapp2.
+A development version draws its minor version directly from Git, the total
+number of commits on the current branch equals the revision number. Once
+deployed, this number is embedded into the Python package.
+
+"""
 
 try:
-    # If used as a git repository
-    _cwd = _os.path.dirname(__file__)
-    patch = int(_subprocess.check_output(
-        "git rev-list HEAD --count", cwd=_cwd,
+    # Look for serialised version
+    from .__version__ import version
 
-        # Ensure strings are returned from both Python 2 and 3
-        universal_newlines=True
+except ImportError:
+    # Else, we're likely running out of a Git repository
+    import os as _os
+    import subprocess as _subprocess
 
-    ).rstrip())
-except Exception as e:
-    # Otherwise, no big deal
-    patch = 0
+    try:
+        # If used as a git repository
+        _cwd = _os.path.dirname(__file__)
+        _patch = int(_subprocess.check_output(
+            "git rev-list HEAD --count", cwd=_cwd,
 
-version = "1.1" + (".%s" % patch) if patch else ""
+            # Ensure strings are returned from both Python 2 and 3
+            universal_newlines=True
+
+        ).rstrip())
+    except Exception as e:
+        # Otherwise, no big deal
+        _patch = 0
+
+    # Note to reader:
+    # Increment this when relevant
+    version = "1.1" + (".%s" % _patch) if _patch else ""

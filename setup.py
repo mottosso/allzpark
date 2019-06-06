@@ -1,5 +1,6 @@
 """A cross-platform launcher for film and games projects, built on Rez"""
 
+import os
 from setuptools import setup, find_packages
 from launchapp2.version import version
 
@@ -17,6 +18,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+# Store version alongside package
+dirname = os.path.dirname(__file__)
+fname = os.path.join(dirname, "launchapp2", "__version__.py")
+with open(fname, "w") as f:
+    f.write("version = \"%s\"\n" % version)
+
 setup(
     name="launchapp2",
     version=version,
@@ -33,8 +40,8 @@ setup(
     packages=find_packages(),
     package_data={
         "launchapp2": [
-            "resources/*.png"
-            "resources/*.css"
+            "resources/*.png",
+            "resources/*.css",
         ]
     },
     classifiers=classifiers,
