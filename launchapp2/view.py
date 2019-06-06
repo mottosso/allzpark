@@ -949,7 +949,6 @@ class Packages(DockWidget):
         widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
 
-        widgets["status"].showMessage("It's working")
         widgets["status"].setSizeGripEnabled(False)
 
         self._ctrl = ctrl
