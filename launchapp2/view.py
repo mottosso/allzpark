@@ -554,61 +554,6 @@ class Window(QtWidgets.QMainWindow):
         super(Window, self).closeEvent(event)
 
 
-class ProjectBrowser(QtWidgets.QDialog):
-    accepted = QtCore.Signal(str)  # project
-    declined = QtCore.Signal()
-
-    def __init__(self, current, projects, parent=None):
-        super(ProjectBrowser, self).__init__(parent)
-        self.setWindowFlags(QtCore.Qt.Popup)
-        self.setWindowTitle("Projects..")
-        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-
-        widgets = {
-            "listing": QtWidgets.QListWidget(),
-        }
-
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(widgets["listing"])
-
-        for row, project in enumerate(projects):
-            QtWidgets.QListWidgetItem(project, widgets["listing"])
-
-            if project == current:
-                widgets["listing"].setCurrentRow(row)
-
-        widgets["listing"].itemClicked.connect(self.accept)
-        widgets["listing"].itemActivated.connect(self.accept)
-
-        self._widgets = widgets
-
-    def setFocus(self, reason=None):
-        """Focus means focus on the listing itself"""
-        self._widgets["listing"].setFocus()
-
-    def keyPressEvent(self, event):
-        if event.key() in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
-            return self.accept()
-
-        # ESC is natively associated with hideEvent
-        super(ProjectBrowser, self).keyPressEvent(event)
-
-    def accept(self, item=None):
-        if not item:
-            listing = self._widgets["listing"]
-            item = listing.selectedItems()[0]
-        self.accepted.emit(item.text())
-        self.close()
-
-    def decline(self):
-        self.declined.emit()
-        self.close()
-
-    def hideEvent(self, event):
-        self.decline()
-
-
 class DockWidget(QtWidgets.QDockWidget):
     """Default HTML <b>docs</b>"""
 
