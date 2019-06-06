@@ -10,8 +10,28 @@ from .version import version
 
 
 def tell(msg):
-    print(" %s" % msg)
+    print("%s" % msg)
 
+
+parser = argparse.ArgumentParser("launchapp 2.0", description=(
+    "An application launcher built on Rez, "
+    "pass --help for details"
+))
+
+parser.add_argument("--verbose", action="store_true")
+parser.add_argument("--version", action="store_true")
+parser.add_argument("--clear-settings", action="store_true")
+parser.add_argument("--startup-project")
+parser.add_argument("--root",
+                    default=os.getenv("LAUNCHAPP_PROJECTS"),
+                    help="Path to where projects live on disk, "
+                         "defaults to LAUNCHAPP_PROJECTS")
+
+opts = parser.parse_args()
+
+if opts.version:
+    tell(version)
+    exit(0)
 
 print("=" * 30)
 print(" launchapp2 (%s)" % version)
@@ -46,21 +66,6 @@ sys.modules["six"] = six
 tell("- Loading launchapp2..")
 
 from . import view, control, resources, util
-
-parser = argparse.ArgumentParser("launchapp 2.0", description=(
-    "An application launcher built on Rez, "
-    "pass --help for details"
-))
-
-parser.add_argument("--verbose", action="store_true")
-parser.add_argument("--clear-settings", action="store_true")
-parser.add_argument("--startup-project")
-parser.add_argument("--root",
-                    default=os.getenv("LAUNCHAPP_PROJECTS"),
-                    help="Path to where projects live on disk, "
-                         "defaults to LAUNCHAPP_PROJECTS")
-
-opts = parser.parse_args()
 
 logging.basicConfig(format=(
     "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
