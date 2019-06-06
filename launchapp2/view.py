@@ -328,7 +328,7 @@ class Window(QtWidgets.QMainWindow):
         menu = bar.addMenu("&Help")
 
     def update_advanced_controls(self):
-        shown = self._ctrl.state.retrieve("showAdvancedControls")
+        shown = bool(self._ctrl.state.retrieve("showAdvancedControls"))
         self._widgets["projectVersions"].setVisible(shown)
 
         # Update dock toggles
@@ -420,7 +420,7 @@ class Window(QtWidgets.QMainWindow):
         # Handle the easy cases first
         app = QtWidgets.QApplication.instance()
         ctrl_held = app.keyboardModifiers() & QtCore.Qt.ControlModifier
-        allow_multiple = int(self._ctrl.state.retrieve("allowMultipleDocks"))
+        allow_multiple = bool(self._ctrl.state.retrieve("allowMultipleDocks"))
 
         if ctrl_held or not allow_multiple:
             for d in self._docks.values():
