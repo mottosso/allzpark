@@ -639,71 +639,76 @@ class Command(QtCore.QObject):
                  parent=None):
         super(Command, self).__init__(parent)
 
-        overrides = overrides or {}
-        disabled = disabled or {}
+        self.overrides = overrides or {}
+        self.disabled = disabled or {}
 
         self.context = context
         self.app = package
+        self.popen = None
 
         # `cmd` rather than `command`, to distinguish
         # between class and argument
         self.cmd = command
 
+        # Launching may take a moment, and there's no need
+        # for the user to wait around for that to happen.
+        thread = threading.Thread(target=self.execute)
+        thread.daemon = True
+        thread.start()
+
+        self.thread = thread
+
+    def execute(self):
         kwargs = {
-            "command": command,
+            "command": self.cmd,
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
         }
 
-        # Apply overrides to a new context, to preserve the original
-        o_context = ResolvedContext(context.requested_packages())
-        o_packages = o_context.resolved_packages[:]
+        context = self.context
 
-        name_to_package_lut = {
-            package.name: package
-            for package in o_packages
-        }
+        if self.overrides or self.disabled:
+            # Apply overrides to a new context, to preserve the original
+            context = ResolvedContext(context.requested_packages())
+            packages = context.resolved_packages[:]
 
-        for name, version in overrides.items():
-            try:
-                original = name_to_package_lut[name]
-            except KeyError:
-                # Override not part of this context, that's fine
-                continue
-
-            replacement = {
+            name_to_package_lut = {
                 package.name: package
-                for package in rez.packages_.iter_packages(name, version)
-            }[name]
+                for package in packages
+            }
 
-            # It's bound to only have 1 variant
-            variants = list(replacement.iter_variants())
+            for name, version in self.overrides.items():
+                try:
+                    original = name_to_package_lut[name]
+                except KeyError:
+                    # Override not part of this context, that's fine
+                    continue
 
-            if len(variants) != 1:
-                log.warning(map(str, variants))
-                log.warning(
-                    "Multiple variants found for %s, "
-                    "this is currently unsupported, using last." % name
-                )
+                # Find a replacement, taking implciit variants into account
+                request = "%s-%s" % (name, version)
+                replacement = ResolvedContext([request])
+                replacement = {
+                    package.name: package
+                    for package in replacement.resolved_packages
+                }[name]
 
-            replacement = variants[-1]
+                packages.remove(original)
+                packages.append(replacement)
 
-            o_packages.remove(original)
-            o_packages.append(replacement)
+                log.info("Overriding %s.%s -> %s.%s" % (
+                    name, original.version,
+                    name, replacement.version
+                ))
 
-            log.info("Overriding %s.%s -> %s.%s" % (
-                name, original.version,
-                name, replacement.version
-            ))
+            for package_name in self.disabled:
+                package = name_to_package_lut[package_name]
+                packages.remove(package)
 
-        for package_name in disabled:
-            package = name_to_package_lut[package_name]
-            o_packages.remove(package)
+                log.info("Disabling %s" % package_name)
 
-            log.info("Disabling %s" % package_name)
+            context.resolved_packages[:] = packages
 
-        o_context.resolved_packages[:] = o_packages
-        self.popen = o_context.execute_shell(**kwargs)
+        self.popen = context.execute_shell(**kwargs)
 
         for target in (self.listen_on_stdout,
                        self.listen_on_stderr):
@@ -712,7 +717,7 @@ class Command(QtCore.QObject):
             thread.start()
 
     def is_running(self):
-        return self.popen.poll() is None
+        return self.popen and self.popen.poll() is None
 
     def listen_on_stdout(self):
         for line in iter(self.popen.stdout.readline, ""):
