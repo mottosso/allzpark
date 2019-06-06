@@ -5,6 +5,8 @@ import functools
 import contextlib
 import logging
 import collections
+import webbrowser
+import subprocess
 
 from .vendor import six
 from .vendor.Qt import QtCore
@@ -205,3 +207,14 @@ def iterable(arg):
         isinstance(arg, collections.Iterable)
         and not isinstance(arg, six.string_types)
     )
+
+
+def open_package_location(package):
+    root = package.root
+
+    if os.path.exists(root):
+        if os.name == "nt":
+            fname = os.path.join(root, "package.py")
+            subprocess.Popen("explorer /select,%s" % fname)
+        else:
+            webbrowser.open(root)

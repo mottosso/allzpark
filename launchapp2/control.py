@@ -370,12 +370,14 @@ class Controller(QtCore.QObject):
             self.info("Launching %s.." % tool_name)
 
             overrides = self._models["packages"]._overrides
+            disabled = self._models["packages"]._disabled
 
             cmd = Command(
                 context=rez_context,
                 command=tool_name,
                 package=rez_app,
                 overrides=overrides,
+                disabled=disabled,
                 parent=self
             )
 
@@ -628,8 +630,18 @@ class Command(QtCore.QObject):
     def __str__(self):
         return "Command('%s')" % self.cmd
 
-    def __init__(self, context, command, package, overrides, parent=None):
+    def __init__(self,
+                 context,
+                 command,
+                 package,
+                 overrides=None,
+                 disabled=None,
+                 parent=None):
         super(Command, self).__init__(parent)
+
+        overrides = overrides or {}
+        disabled = disabled or {}
+
         self.context = context
         self.app = package
 
@@ -643,8 +655,8 @@ class Command(QtCore.QObject):
             "stderr": subprocess.PIPE,
         }
 
-        # Apply overrides
-        o_context = context.copy()
+        # Apply overrides to a new context, to preserve the original
+        o_context = ResolvedContext(context.requested_packages())
         o_packages = o_context.resolved_packages[:]
 
         name_to_package_lut = {
@@ -683,6 +695,12 @@ class Command(QtCore.QObject):
                 name, original.version,
                 name, replacement.version
             ))
+
+        for package_name in disabled:
+            package = name_to_package_lut[package_name]
+            o_packages.remove(package)
+
+            log.info("Disabling %s" % package_name)
 
         o_context.resolved_packages[:] = o_packages
         self.popen = o_context.execute_shell(**kwargs)

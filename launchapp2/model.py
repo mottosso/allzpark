@@ -464,6 +464,7 @@ class PackagesModel(AbstractTableModel):
         super(PackagesModel, self).__init__(parent)
 
         self._overrides = {}
+        self._disabled = {}
 
     def reset(self, packages=None):
         packages = packages or []
@@ -483,6 +484,7 @@ class PackagesModel(AbstractTableModel):
                 ),
                 "package": pkg,
                 "override": self._overrides.get(pkg.name),
+                "disabled": self._disabled.get(pkg.name, False),
                 "context": None,
                 "active": True,
                 "versions": None
@@ -501,13 +503,23 @@ class PackagesModel(AbstractTableModel):
         except IndexError:
             return None
 
-        if data["override"] is not None:
+        if data["override"]:
             if role == QtCore.Qt.DisplayRole and col == 1:
                 return data["override"]
 
             if role == QtCore.Qt.FontRole:
                 font = QtGui.QFont()
                 font.setBold(True)
+                return font
+
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("darkorange")
+
+        if data["disabled"]:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                font.setStrikeOut(True)
                 return font
 
             if role == QtCore.Qt.ForegroundRole:
@@ -533,13 +545,24 @@ class PackagesModel(AbstractTableModel):
             default = self.data(index, "default")
             package = self.data(index, "package").name
 
-            if value != default:
+            if value and value != default:
                 log.info("Storing permanent override %s-%s" % (package, value))
                 self._overrides[package] = value
             else:
                 log.info("Resetting to default")
                 self._overrides.pop(package, None)
                 value = None
+
+        if role == "disabled":
+            package = self.data(index, "package").name
+            value = bool(value)
+
+            if value:
+                log.info("Disabling %s" % package)
+            else:
+                log.info("Enabling %s" % package)
+
+            self._disabled[package] = value
 
         return super(PackagesModel, self).setData(index, value, role)
 

@@ -7,7 +7,7 @@ from collections import OrderedDict as odict
 from .vendor.Qt import QtWidgets, QtCore, QtCompat, QtGui
 from .vendor import six, qargparse
 from .version import version
-from . import resources as res, model, delegates
+from . import resources as res, model, delegates, util
 
 px = res.px
 
@@ -954,17 +954,27 @@ class Packages(DockWidget):
     def on_right_click(self, position):
         view = self._widgets["view"]
         index = view.indexAt(position)
+        model = index.model()
 
         menu = QtWidgets.QMenu(self)
         edit = QtWidgets.QAction("Edit")
+        disable = QtWidgets.QAction("Disable")
         default = QtWidgets.QAction("Set to default")
-        latest = QtWidgets.QAction("Set to latest")
         earliest = QtWidgets.QAction("Set to earliest")
+        latest = QtWidgets.QAction("Set to latest")
+        openfile = QtWidgets.QAction("Open file location")
+
+        disable.setCheckable(True)
+        disable.setChecked(model.data(index, "disabled"))
 
         menu.addAction(edit)
+        menu.addAction(disable)
+        menu.addSeparator()
         menu.addAction(default)
-        menu.addAction(latest)
         menu.addAction(earliest)
+        menu.addAction(latest)
+        menu.addSeparator()
+        menu.addAction(openfile)
         menu.move(QtGui.QCursor.pos())
 
         picked = menu.exec_()
@@ -976,18 +986,26 @@ class Packages(DockWidget):
             self._widgets["view"].edit(index)
 
         if picked == default:
-            model = index.model()
             model.setData(index, None, "override")
+            model.setData(index, False, "disabled")
 
         if picked == earliest:
-            model = index.model()
             versions = model.data(index, "versions")
             model.setData(index, versions[0], "override")
+            model.setData(index, False, "disabled")
 
         if picked == latest:
-            model = index.model()
             versions = model.data(index, "versions")
             model.setData(index, versions[-1], "override")
+            model.setData(index, False, "disabled")
+
+        if picked == openfile:
+            package = model.data(index, "package")
+            util.open_package_location(package)
+
+        if picked == disable:
+            model.setData(index, None, "override")
+            model.setData(index, disable.isChecked(), "disabled")
 
 
 class Context(DockWidget):
