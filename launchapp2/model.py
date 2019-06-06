@@ -529,14 +529,16 @@ class PackagesModel(AbstractTableModel):
         return data[key]
 
     def setData(self, index, value, role):
-        if value and role == "override":
+        if role == "override":
             default = self.data(index, "default")
             package = self.data(index, "package").name
 
             if value != default:
-                log.info("Storing permanent override %s.%s" % (package, value))
+                log.info("Storing permanent override %s-%s" % (package, value))
+                self._overrides[package] = value
             else:
                 log.info("Resetting to default")
+                self._overrides.pop(package, None)
                 value = None
 
         return super(PackagesModel, self).setData(index, value, role)
