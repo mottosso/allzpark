@@ -930,13 +930,16 @@ class Packages(DockWidget):
 
         widgets = {
             "view": SlimTableView(),
+            "status": QtWidgets.QStatusBar(),
         }
 
         self.setWidget(panels["central"])
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
         layout.addWidget(widgets["view"])
+        layout.addWidget(widgets["status"])
 
         widgets["view"].setStretch(1)
         widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
@@ -945,11 +948,29 @@ class Packages(DockWidget):
         widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
 
+        widgets["status"].showMessage("It's working")
+        widgets["status"].setSizeGripEnabled(False)
+
         self._ctrl = ctrl
         self._widgets = widgets
 
     def set_model(self, model):
         self._widgets["view"].setModel(model)
+        model.modelReset.connect(self.on_model_changed)
+        model.dataChanged.connect(self.on_model_changed)
+
+    def on_model_changed(self):
+        model = self._widgets["view"].model()
+        package_count = model.rowCount()
+        override_count = len([i for i in model.items if i["override"]])
+        disabled_count = len([i for i in model.items if i["disabled"]])
+
+        self._widgets["status"].showMessage(
+            "%d Packages, %d Overridden, %d Disabled" % (
+                package_count,
+                override_count,
+                disabled_count,
+            ))
 
     def on_right_click(self, position):
         view = self._widgets["view"]
