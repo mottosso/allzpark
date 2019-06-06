@@ -66,12 +66,6 @@ class Window(QtWidgets.QMainWindow):
 
             "dockToggles": QtWidgets.QWidget(),
 
-            "extraContainer": QtWidgets.QWidget(),
-            "extraRequirementsRender": QtWidgets.QPushButton(),
-            "extraRequirementsPrefix": QtWidgets.QLabel("rez env "),
-            "extraRequirements": QtWidgets.QLineEdit(),
-            "extraRequirementsSuffix": QtWidgets.QLabel(" -- maya"),
-
             "stateIndicator": QtWidgets.QLabel(),
         }
 
@@ -85,12 +79,6 @@ class Window(QtWidgets.QMainWindow):
             ("commands", Commands()),
             ("preferences", Preferences(self, ctrl)),
         ))
-
-        actions = {
-            "projectsGroup": QtWidgets.QActionGroup(self),
-            "launchToolsGroup": QtWidgets.QActionGroup(self),
-            "extraRequirements": QtWidgets.QAction("Extra requirements", self)
-        }
 
         # Expose to CSS
         for name, widget in chain(panels.items(),
@@ -124,7 +112,6 @@ class Window(QtWidgets.QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addWidget(panels["body"], 1, 0)
-        layout.addWidget(widgets["extraContainer"], 4, 0)
 
         layout = QtWidgets.QVBoxLayout(pages["errored"])
         layout.addWidget(QtWidgets.QWidget(), 1)
@@ -216,14 +203,6 @@ class Window(QtWidgets.QMainWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["apps"])
 
-        layout = QtWidgets.QHBoxLayout(widgets["extraContainer"])
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(QtWidgets.QWidget(), 1)
-        layout.addWidget(widgets["extraRequirementsPrefix"])
-        layout.addWidget(widgets["extraRequirements"])
-        layout.addWidget(widgets["extraRequirementsSuffix"])
-        layout.addWidget(QtWidgets.QWidget(), 1)  # centered
-
         status_bar = self.statusBar()
         status_bar.addPermanentWidget(widgets["stateIndicator"])
 
@@ -236,17 +215,6 @@ class Window(QtWidgets.QMainWindow):
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
 
         widgets["projectVersions"].setModel(ctrl.models["projectVersions"])
-        widgets["extraRequirements"].setMinimumWidth(10)
-        widgets["extraRequirements"].setPlaceholderText("<requirements>")
-
-        def resize_to_content():
-            lineedit = widgets["extraRequirements"]
-            font = QtGui.QFont("", 0)
-            fm = QtGui.QFontMetrics(font)
-            pixelsWide = fm.width(lineedit.text())
-            lineedit.setMinimumWidth(pixelsWide)
-
-        widgets["extraRequirements"].textChanged.connect(resize_to_content)
 
         docks["packages"].set_model(ctrl.models["packages"])
         docks["context"].set_model(ctrl.models["context"])
@@ -254,14 +222,7 @@ class Window(QtWidgets.QMainWindow):
         docks["commands"].set_model(ctrl.models["commands"])
         widgets["apps"].setModel(ctrl.models["apps"])
 
-        tool_group = actions["launchToolsGroup"]
-        tool_group.triggered.connect(self.on_tool_changed)
-
         widgets["projectMenu"].aboutToShow.connect(self.on_show_project_menu)
-        widgets["extraContainer"].hide()
-        widgets["extraRequirements"].editingFinished.connect(
-            self.on_extra_requirements_edited)
-
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
         # Signals
@@ -283,50 +244,14 @@ class Window(QtWidgets.QMainWindow):
         self._widgets = widgets
         self._panels = panels
         self._docks = docks
-        self._actions = actions
         self._ctrl = ctrl
 
-        # self.setup_menus()
         self.setup_docks()
         self.on_state_changed("booting")
         self.update_advanced_controls()
 
     def createPopupMenu(self):
         """Null; defaults to checkboxes for docks and toolbars"""
-
-    def setup_menus(self):
-        bar = self.menuBar()
-        menu = bar.addMenu("&File")
-        menu = bar.addMenu("&Advanced")
-
-        toggles = (
-            ("Show Context", "context"),
-            ("Show Packages", "console"),
-            ("Show Environment", "environment"),
-            ("Show Console", "packages"),
-        )
-
-        for label, dock in toggles:
-            action = QtWidgets.QAction(label, bar)
-            action.setCheckable(True)
-            action.setChecked(True)
-
-            action.setToolTip(dock.__doc__)
-
-            action.activated.connect(
-                lambda d=dock, a=action:
-                self._docks[d].setVisible(a.isChecked())
-            )
-
-            menu.addAction(action)
-
-        menu.addSeparator()
-
-        developer_mode = QtWidgets.QAction("Developer Mode", bar)
-        developer_mode.setCheckable(True)
-        menu.addAction(developer_mode)
-
-        menu = bar.addMenu("&Help")
 
     def update_advanced_controls(self):
         shown = bool(self._ctrl.state.retrieve("showAdvancedControls"))
@@ -344,24 +269,6 @@ class Window(QtWidgets.QMainWindow):
 
             if not visible:
                 dock.hide()
-
-    def on_tool_changed(self, action):
-        self.tell("%s triggered" % action.text())
-        tool = action.text()
-        self._ctrl.select_tool(tool)
-
-    def on_extra_requirements_checked(self):
-        action = self._actions["extraRequirements"]
-        self._widgets["extraContainer"].setVisible(action.isChecked())
-
-        if action.isChecked():
-            self.on_extra_requirements_edited()
-        else:
-            self._ctrl.edit_requirements([])
-
-    def on_extra_requirements_edited(self):
-        requirements = self._widgets["extraRequirements"].text()
-        self._ctrl.edit_requirements(requirements.split())
 
     def setup_docks(self):
         for dock in self._docks.values():
@@ -490,30 +397,6 @@ class Window(QtWidgets.QMainWindow):
             group.addAction(action)
             menu.addAction(action)
 
-    def on_show_tools_menu(self):
-        tool_group = self._actions["launchToolsGroup"]
-
-        # for action in tool_group.actions():
-        #     tool_group.removeAction(action)
-
-        # app_name = self._ctrl.current_application
-        # for tool in self._ctrl.tools(app_name):
-        #     cmd = QtWidgets.QAction(tool, self)
-        #     cmd.setCheckable(True)
-
-        #     if tool == self._ctrl.current_tool:
-        #         cmd.setChecked(True)
-
-        #     tool_group.addAction(cmd)
-        #     menu.addAction(cmd)
-
-        # menu.addSeparator()
-
-        # extra = self._actions["extraRequirements"]
-        # extra.triggered.connect(self.on_extra_requirements_checked)
-        # extra.setCheckable(True)
-        # menu.addAction(extra)
-
     def on_project_changed(self, before, after):
         # Happens when editing requirements
         if before != after:
@@ -630,15 +513,6 @@ class Window(QtWidgets.QMainWindow):
         index = selected.indexes()[0]
         app_name = index.data(QtCore.Qt.DisplayRole)
         self._ctrl.select_application(app_name)
-
-        project = self._ctrl.current_project
-        app = self._ctrl.current_application
-        tool = self._ctrl.current_tool
-
-        self._widgets["extraRequirementsPrefix"].setText(
-            "rez env %s %s " % (project, app))
-        self._widgets["extraRequirementsSuffix"].setText(" -- %s" % tool)
-
         self._docks["app"].refresh(index)
 
     def showEvent(self, event):
@@ -651,17 +525,10 @@ class Window(QtWidgets.QMainWindow):
             self.restoreGeometry(self._ctrl.state.retrieve("geometry"))
             self.restoreState(self._ctrl.state.retrieve("windowState"))
 
-            if self._ctrl.state.retrieve("extraRequirements"):
-                self._actions["extraRequirements"].setChecked(True)
-                self._actions["extraRequirements"].triggered.emit()
-
     def closeEvent(self, event):
         self.tell("Storing state..")
         self._ctrl.state.store("geometry", self.saveGeometry())
         self._ctrl.state.store("windowState", self.saveState())
-
-        if self._actions["extraRequirements"].isChecked():
-            self._ctrl.state.store("extraRequirements", True)
 
         super(Window, self).closeEvent(event)
 
