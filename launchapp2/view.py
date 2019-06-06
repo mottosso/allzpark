@@ -250,6 +250,27 @@ class Window(QtWidgets.QMainWindow):
         self.on_state_changed("booting")
         self.update_advanced_controls()
 
+        # Enable mouse tracking for tooltips
+        QtWidgets.QApplication.instance().installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        """Forward tooltips to status bar whenever the mouse moves"""
+        if event.type() == QtCore.QEvent.MouseMove:
+            try:
+                tooltip = obj.toolTip()
+
+                # Some tooltips are multi-line, and the statusbar
+                # typically ignores newlines and writes it all out
+                # as one long line.
+                tooltip = tooltip.splitlines()[0]
+
+                self.statusBar().showMessage(tooltip, timeout=2000)
+            except (AttributeError, IndexError):
+                pass
+
+        # Forward the event to subsequent listeners
+        return False
+
     def createPopupMenu(self):
         """Null; defaults to checkboxes for docks and toolbars"""
 
