@@ -1,5 +1,6 @@
 """The view may access a controller, but not vice versa"""
 
+import os
 import logging
 from itertools import chain
 from collections import OrderedDict as odict
@@ -1022,7 +1023,8 @@ class Packages(DockWidget):
 
         if picked == openfile:
             package = model.data(index, "package")
-            util.open_package_location(package)
+            fname = os.path.join(package.root, "package.py")
+            util.open_file_location(fname)
 
         if picked == disable:
             model.setData(index, None, "override")

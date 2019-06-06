@@ -209,12 +209,11 @@ def iterable(arg):
     )
 
 
-def open_package_location(package):
-    root = package.root
-
-    if os.path.exists(root):
+def open_file_location(fname):
+    if os.path.exists(fname):
         if os.name == "nt":
-            fname = os.path.join(root, "package.py")
             subprocess.Popen("explorer /select,%s" % fname)
         else:
-            webbrowser.open(root)
+            webbrowser.open(os.path.dirname(fname))
+    else:
+        raise OSError("%s did not exist" % fname)
