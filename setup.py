@@ -1,15 +1,7 @@
 """A cross-platform launcher for film and games projects, built on Rez"""
 
-import os
 from setuptools import setup, find_packages
-
-dirname = os.path.dirname(__file__)
-version = os.path.join(dirname, "launchapp2", "version.py")
-
-with open(version) as f:
-    # Populates the `version` variable above
-    exec(f.read().strip())
-
+from launchapp2.version import version
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -17,8 +9,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 2",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
@@ -50,13 +40,5 @@ setup(
     classifiers=classifiers,
     install_requires=[
     ],
-    python_requires=", ".join([
-        ">=2.7",
-        "!=3.0.*",
-        "!=3.1.*",
-        "!=3.2.*",
-        "!=3.3.*",
-        "!=3.4.*",
-        "<4",
-    ])
+    python_requires=">2.7, <4",
 )
