@@ -3,6 +3,7 @@
 import os
 import logging
 from itertools import chain
+from functools import partial
 from collections import OrderedDict as odict
 
 from .vendor.Qt import QtWidgets, QtCore, QtCompat, QtGui
@@ -174,16 +175,17 @@ class Window(QtWidgets.QMainWindow):
             toggle.setFlat(True)
             toggle.setProperty("type", "toggle")
             toggle.setToolTip("%s\n%s" % (type(dock).__name__, dock.__doc__ or ""))
-            toggle.setIcon(res.pixmap(dock.icon))
+            toggle.setIcon(res.icon(dock.icon))
             toggle.setIconSize(QtCore.QSize(px(32), px(32)))
-            toggle.clicked.connect(
-                lambda d=dock, t=toggle: d.setVisible(t.isChecked())
-            )
 
-            toggle.clicked.connect(
-                lambda d=dock, t=toggle: self.on_dock_toggled(
-                    d, t.isChecked())
-            )
+            def on_toggled(dock, toggle):
+                dock.setVisible(toggle.isChecked())
+                self.on_dock_toggled(dock, toggle.isChecked())
+
+            def on_visible(dock, toggle, state):
+                toggle.setChecked(dock.isVisible())
+
+            toggle.clicked.connect(partial(on_toggled, dock, toggle))
 
             # Store reference for showEvent
             dock.toggle = toggle
@@ -193,9 +195,7 @@ class Window(QtWidgets.QMainWindow):
 
             # Create two-way connection; when dock is programatically
             # closed, or closed by other means, update toggle to reflect this.
-            dock.visibilityChanged.connect(
-                lambda s, d=dock, t=toggle: t.setChecked(d.isVisible())
-            )
+            dock.visibilityChanged.connect(partial(on_visible, dock, toggle))
 
             layout.addWidget(toggle)
 
@@ -211,7 +211,7 @@ class Window(QtWidgets.QMainWindow):
         widgets["logo"].setScaledContents(True)
         widgets["projectBtn"].setMenu(widgets["projectMenu"])
         widgets["projectBtn"].setPopupMode(widgets["projectBtn"].InstantPopup)
-        widgets["projectBtn"].setIcon(res.pixmap("Default_Project"))
+        widgets["projectBtn"].setIcon(res.icon("Default_Project"))
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
 
         widgets["projectVersions"].setModel(ctrl.models["projectVersions"])
@@ -264,7 +264,7 @@ class Window(QtWidgets.QMainWindow):
                 # as one long line.
                 tooltip = tooltip.splitlines()[0]
 
-                self.statusBar().showMessage(tooltip, timeout=2000)
+                self.statusBar().showMessage(tooltip, 2000)
             except (AttributeError, IndexError):
                 pass
 
@@ -435,7 +435,7 @@ class Window(QtWidgets.QMainWindow):
 
     def tell(self, message):
         self._docks["console"].append(message, logging.INFO)
-        self.statusBar().showMessage(message, timeout=2000)
+        self.statusBar().showMessage(message, 2000)
 
     def on_logged(self, message, level):
         self._docks["console"].append(message, level)
@@ -622,6 +622,7 @@ class App(DockWidget):
             "extras": SlimTableView(),
 
             # Shortcuts
+            "tools": qargparse.QArgumentParser(),
             "environment": QtWidgets.QToolButton(),
             "packages": QtWidgets.QToolButton(),
             "terminal": QtWidgets.QToolButton(),
@@ -633,6 +634,12 @@ class App(DockWidget):
         for name, widget in chain(panels.items(), widgets.items()):
             widget.setAttribute(QtCore.Qt.WA_StyledBackground)
             widget.setObjectName(name)
+
+        widgets["tools"].add_argument("", type=qargparse.Choice, items=[
+            "maya",
+            "mayapy",
+            "mayabatch",
+        ], default="mayapy")
 
         layout = QtWidgets.QHBoxLayout(panels["shortcuts"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -652,8 +659,8 @@ class App(DockWidget):
         layout.setVerticalSpacing(0)
 
         layout.addWidget(widgets["icon"], 0, 0, 2, 1)
-        layout.addWidget(widgets["label"], 0, 1, QtCore.Qt.AlignTop)
-        layout.addWidget(widgets["tool"], 1, 1, QtCore.Qt.AlignTop)
+        layout.addWidget(widgets["tools"], 0, 1, 2, 1)
+        # layout.addWidget(widgets["label"], 0, 1, QtCore.Qt.AlignTop)
         # layout.addWidget(QtWidgets.QWidget(), 0, 1, 1, 1)
         # layout.addWidget(widgets["version"], 1, 1, QtCore.Qt.AlignTop)
         layout.addWidget(widgets["commands"], 2, 0, 1, 2)
@@ -665,14 +672,16 @@ class App(DockWidget):
         layout.addWidget(panels["footer"], 20, 0, 1, 2)
 
         widgets["icon"].setPixmap(res.pixmap("Alert_Info_32"))
-        widgets["environment"].setIcon(res.pixmap(Environment.icon))
-        widgets["packages"].setIcon(res.pixmap(Packages.icon))
-        widgets["terminal"].setIcon(res.pixmap(Console.icon))
+        widgets["environment"].setIcon(res.icon(Environment.icon))
+        widgets["packages"].setIcon(res.icon(Packages.icon))
+        widgets["terminal"].setIcon(res.icon(Console.icon))
         widgets["tool"].setText("maya")
 
         for sc in ("environment", "packages", "terminal"):
             widgets[sc].setIconSize(QtCore.QSize(px(32), px(32)))
 
+        # QtCom
+        widgets["launchBtn"].setCheckable(True)
         widgets["launchBtn"].clicked.connect(self.on_launch_clicked)
 
         proxy_model = model.ProxyModel(ctrl.models["commands"])
@@ -722,7 +731,6 @@ class Console(DockWidget):
         self.setWidget(panels["central"])
 
         widgets["text"].setReadOnly(True)
-        widgets["text"].setLineWrapMode(widgets["text"].NoWrap)
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)

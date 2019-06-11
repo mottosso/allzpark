@@ -28,3 +28,7 @@ def pixmap(*paths):
         _cache[paths] = pixmap
 
     return pixmap
+
+
+def icon(*paths):
+    return QtGui.QIcon(pixmap(*paths))

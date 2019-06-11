@@ -132,7 +132,7 @@ class QArgument(QtCore.QObject):
         super(QArgument, self).__init__(kwargs.pop("parent", None))
 
         kwargs["name"] = name
-        kwargs["label"] = kwargs.get("label", self.camelToTitle(name))
+        kwargs["label"] = kwargs.get("label", camel_to_title(name))
         kwargs["default"] = kwargs.get("default", None)
         kwargs["help"] = kwargs.get("help", "")
         kwargs["read"] = kwargs.get("read")
@@ -155,30 +155,6 @@ class QArgument(QtCore.QObject):
 
     def write(self, value):
         pass
-
-    def camelToTitle(self, text):
-        """Convert camelCase `text` to Title Case
-
-        Example:
-            >>> camelToTitle("mixedCase")
-            "Mixed Case"
-            >>> camelToTitle("myName")
-            "My Name"
-            >>> camelToTitle("you")
-            "You"
-            >>> camelToTitle("You")
-            "You"
-            >>> camelToTitle("This is That")
-            "This Is That"
-
-        """
-
-        return re.sub(
-            r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))",
-            r" \1", text
-        ).title()
-
-    camel_to_title = camelToTitle
 
 
 class Boolean(QArgument):
@@ -336,6 +312,57 @@ class InfoList(QArgument):
         return label, widget
 
 
+class Choice(QArgument):
+    def __init__(self, name, **kwargs):
+        kwargs["items"] = kwargs.get("items", ["Empty"])
+        kwargs["default"] = kwargs.get("default", kwargs["items"][0])
+        super(Choice, self).__init__(name, **kwargs)
+
+    def index(self, value):
+        """Return numerical equivalent to self.read()"""
+        return self["items"].index(value)
+
+    def create(self):
+        label = QtWidgets.QLabel(self["name"])
+        label.setAlignment(QtCore.Qt.AlignBottom)
+
+        class Model(QtCore.QStringListModel):
+            def data(self, index, role):
+                return super(Model, self).data(index, role)
+
+        def on_changed(selected, deselected):
+            selected = selected.indexes()[0]
+            value = selected.data(QtCore.Qt.DisplayRole)
+            self["current"] = value
+
+        def set_current(current):
+            options = model.stringList()
+            for index, member in enumerate(options):
+                if member == current:
+                    break
+            else:
+                raise ValueError("%s not a member of %s" % (current, self))
+
+            qindex = model.index(index, 0, QtCore.QModelIndex())
+            smodel = widget.selectionModel()
+            smodel.setCurrentIndex(qindex, smodel.Select)
+            self["current"] = options[index]
+
+        model = QtCore.QStringListModel(self["items"])
+        widget = QtWidgets.QListView()
+        widget.setModel(model)
+        widget.selectionModel().selectionChanged.connect(on_changed)
+        widget.setEditTriggers(widget.NoEditTriggers)
+
+        self.read = lambda: self["current"]
+        self.write = lambda value: set_current(value)
+
+        if self["default"] is not None:
+            self.write(self["default"])
+
+        return label, widget
+
+
 class Separator(QArgument):
     """Visual separator
 
@@ -404,6 +431,32 @@ QLabel[type="Separator"] {
 }
 
 """
+
+
+def camelToTitle(text):
+    """Convert camelCase `text` to Title Case
+
+    Example:
+        >>> camelToTitle("mixedCase")
+        "Mixed Case"
+        >>> camelToTitle("myName")
+        "My Name"
+        >>> camelToTitle("you")
+        "You"
+        >>> camelToTitle("You")
+        "You"
+        >>> camelToTitle("This is That")
+        "This Is That"
+
+    """
+
+    return re.sub(
+        r"((?<=[a-z])[A-Z]|(?<!\A)[A-Z](?=[a-z]))",
+        r" \1", text
+    ).title()
+
+
+camel_to_title = camelToTitle
 
 
 def _demo():
