@@ -2,7 +2,7 @@
 
 ### launchapp2
 
-The Rez-based application launcher for film and games.
+The Rez-based application launcher for film and games, built-on on [Rez](https://github.com/nerdvegas/rez) for both software and projects. See [Rez for Projects](https://github.com/mottosso/rez-for-projects) for an example.
 
 > "launchapp2" is a working title, to change once having reached some level of maturity
 
@@ -10,6 +10,7 @@ The Rez-based application launcher for film and games.
 
 ### Features
 
+- GUI and CLI parity, anything done visually may be done textually
 - Complete control over dependencies per-project
 - Integration with Rez package management
 - Per-package metadata, such as icons and label
@@ -78,6 +79,22 @@ set REZ_MEMCACHED_URI=127.0.0.1:11211
 - **Data hierarchy** Data is hierarchically stored by human readable type, e.g. `widgets` and `panels`
 - **Data persistence** Persistent data is stored in dictionaries, whereas transient data is stored in flat variables. E.g. `widgets = {"myWidget": QtWidgets.QWidget()}` versus `layout = QtWidgets.QHBoxLayout()`
 - **Dictionary naming convention** Variables are written in snake_case, but keys of dictionaries are stored as camelCase.
+
+<br>
+
+### Package Types
+
+To LA2, there exists 3 different kinds of packages.
+
+- Software
+- Application
+- Project
+
+Software encapsulate a library, either Python or otherwise, including all of its data, such as Python modules.
+
+Projects reference both Applications and Software and may or may not include data, such as project specific shelves for Maya, an icon for LA2 or other kinds of metadata you would otherwise find in ftrack or Shotgun. They also include an environment specific to a given project, such as its name, location on disk. E.g. `spiderman-1.0`.
+
+Applications include `maya` and `nuke` and unlike Software doesn't contain their payload. That is, the data is referenced from elsewhere, typically the local drive. This helps improve perf
 
 <br>
 
