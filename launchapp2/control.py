@@ -702,7 +702,12 @@ class Command(QtCore.QObject):
 
             for package_name in self.disabled:
                 package = name_to_package_lut[package_name]
-                packages.remove(package)
+
+                try:
+                    packages.remove(package)
+                except ValueError:
+                    # It wasn't in there, and that's OK
+                    continue
 
                 log.info("Disabling %s" % package_name)
 
