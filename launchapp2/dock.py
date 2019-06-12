@@ -1,0 +1,551 @@
+import os
+import logging
+from itertools import chain
+
+from .vendor.Qt import QtWidgets, QtCore, QtGui, QtCompat
+from .vendor import qargparse
+
+from . import resources as res, model, delegates, util
+
+px = res.px
+
+
+class DockWidget(QtWidgets.QDockWidget):
+    """Default HTML <b>docs</b>"""
+
+    icon = ""
+    advanced = False
+
+    def __init__(self, title, parent=None):
+        super(DockWidget, self).__init__(title, parent)
+        self.layout().setContentsMargins(15, 15, 15, 15)
+
+        panels = {
+            "body": QtWidgets.QStackedWidget(),
+            "help": QtWidgets.QLabel(),
+        }
+
+        for name, widget in panels.items():
+            widget.setObjectName(name)
+
+        central = QtWidgets.QWidget()
+
+        layout = QtWidgets.QVBoxLayout(central)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(panels["help"])
+        layout.addWidget(panels["body"])
+
+        if self.__doc__:
+            panels["help"].setText(self.__doc__.splitlines()[0])
+        else:
+            panels["help"].hide()
+
+        self.__panels = panels
+
+        QtWidgets.QDockWidget.setWidget(self, central)
+
+    def setWidget(self, widget):
+        body = self.__panels["body"]
+
+        while body.widget(0):
+            body.removeWidget(body.widget(0))
+
+        body.addWidget(widget)
+
+
+class App(DockWidget):
+    icon = "Alert_Info_32"
+
+    def __init__(self, ctrl, parent=None):
+        super(App, self).__init__("App", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("App")
+
+        panels = {
+            "central": QtWidgets.QWidget(),
+            "shortcuts": QtWidgets.QWidget(),
+            "footer": QtWidgets.QWidget(),
+        }
+
+        widgets = {
+            "icon": QtWidgets.QLabel(),
+            "label": QtWidgets.QLabel("Autodesk Maya"),
+            "version": QtWidgets.QComboBox(),
+            "tool": QtWidgets.QToolButton(),
+
+            "commands": SlimTableView(),
+            "extras": SlimTableView(),
+
+            # Shortcuts
+            "tools": qargparse.QArgumentParser(),
+            "environment": QtWidgets.QToolButton(),
+            "packages": QtWidgets.QToolButton(),
+            "terminal": QtWidgets.QToolButton(),
+
+            "launchBtn": QtWidgets.QPushButton("Launch"),
+        }
+
+        # Expose to CSS
+        for name, widget in chain(panels.items(), widgets.items()):
+            widget.setAttribute(QtCore.Qt.WA_StyledBackground)
+            widget.setObjectName(name)
+
+        widgets["tools"].add_argument("", type=qargparse.Choice, items=[
+            "maya",
+            "mayapy",
+            "mayabatch",
+        ], default="mayapy")
+
+        layout = QtWidgets.QHBoxLayout(panels["shortcuts"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(widgets["environment"])
+        layout.addWidget(widgets["packages"])
+        layout.addWidget(widgets["terminal"])
+        layout.addWidget(QtWidgets.QWidget(), 1)  # push to the left
+
+        layout = QtWidgets.QHBoxLayout(panels["footer"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["launchBtn"])
+
+        layout = QtWidgets.QGridLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setHorizontalSpacing(px(10))
+        layout.setVerticalSpacing(0)
+
+        layout.addWidget(widgets["icon"], 0, 0, 2, 1)
+        layout.addWidget(widgets["tools"], 0, 1, 2, 1)
+        # layout.addWidget(widgets["label"], 0, 1, QtCore.Qt.AlignTop)
+        # layout.addWidget(QtWidgets.QWidget(), 0, 1, 1, 1)
+        # layout.addWidget(widgets["version"], 1, 1, QtCore.Qt.AlignTop)
+        layout.addWidget(widgets["commands"], 2, 0, 1, 2)
+        # layout.addWidget(widgets["extras"], 3, 0, 1, 2)
+        # layout.addWidget(panels["shortcuts"], 10, 0, 1, 2)
+        layout.addWidget(QtWidgets.QWidget(), 15, 0)
+        # layout.setColumnStretch(1, 1)
+        layout.setRowStretch(15, 1)
+        layout.addWidget(panels["footer"], 20, 0, 1, 2)
+
+        widgets["icon"].setPixmap(res.pixmap("Alert_Info_32"))
+        widgets["environment"].setIcon(res.icon(Environment.icon))
+        widgets["packages"].setIcon(res.icon(Packages.icon))
+        widgets["terminal"].setIcon(res.icon(Console.icon))
+        widgets["tool"].setText("maya")
+
+        for sc in ("environment", "packages", "terminal"):
+            widgets[sc].setIconSize(QtCore.QSize(px(32), px(32)))
+
+        # QtCom
+        widgets["launchBtn"].setCheckable(True)
+        widgets["launchBtn"].clicked.connect(self.on_launch_clicked)
+
+        proxy_model = model.ProxyModel(ctrl.models["commands"])
+        widgets["commands"].setModel(proxy_model)
+
+        self._ctrl = ctrl
+        self._panels = panels
+        self._widgets = widgets
+        self._proxy = proxy_model
+
+        self.setWidget(panels["central"])
+
+    def on_launch_clicked(self):
+        self._ctrl.launch()
+
+    def refresh(self, index):
+        name = index.data(QtCore.Qt.DisplayRole)
+        icon = index.data(QtCore.Qt.DecorationRole)
+        icon = icon.pixmap(QtCore.QSize(px(64), px(64)))
+        self._widgets["label"].setText(name)
+        self._widgets["icon"].setPixmap(icon)
+
+        self._proxy.setup(include=[
+            ("appName", name),
+            ("running", "running"),
+        ])
+
+
+class Console(DockWidget):
+    """Debugging information, mostly for developers"""
+
+    icon = "Prefs_Screen_32"
+
+    def __init__(self, parent=None):
+        super(Console, self).__init__("Console", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Console")
+
+        panels = {
+            "central": QtWidgets.QWidget()
+        }
+
+        widgets = {
+            "text": QtWidgets.QTextEdit()
+        }
+
+        self.setWidget(panels["central"])
+
+        widgets["text"].setReadOnly(True)
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["text"])
+
+        self._widgets = widgets
+
+    def append(self, line, level=logging.INFO):
+        color = {
+            logging.WARNING: "<font color=\"red\">",
+        }.get(level, "<font color=\"#222\">")
+
+        line = "%s%s</font><br>" % (color, line)
+
+        cursor = self._widgets["text"].textCursor()
+        cursor.movePosition(QtGui.QTextCursor.End)
+
+        self._widgets["text"].setTextCursor(cursor)
+        self._widgets["text"].insertHtml(line)
+
+        scrollbar = self._widgets["text"].verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+
+class Packages(DockWidget):
+    """Packages associated with the currently selected application"""
+
+    icon = "File_Archive_32"
+    advanced = True
+
+    def __init__(self, ctrl, parent=None):
+        super(Packages, self).__init__("Packages", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Packages")
+
+        panels = {
+            "central": QtWidgets.QWidget()
+        }
+
+        widgets = {
+            "view": SlimTableView(),
+            "status": QtWidgets.QStatusBar(),
+        }
+
+        self.setWidget(panels["central"])
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(widgets["view"])
+        layout.addWidget(widgets["status"])
+
+        widgets["view"].setStretch(1)
+        widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
+        widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
+        widgets["view"].verticalHeader().setDefaultSectionSize(px(20))
+        widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        widgets["view"].customContextMenuRequested.connect(self.on_right_click)
+
+        widgets["status"].setSizeGripEnabled(False)
+
+        self._ctrl = ctrl
+        self._widgets = widgets
+
+    def set_model(self, model):
+        self._widgets["view"].setModel(model)
+        model.modelReset.connect(self.on_model_changed)
+        model.dataChanged.connect(self.on_model_changed)
+
+    def on_model_changed(self):
+        model = self._widgets["view"].model()
+        package_count = model.rowCount()
+        override_count = len([i for i in model.items if i["override"]])
+        disabled_count = len([i for i in model.items if i["disabled"]])
+
+        self._widgets["status"].showMessage(
+            "%d Packages, %d Overridden, %d Disabled" % (
+                package_count,
+                override_count,
+                disabled_count,
+            ))
+
+    def on_right_click(self, position):
+        view = self._widgets["view"]
+        index = view.indexAt(position)
+        model = index.model()
+
+        menu = QtWidgets.QMenu(self)
+        edit = QtWidgets.QAction("Edit")
+        disable = QtWidgets.QAction("Disable")
+        default = QtWidgets.QAction("Set to default")
+        earliest = QtWidgets.QAction("Set to earliest")
+        latest = QtWidgets.QAction("Set to latest")
+        openfile = QtWidgets.QAction("Open file location")
+
+        disable.setCheckable(True)
+        disable.setChecked(model.data(index, "disabled"))
+
+        menu.addAction(edit)
+        menu.addAction(disable)
+        menu.addSeparator()
+        menu.addAction(default)
+        menu.addAction(earliest)
+        menu.addAction(latest)
+        menu.addSeparator()
+        menu.addAction(openfile)
+        menu.move(QtGui.QCursor.pos())
+
+        picked = menu.exec_()
+
+        if picked is None:
+            return  # Cancelled
+
+        if picked == edit:
+            self._widgets["view"].edit(index)
+
+        if picked == default:
+            model.setData(index, None, "override")
+            model.setData(index, False, "disabled")
+
+        if picked == earliest:
+            versions = model.data(index, "versions")
+            model.setData(index, versions[0], "override")
+            model.setData(index, False, "disabled")
+
+        if picked == latest:
+            versions = model.data(index, "versions")
+            model.setData(index, versions[-1], "override")
+            model.setData(index, False, "disabled")
+
+        if picked == openfile:
+            package = model.data(index, "package")
+            fname = os.path.join(package.root, "package.py")
+            util.open_file_location(fname)
+
+        if picked == disable:
+            model.setData(index, None, "override")
+            model.setData(index, disable.isChecked(), "disabled")
+
+
+class Context(DockWidget):
+    """Full context relative the currently selected application"""
+
+    icon = "App_Generic_4_32"
+    advanced = True
+
+    def __init__(self, parent=None):
+        super(Context, self).__init__("Context", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Context")
+
+        panels = {
+            "central": QtWidgets.QWidget()
+        }
+
+        widgets = {
+            "view": QtWidgets.QTreeView()
+        }
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["view"])
+
+        self._panels = panels
+        self._widgets = widgets
+
+        self.setWidget(panels["central"])
+
+    def set_model(self, model):
+        self._widgets["view"].setModel(model)
+
+
+class Environment(DockWidget):
+    """Full environment relative the currently selected application"""
+
+    icon = "App_Heidi_32"
+    advanced = True
+
+    def __init__(self, parent=None):
+        super(Environment, self).__init__("Environment", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Environment")
+
+        panels = {
+            "central": QtWidgets.QWidget()
+        }
+
+        widgets = {
+            "view": QtWidgets.QTreeView()
+        }
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["view"])
+
+        self._panels = panels
+        self._widgets = widgets
+
+        self.setWidget(panels["central"])
+
+    def set_model(self, model):
+        self._widgets["view"].setModel(model)
+
+
+class Commands(DockWidget):
+    """Currently running commands"""
+
+    icon = "App_Pulse_32"
+    advanced = True
+
+    def __init__(self, parent=None):
+        super(Commands, self).__init__("Commands", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Commands")
+
+        panels = {
+            "central": QtWidgets.QWidget(),
+            "body": QtWidgets.QWidget(),
+            "footer": QtWidgets.QWidget(),
+        }
+
+        widgets = {
+            "view": SlimTableView(),
+            "stdout": QtWidgets.QTextEdit(),
+            "stderr": QtWidgets.QTextEdit(),
+        }
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(panels["body"])
+        # layout.addWidget(panels["footer"])
+
+        layout = QtWidgets.QVBoxLayout(panels["body"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["view"])
+
+        layout = QtWidgets.QVBoxLayout(panels["footer"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["stdout"])
+        layout.addWidget(widgets["stderr"])
+
+        self._panels = panels
+        self._widgets = widgets
+
+        self.setWidget(panels["central"])
+
+    def set_model(self, model):
+        self._widgets["view"].setModel(model)
+
+
+class Preferences(DockWidget):
+    """Preferred settings relative the current user"""
+
+    icon = "Action_GoHome_32"
+
+    options = [
+        qargparse.Info("startupProject", help=(
+            "Load this project on startup"
+        )),
+        qargparse.Info("startupApplication", help=(
+            "Load this application on startup"
+        )),
+
+        qargparse.Separator("Theme"),
+
+        qargparse.Info("primaryColor", default="white", help=(
+            "Main color of the GUI"
+        )),
+        qargparse.Info("secondaryColor", default="steelblue", help=(
+            "Secondary color of the GUI"
+        )),
+
+        qargparse.Button("resetLayout", help=(
+            "Reset stored layout to their defaults"
+        )),
+
+        qargparse.Separator("Settings"),
+
+        qargparse.Boolean("smallIcons", enabled=False, help=(
+            "Draw small icons"
+        )),
+        qargparse.Boolean("allowMultipleDocks", help=(
+            "Allow more than one dock to exist at a time"
+        )),
+        qargparse.Boolean("showAdvancedControls", help=(
+            "Show developer-centric controls"
+        )),
+
+        qargparse.Separator("System"),
+
+        # Provided by controller
+        qargparse.Info("pythonExe"),
+        qargparse.Info("pythonVersion"),
+        qargparse.Info("qtVersion"),
+        qargparse.Info("qtBinding"),
+        qargparse.Info("qtBindingVersion"),
+        qargparse.Info("rezLocation"),
+        qargparse.Info("rezVersion"),
+        qargparse.Info("memcachedURI"),
+        qargparse.InfoList("rezPackagesPath"),
+        qargparse.InfoList("rezLocalPath"),
+        qargparse.InfoList("rezReleasePath"),
+        qargparse.Info("settingsPath"),
+    ]
+
+    def __init__(self, window, ctrl, parent=None):
+        super(Preferences, self).__init__("Preferences", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Preferences")
+
+        panels = {
+            "scrollarea": QtWidgets.QScrollArea(),
+            "central": QtWidgets.QWidget(),
+        }
+
+        widgets = {
+            "options": qargparse.QArgumentParser(
+                self.options, storage=ctrl._storage)
+        }
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["options"])
+
+        panels["scrollarea"].setWidget(panels["central"])
+        panels["scrollarea"].setWidgetResizable(True)
+
+        widgets["options"].changed.connect(self.handler)
+
+        self._panels = panels
+        self._widgets = widgets
+        self._ctrl = ctrl
+        self._window = window
+
+        self.setWidget(panels["scrollarea"])
+
+    def handler(self, argument):
+        self._window.on_setting_changed(argument)
+
+
+class SlimTableView(QtWidgets.QTableView):
+    def __init__(self, parent=None):
+        super(SlimTableView, self).__init__(parent)
+        self.setShowGrid(False)
+        self.verticalHeader().hide()
+        self.setSelectionMode(self.SingleSelection)
+        self.setSelectionBehavior(self.SelectRows)
+        self._stretch = 0
+
+    def setStretch(self, column):
+        self._stretch = column
+
+    def refresh(self):
+        header = self.horizontalHeader()
+        QtCompat.setSectionResizeMode(
+            header, self._stretch, QtWidgets.QHeaderView.Stretch)
+
+    def setModel(self, model):
+        model.rowsInserted.connect(self.refresh)
+        model.modelReset.connect(self.refresh)
+        super(SlimTableView, self).setModel(model)
+        self.refresh()
