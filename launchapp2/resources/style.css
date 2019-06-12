@@ -26,12 +26,11 @@ Window App #tools {
     max-height: 100px;
     min-height: 100px;
 }
-/*
-Window App #icon {
-    max-height: 100px;
-    min-height: 100px;
+
+Window App #label {
+    font-size: 13px;
 }
-*/
+
 QHeaderView {
     qproperty-defaultAlignment: AlignLeft;
     font-weight: 10;

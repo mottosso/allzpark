@@ -10,14 +10,14 @@ from . import resources as res, model, delegates, util
 px = res.px
 
 
-class DockWidget(QtWidgets.QDockWidget):
+class AbstractDockWidget(QtWidgets.QDockWidget):
     """Default HTML <b>docs</b>"""
 
     icon = ""
     advanced = False
 
     def __init__(self, title, parent=None):
-        super(DockWidget, self).__init__(title, parent)
+        super(AbstractDockWidget, self).__init__(title, parent)
         self.layout().setContentsMargins(15, 15, 15, 15)
 
         panels = {
@@ -54,7 +54,7 @@ class DockWidget(QtWidgets.QDockWidget):
         body.addWidget(widget)
 
 
-class App(DockWidget):
+class App(AbstractDockWidget):
     icon = "Alert_Info_32"
 
     def __init__(self, ctrl, parent=None):
@@ -78,7 +78,9 @@ class App(DockWidget):
             "extras": SlimTableView(),
 
             # Shortcuts
-            "tools": qargparse.QArgumentParser(),
+            "tools": qargparse.Choice(
+                "", items=["a", "b", "c"], default="b"
+            ).create(),
             "environment": QtWidgets.QToolButton(),
             "packages": QtWidgets.QToolButton(),
             "terminal": QtWidgets.QToolButton(),
@@ -90,12 +92,6 @@ class App(DockWidget):
         for name, widget in chain(panels.items(), widgets.items()):
             widget.setAttribute(QtCore.Qt.WA_StyledBackground)
             widget.setObjectName(name)
-
-        widgets["tools"].add_argument("", type=qargparse.Choice, items=[
-            "maya",
-            "mayapy",
-            "mayabatch",
-        ], default="mayapy")
 
         layout = QtWidgets.QHBoxLayout(panels["shortcuts"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -115,26 +111,29 @@ class App(DockWidget):
         layout.setVerticalSpacing(0)
 
         layout.addWidget(widgets["icon"], 0, 0, 2, 1)
-        layout.addWidget(widgets["tools"], 0, 1, 2, 1)
-        # layout.addWidget(widgets["label"], 0, 1, QtCore.Qt.AlignTop)
+        layout.addWidget(widgets["label"], 0, 1, QtCore.Qt.AlignTop)
         # layout.addWidget(QtWidgets.QWidget(), 0, 1, 1, 1)
         # layout.addWidget(widgets["version"], 1, 1, QtCore.Qt.AlignTop)
-        layout.addWidget(widgets["commands"], 2, 0, 1, 2)
+        layout.addWidget(QtWidgets.QLabel("Last used 6th June 2019, 8:35:00"), 1, 1, QtCore.Qt.AlignTop)
+        layout.addWidget(QtWidgets.QLabel("Tool"), 3, 0)
+        layout.addWidget(widgets["tools"], 4, 0, 1, 2)
+        # layout.addWidget(widgets["commands"], 2, 0, 1, 2)
         # layout.addWidget(widgets["extras"], 3, 0, 1, 2)
         # layout.addWidget(panels["shortcuts"], 10, 0, 1, 2)
         layout.addWidget(QtWidgets.QWidget(), 15, 0)
-        # layout.setColumnStretch(1, 1)
+        layout.setColumnStretch(1, 1)
         layout.setRowStretch(15, 1)
         layout.addWidget(panels["footer"], 20, 0, 1, 2)
 
         widgets["icon"].setPixmap(res.pixmap("Alert_Info_32"))
+        # widgets["icon"].setIconSize(QtCore.QSize(px(24), px(24)))
         widgets["environment"].setIcon(res.icon(Environment.icon))
         widgets["packages"].setIcon(res.icon(Packages.icon))
         widgets["terminal"].setIcon(res.icon(Console.icon))
         widgets["tool"].setText("maya")
 
-        for sc in ("environment", "packages", "terminal"):
-            widgets[sc].setIconSize(QtCore.QSize(px(32), px(32)))
+        # for sc in ("environment", "packages", "terminal"):
+        #     widgets[sc].setIconSize(QtCore.QSize(px(24), px(24)))
 
         # QtCom
         widgets["launchBtn"].setCheckable(True)
@@ -156,7 +155,7 @@ class App(DockWidget):
     def refresh(self, index):
         name = index.data(QtCore.Qt.DisplayRole)
         icon = index.data(QtCore.Qt.DecorationRole)
-        icon = icon.pixmap(QtCore.QSize(px(64), px(64)))
+        icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
         self._widgets["label"].setText(name)
         self._widgets["icon"].setPixmap(icon)
 
@@ -166,7 +165,7 @@ class App(DockWidget):
         ])
 
 
-class Console(DockWidget):
+class Console(AbstractDockWidget):
     """Debugging information, mostly for developers"""
 
     icon = "Prefs_Screen_32"
@@ -211,7 +210,7 @@ class Console(DockWidget):
         scrollbar.setValue(scrollbar.maximum())
 
 
-class Packages(DockWidget):
+class Packages(AbstractDockWidget):
     """Packages associated with the currently selected application"""
 
     icon = "File_Archive_32"
@@ -275,12 +274,12 @@ class Packages(DockWidget):
         model = index.model()
 
         menu = QtWidgets.QMenu(self)
-        edit = QtWidgets.QAction("Edit")
-        disable = QtWidgets.QAction("Disable")
-        default = QtWidgets.QAction("Set to default")
-        earliest = QtWidgets.QAction("Set to earliest")
-        latest = QtWidgets.QAction("Set to latest")
-        openfile = QtWidgets.QAction("Open file location")
+        edit = QtWidgets.QAction("Edit", menu)
+        disable = QtWidgets.QAction("Disable", menu)
+        default = QtWidgets.QAction("Set to default", menu)
+        earliest = QtWidgets.QAction("Set to earliest", menu)
+        latest = QtWidgets.QAction("Set to latest", menu)
+        openfile = QtWidgets.QAction("Open file location", menu)
 
         disable.setCheckable(True)
         disable.setChecked(model.data(index, "disabled"))
@@ -327,7 +326,7 @@ class Packages(DockWidget):
             model.setData(index, disable.isChecked(), "disabled")
 
 
-class Context(DockWidget):
+class Context(AbstractDockWidget):
     """Full context relative the currently selected application"""
 
     icon = "App_Generic_4_32"
@@ -359,7 +358,7 @@ class Context(DockWidget):
         self._widgets["view"].setModel(model)
 
 
-class Environment(DockWidget):
+class Environment(AbstractDockWidget):
     """Full environment relative the currently selected application"""
 
     icon = "App_Heidi_32"
@@ -391,7 +390,7 @@ class Environment(DockWidget):
         self._widgets["view"].setModel(model)
 
 
-class Commands(DockWidget):
+class Commands(AbstractDockWidget):
     """Currently running commands"""
 
     icon = "App_Pulse_32"
@@ -437,7 +436,7 @@ class Commands(DockWidget):
         self._widgets["view"].setModel(model)
 
 
-class Preferences(DockWidget):
+class Preferences(AbstractDockWidget):
     """Preferred settings relative the current user"""
 
     icon = "Action_GoHome_32"
