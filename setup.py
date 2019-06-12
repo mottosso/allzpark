@@ -44,12 +44,6 @@ setup(
             "resources/*.css",
         ]
     },
-    entry_points={
-        "console_scripts": [
-            "launchapp2 = launchapp2",
-            "la2 = launchapp2",
-        ]
-    },
     classifiers=classifiers,
     install_requires=[
     ],
