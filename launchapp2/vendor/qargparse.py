@@ -351,8 +351,9 @@ class Choice(QArgument):
         model = QtCore.QStringListModel(self["items"])
         widget = QtWidgets.QListView()
         widget.setModel(model)
-        widget.selectionModel().selectionChanged.connect(on_changed)
         widget.setEditTriggers(widget.NoEditTriggers)
+        smodel = widget.selectionModel()
+        smodel.selectionChanged.connect(on_changed)
 
         self.read = lambda: self["current"]
         self.write = lambda value: set_current(value)
