@@ -98,7 +98,12 @@ class QArgumentParser(QtWidgets.QWidget):
         arg.changed.connect(lambda: self.changed.emit(arg))
 
         layout = self.layout()
-        c0, c1 = arg.create()
+        c0 = (
+            QtWidgets.QLabel(arg["label"])
+            if arg.label
+            else QtWidgets.QLabel()
+        )
+        c1 = arg.create()
 
         for widget in (c0, c1):
             widget.setToolTip(arg["help"])
@@ -128,6 +133,9 @@ class QArgumentParser(QtWidgets.QWidget):
 class QArgument(QtCore.QObject):
     changed = QtCore.Signal()
 
+    # Provide a left-hand side label for this argument
+    label = True
+
     def __init__(self, name, **kwargs):
         super(QArgument, self).__init__(kwargs.pop("parent", None))
 
@@ -148,7 +156,7 @@ class QArgument(QtCore.QObject):
         self._data[key] = value
 
     def create(self):
-        return QtWidgets.QLabel(), QtWidgets.QWidget()
+        return QtWidgets.QWidget()
 
     def read(self):
         pass
@@ -159,7 +167,6 @@ class QArgument(QtCore.QObject):
 
 class Boolean(QArgument):
     def create(self):
-        label = QtWidgets.QLabel(self["label"])
         widget = QtWidgets.QCheckBox()
         widget.clicked.connect(self.changed.emit)
 
@@ -194,7 +201,7 @@ class Boolean(QArgument):
         if self["default"] is not None:
             self.write(self["default"])
 
-        return label, widget
+        return widget
 
 
 class Tristate(QArgument):
@@ -203,8 +210,6 @@ class Tristate(QArgument):
 
 class Number(QArgument):
     def create(self):
-        label = QtWidgets.QLabel(self["label"])
-
         if isinstance(self, Float):
             widget = QtWidgets.QDoubleSpinBox()
         else:
@@ -217,7 +222,7 @@ class Number(QArgument):
         if self["default"] is not None:
             self.write(self["default"])
 
-        return label, widget
+        return widget
 
 
 class Integer(Number):
@@ -234,7 +239,6 @@ class Range(Number):
 
 class String(QArgument):
     def create(self):
-        label = QtWidgets.QLabel(self["label"])
         widget = QtWidgets.QLineEdit()
         widget.editingFinished.connect(self.changed.emit)
         self.read = lambda: widget.text()
@@ -246,7 +250,7 @@ class String(QArgument):
         if self["default"] is not None:
             self.write(self["default"])
 
-        return label, widget
+        return widget
 
 
 class Info(String):
@@ -258,8 +262,9 @@ class Color(String):
 
 
 class Button(QArgument):
+    label = False
+
     def create(self):
-        label = QtWidgets.QLabel()
         widget = QtWidgets.QPushButton(self["label"])
         widget.clicked.connect(self.changed.emit)
 
@@ -281,7 +286,7 @@ class Button(QArgument):
         if self["default"] is not None:
             self.write(self["default"])
 
-        return label, widget
+        return widget
 
 
 class Toggle(Button):
@@ -294,9 +299,6 @@ class InfoList(QArgument):
         super(InfoList, self).__init__(name, **kwargs)
 
     def create(self):
-        label = QtWidgets.QLabel(self["name"])
-        label.setAlignment(QtCore.Qt.AlignBottom)
-
         class Model(QtCore.QStringListModel):
             def data(self, index, role):
                 return super(Model, self).data(index, role)
@@ -309,7 +311,7 @@ class InfoList(QArgument):
         self.read = lambda: model.stringList()
         self.write = lambda value: model.setStringList(value)
 
-        return label, widget
+        return widget
 
 
 class Choice(QArgument):
@@ -323,9 +325,6 @@ class Choice(QArgument):
         return self["items"].index(value)
 
     def create(self):
-        label = QtWidgets.QLabel(self["name"])
-        label.setAlignment(QtCore.Qt.AlignBottom)
-
         class Model(QtCore.QStringListModel):
             def data(self, index, role):
                 return super(Model, self).data(index, role)
@@ -361,7 +360,7 @@ class Choice(QArgument):
         if self["default"] is not None:
             self.write(self["default"])
 
-        return label, widget
+        return widget
 
 
 class Separator(QArgument):
@@ -378,14 +377,12 @@ class Separator(QArgument):
     """
 
     def create(self):
-        label = QtWidgets.QLabel(self["name"])
-        label.setAlignment(QtCore.Qt.AlignBottom)
         widget = QtWidgets.QWidget()
 
         self.read = lambda: None
         self.write = lambda value: None
 
-        return label, widget
+        return widget
 
 
 class Enum(QArgument):
@@ -400,7 +397,6 @@ class Enum(QArgument):
         super(Enum, self).__init__(name, **kwargs)
 
     def create(self):
-        label = QtWidgets.QLabel(self["name"])
         widget = QtWidgets.QComboBox()
         widget.addItems(self["items"])
         widget.currentIndexChanged.connect(
@@ -412,7 +408,7 @@ class Enum(QArgument):
         if self["default"] is not None:
             self.write(self["default"])
 
-        return label, widget
+        return widget
 
 
 style = """\
