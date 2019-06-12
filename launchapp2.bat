@@ -11,10 +11,7 @@ if "%REZ_PACKAGES_PATH%"=="" (set REZ_PACKAGES_PATH=%USERPROFILE%\packages)
 :: Without this, resolving contexts may take seconds to minutes
 if "%REZ_MEMCACHED_URI%"=="" (set REZ_MEMCACHED_URI=127.0.0.1:11211)
 
-:: Defaults to finding projects in your home directory
-if "%LAUNCHAPP_ROOT%"=="" (set LAUNCHAPP_ROOT=%USERPROFILE%\projects)
-
 :: Supports Python 2.7 and Python 3.6+, along with any version of PySide, PySide2, PyQt4 and PyQt5
-if "%LAUNCHAPP_REQUIRE%"=="" (set LAUNCHAPP_REQUIRE=rez python-2 PySide)
+if "%LAUNCHAPP_REQUIRE%"=="" (set LAUNCHAPP_REQUIRE=rez python-3 PySide2)
 
-rez env %LAUNCHAPP_REQUIRE% -- python -m launchapp2 --root %LAUNCHAPP_ROOT% --verbose %*
+rez env %LAUNCHAPP_REQUIRE% -- python -m launchapp2 --verbose %*

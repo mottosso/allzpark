@@ -9,6 +9,21 @@ import argparse
 from .version import version
 
 
+# These can be overridden
+defaults = {
+    "REZ_PACKAGES_PATH": os.path.join(os.path.expanduser("~/packages")),
+
+    # Without this, resolving contexts may take seconds to minutes
+    "REZ_MEMCACHED_URI": "127.0.0.1:11211",
+
+    # Defaults to finding projects in your home directory
+    "LAUNCHAPP_ROOT": os.path.join(os.path.expanduser("~/projects")),
+}
+
+for key, default in defaults.items():
+    os.environ[key] = os.getenv(key, default)
+
+
 def tell(msg):
     print("%s" % msg)
 
@@ -23,9 +38,9 @@ parser.add_argument("--version", action="store_true")
 parser.add_argument("--clear-settings", action="store_true")
 parser.add_argument("--startup-project")
 parser.add_argument("--root",
-                    default=os.getenv("LAUNCHAPP_PROJECTS"),
+                    default=os.environ["LAUNCHAPP_ROOT"],
                     help="Path to where projects live on disk, "
-                         "defaults to LAUNCHAPP_PROJECTS")
+                         "defaults to LAUNCHAPP_ROOT")
 
 opts = parser.parse_args()
 
