@@ -36,11 +36,11 @@ but not vice versa as that would implicate a view when using it standalone.
 import os
 import logging
 import itertools
-import collections
 
 import rez.packages_
 import rez.package_filter
 import rez.resolved_context
+from rez.config import config
 
 from .vendor.Qt import QtCore, QtGui, QtCompat
 from .vendor import qjsonmodel, qhonestmodel, six
@@ -471,7 +471,7 @@ def is_local(pkg):
     if pkg.resource.repository_type != "filesystem":
         return False
 
-    local_path = os.getenv("REZ_LOCAL_PACKAGES_PATH")
+    local_path = config.local_packages_path
     local_path = os.path.abspath(local_path)
     local_path = os.path.normpath(local_path)
 
