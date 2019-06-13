@@ -198,6 +198,9 @@ class Window(QtWidgets.QMainWindow):
             widget.visibilityChanged.connect(
                 partial(on_visible, widget, toggle))
 
+            # Forward any messages
+            widget.message.connect(self.tell)
+
             layout.addWidget(toggle)
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
@@ -314,6 +317,9 @@ class Window(QtWidgets.QMainWindow):
 
     def reset(self):
         self._ctrl.reset()
+
+    def on_command_copied(self, cmd):
+        self.tell("Copied command '%s'" % cmd)
 
     def on_reset_clicked(self):
         self.reset()

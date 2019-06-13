@@ -17,6 +17,8 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
     icon = ""
     advanced = False
 
+    message = QtCore.Signal(str)  # Handled by main window
+
     def __init__(self, title, parent=None):
         super(AbstractDockWidget, self).__init__(title, parent)
         self.layout().setContentsMargins(15, 15, 15, 15)
@@ -440,8 +442,8 @@ class Commands(AbstractDockWidget):
 
         widgets = {
             "view": SlimTableView(),
-            "stdout": QtWidgets.QTextEdit(),
-            "stderr": QtWidgets.QTextEdit(),
+            "stdout": QtWidgets.QListView(),
+            "stderr": QtWidgets.QListView(),
         }
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
@@ -458,6 +460,9 @@ class Commands(AbstractDockWidget):
         layout.addWidget(widgets["stdout"])
         layout.addWidget(widgets["stderr"])
 
+        widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        widgets["view"].customContextMenuRequested.connect(self.on_right_click)
+
         self._panels = panels
         self._widgets = widgets
 
@@ -465,6 +470,40 @@ class Commands(AbstractDockWidget):
 
     def set_model(self, model):
         self._widgets["view"].setModel(model)
+
+    def on_right_click(self, position):
+        view = self._widgets["view"]
+        index = view.indexAt(position)
+        model = index.model()
+
+        menu = QtWidgets.QMenu(self)
+        kill = QtWidgets.QAction("Kill", menu)
+        copy_command = QtWidgets.QAction("Copy command", menu)
+
+        menu.addAction(kill) if os.name != "nt" else None
+        menu.addAction(copy_command)
+        menu.move(QtGui.QCursor.pos())
+
+        picked = menu.exec_()
+
+        if picked is None:
+            return  # Cancelled
+
+        if picked == kill:
+            name = model.data(index, "cmd")
+            if not model.data(index, "running"):
+                self.message.emit("%s isn't running" % name)
+                return
+
+            self.message.emit("Killing %s" % name)
+            command = model.data(index, "object")
+            command.kill()
+
+        if picked == copy_command:
+            clipboard = QtWidgets.QApplication.instance().clipboard()
+            cmd = model.data(index, "niceCmd")
+            clipboard.setText(cmd)
+            self.message.emit("Copying %s" % cmd)
 
 
 class Preferences(AbstractDockWidget):

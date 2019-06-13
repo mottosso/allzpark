@@ -691,6 +691,11 @@ class Command(QtCore.QObject):
             thread.start()
 
     def is_running(self):
+        # Normally, you'd be able to determine whether a Popen instance was
+        # still running by querying Popen.poll() == None, but Rez may or may
+        # not use `Popen(shell=True)` which throws this mechanism off. Instead,
+        # we'll let an open pipe to STDOUT determine whether or not a process
+        # is currently running.
         return not self._killed
 
     def listen_on_stdout(self):

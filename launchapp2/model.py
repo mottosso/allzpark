@@ -609,6 +609,7 @@ class CommandsModel(AbstractTableModel):
         0: {
             QtCore.Qt.DisplayRole: "cmd",
             QtCore.Qt.DecorationRole: "icon",
+            QtCore.Qt.UserRole + 1: "niceCmd",
         },
         1: {
             QtCore.Qt.DisplayRole: "running",
@@ -626,9 +627,18 @@ class CommandsModel(AbstractTableModel):
         root = os.path.dirname(app.uri)
         icons = getattr(app, "_icons", {})
 
+        nicecmd = "rez env {request} -- {cmd}".format(
+            request=" ".join(
+                str(pkg)
+                for pkg in command.context.requested_packages()
+            ),
+            cmd=command.cmd
+        )
+
         self.beginInsertRows(QtCore.QModelIndex(), index, index + 1)
         self.items.append({
             "cmd": command.cmd,
+            "niceCmd": nicecmd,
             "running": "waiting..",
             "icon": QtGui.QIcon(
                 icons.get("32x32", "").format(root=root)
@@ -678,6 +688,50 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
         self.includes = includes or dict()
 
         self.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+    # def data(self, index, role):
+    #     sindex = self.mapToSource(index)
+    #     smodel = self.sourceModel()
+
+    #     row = sindex.row()
+    #     col = sindex.column()
+
+    #     try:
+    #         data = smodel.items[row]
+    #     except IndexError:
+    #         return None
+
+    #     try:
+    #         return data[role]
+    #     except KeyError:
+    #         try:
+    #             key = smodel.ColumnToKey[col][role]
+    #         except KeyError:
+    #             return None
+
+    #     return data[key]
+
+    # def setData(self, index, value, role):
+    #     sindex = self.mapToSource(index)
+    #     smodel = self.sourceModel()
+
+    #     row = sindex.row()
+    #     col = sindex.column()
+
+    #     try:
+    #         data = smodel.items[row]
+    #     except IndexError:
+    #         return False
+
+    #     try:
+    #         data[role] = value
+    #     except KeyError:
+    #         key = smodel.ColumnToKey[col][role]
+    #         data[key] = value
+
+    #     QtCompat.dataChanged(smodel, sindex, sindex, [role])
+
+    #     return True
 
     def setup(self, include=None, exclude=None):
         include = include or []
