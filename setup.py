@@ -4,6 +4,10 @@ import os
 from setuptools import setup, find_packages
 from launchapp2.version import version
 
+# Git is required for deployment
+assert len(version.split(".")) == 3, (
+    "Could not compute patch version, see version.py")
+
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
@@ -27,9 +31,7 @@ with open(fname, "w") as f:
 setup(
     name="launchapp2",
     version=version,
-    description=(
-        "A cross-platform launcher for film and games built on Rez"
-    ),
+    description=__doc__,
     keywords="launcher package resolve version software management",
     long_description=__doc__,
     url="https://github.com/mottosso/launchapp2",
