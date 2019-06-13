@@ -31,6 +31,10 @@ Window App #label {
     font-size: 13px;
 }
 
+Window App QAbstractItemView {
+    max-height: 100px;
+}
+
 QHeaderView {
     qproperty-defaultAlignment: AlignLeft;
     font-weight: 10;

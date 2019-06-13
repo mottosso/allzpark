@@ -1,4 +1,5 @@
 import os
+import time
 import logging
 from itertools import chain
 
@@ -76,11 +77,21 @@ class App(AbstractDockWidget):
 
             "commands": SlimTableView(),
             "extras": SlimTableView(),
+            "lastUsed": QtWidgets.QLabel(),
+
+            "args": qargparse.QArgumentParser([
+                qargparse.Choice("tool", help=(
+                    "Which executable within the context of this application"
+                )),
+                qargparse.Boolean("detached", help=(
+                    "Spawn a dedicated console for this executable\n"
+                    "Typically only necessary for console applications. "
+                    "If you find that an executable doesn't provide a window, "
+                    "such as mayapy, then you probably want detached."
+                )),
+            ]),
 
             # Shortcuts
-            "tools": qargparse.Choice(
-                "", items=["a", "b", "c"], default="b"
-            ).create(),
             "environment": QtWidgets.QToolButton(),
             "packages": QtWidgets.QToolButton(),
             "terminal": QtWidgets.QToolButton(),
@@ -110,32 +121,27 @@ class App(AbstractDockWidget):
         layout.setHorizontalSpacing(px(10))
         layout.setVerticalSpacing(0)
 
+        def Spacer():
+            return QtWidgets.QLabel("")
+
         layout.addWidget(widgets["icon"], 0, 0, 2, 1)
         layout.addWidget(widgets["label"], 0, 1, QtCore.Qt.AlignTop)
-        # layout.addWidget(QtWidgets.QWidget(), 0, 1, 1, 1)
-        # layout.addWidget(widgets["version"], 1, 1, QtCore.Qt.AlignTop)
-        layout.addWidget(QtWidgets.QLabel("Last used 6th June 2019, 8:35:00"), 1, 1, QtCore.Qt.AlignTop)
-        layout.addWidget(QtWidgets.QLabel("Tool"), 3, 0)
-        layout.addWidget(widgets["tools"], 4, 0, 1, 2)
-        # layout.addWidget(widgets["commands"], 2, 0, 1, 2)
-        # layout.addWidget(widgets["extras"], 3, 0, 1, 2)
-        # layout.addWidget(panels["shortcuts"], 10, 0, 1, 2)
+        layout.addWidget(widgets["lastUsed"], 1, 1, QtCore.Qt.AlignTop)
+        layout.addWidget(widgets["args"], 5, 0, 1, 2)
+        layout.addWidget(widgets["commands"], 6, 0, 1, 2)
         layout.addWidget(QtWidgets.QWidget(), 15, 0)
         layout.setColumnStretch(1, 1)
         layout.setRowStretch(15, 1)
-        layout.addWidget(panels["footer"], 20, 0, 1, 2)
+        layout.addWidget(panels["footer"], 40, 0, 1, 2)
 
         widgets["icon"].setPixmap(res.pixmap("Alert_Info_32"))
-        # widgets["icon"].setIconSize(QtCore.QSize(px(24), px(24)))
         widgets["environment"].setIcon(res.icon(Environment.icon))
         widgets["packages"].setIcon(res.icon(Packages.icon))
         widgets["terminal"].setIcon(res.icon(Console.icon))
         widgets["tool"].setText("maya")
 
-        # for sc in ("environment", "packages", "terminal"):
-        #     widgets[sc].setIconSize(QtCore.QSize(px(24), px(24)))
+        widgets["args"].changed.connect(self.on_arg_changed)
 
-        # QtCom
         widgets["launchBtn"].setCheckable(True)
         widgets["launchBtn"].clicked.connect(self.on_launch_clicked)
 
@@ -152,12 +158,37 @@ class App(AbstractDockWidget):
     def on_launch_clicked(self):
         self._ctrl.launch()
 
+    def on_arg_changed(self, arg):
+        if arg["name"] not in ("detached", "tool"):
+            return
+
+        ctrl = self._ctrl
+        model = ctrl.models["apps"]
+        app_name = ctrl.state["appName"]
+        app_index = model.findIndex(app_name)
+        value = arg.read()
+        model.setData(app_index, value, arg["name"])
+
     def refresh(self, index):
         name = index.data(QtCore.Qt.DisplayRole)
         icon = index.data(QtCore.Qt.DecorationRole)
         icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
         self._widgets["label"].setText(name)
         self._widgets["icon"].setPixmap(icon)
+
+        last_used = self._ctrl.state.retrieve("app/%s/lastUsed" % name)
+        last_used = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(float(last_used))
+        ) if last_used else "Never"
+        last_used = "Last used: %s" % last_used
+
+        self._widgets["lastUsed"].setText("%s" % last_used)
+
+        model = index.model()
+        tools = model.data(index, "tools")
+        default_tool = model.data(index, "tool") or tools[0]
+        arg = self._widgets["args"].find("tool")
+        arg.reset(tools[:], default_tool)
 
         self._proxy.setup(include=[
             ("appName", name),

@@ -36,6 +36,7 @@ but not vice versa as that would implicate a view when using it standalone.
 import os
 import logging
 import itertools
+import collections
 
 import rez.packages_
 import rez.package_filter
@@ -346,6 +347,14 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
     def reset(self, items=None):
         pass
 
+    def find(self, name):
+        return next(i for i in self.items if i["name"] == name)
+
+    def findIndex(self, name):
+        return self.createIndex(
+            self.items.index(self.find(name)), 0, QtCore.QModelIndex()
+        )
+
     def rowCount(self, parent=QtCore.QModelIndex()):
         if parent.isValid():
             return 0
@@ -404,7 +413,7 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
 class ApplicationModel(AbstractTableModel):
     ColumnToKey = {
         0: {
-            QtCore.Qt.DisplayRole: "name",
+            QtCore.Qt.DisplayRole: "label",
             QtCore.Qt.DecorationRole: "icon",
         },
         1: {
@@ -425,10 +434,16 @@ class ApplicationModel(AbstractTableModel):
 
         for app in applications:
             root = os.path.dirname(app.uri)
-            icons = getattr(app, "_data", {}).get("icons")
+
+            data = getattr(app, "_data", {})
+            icons = data.get("icons")
             icons = icons or getattr(app, "_icons", {})  # backwards comp
+            label = data.get("label", app.name)
+            tools = getattr(app, "tools", None) or [app.name]
+
             item = {
                 "name": app.name,
+                "label": label,
                 "version": str(app.version),
                 "icon": QtGui.QIcon(
                     icons.get("32x32", "").format(root=root)
@@ -436,7 +451,15 @@ class ApplicationModel(AbstractTableModel):
                 "package": app,
                 "context": None,
                 "active": True,
-                "overridden": None,
+
+                # Whether or not to open a separate console for this app
+                "detached": False,
+
+                # Current tool
+                "tool": None,
+
+                # All available tools
+                "tools": tools,
             }
 
             self.items.append(item)
@@ -447,7 +470,7 @@ class ApplicationModel(AbstractTableModel):
 class PackagesModel(AbstractTableModel):
     ColumnToKey = {
         0: {
-            QtCore.Qt.DisplayRole: "name",
+            QtCore.Qt.DisplayRole: "label",
             QtCore.Qt.DecorationRole: "icon",
         },
         1: {
@@ -474,9 +497,13 @@ class PackagesModel(AbstractTableModel):
 
         for pkg in packages:
             root = os.path.dirname(pkg.uri)
-            icons = getattr(pkg, "_icons", {})
+            data = getattr(pkg, "_data", {})
+            icons = data.get("icons")
+            icons = icons or getattr(pkg, "_icons", {})  # backwards comp
+            label = data.get("label", pkg.name)
             item = {
                 "name": pkg.name,
+                "label": label,
                 "version": str(pkg.version),
                 "default": str(pkg.version),
                 "icon": QtGui.QIcon(
@@ -607,20 +634,37 @@ class CommandsModel(AbstractTableModel):
                 icons.get("32x32", "").format(root=root)
             ),
             "object": command,
-            "appName": command.app.name,
+            "appName": app.name,
         })
         self.endInsertRows()
 
     def poll(self):
+        self.layoutAboutToBeChanged.emit()
+
         for row in range(self.rowCount()):
             command = self.items[row]["object"]
             value = "running" if command.is_running() else "killed"
-            index = self.index(row, 1)
-            self.setData(index, value, QtCore.Qt.DisplayRole)
+            index = self.createIndex(row, 0, QtCore.QModelIndex())
+            self.setData(index, value, "running")
+
+        self.layoutChanged.emit()
 
 
 class JsonModel(qjsonmodel.QJsonModel):
     pass
+
+
+class EnvironmentModel(JsonModel):
+    def load(self, data):
+
+        # Convert PATH environment variables to lists
+        # for improved viewing experience
+        for key, value in data.copy().items():
+            if os.pathsep in value:
+                value = value.split(os.pathsep)
+            data[key] = value
+
+        super(EnvironmentModel, self).load(data)
 
 
 class ProxyModel(QtCore.QSortFilterProxyModel):

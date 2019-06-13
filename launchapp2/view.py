@@ -507,7 +507,7 @@ class Window(QtWidgets.QMainWindow):
         if app:
             for row in range(model.rowCount()):
                 index = model.index(row, 0, QtCore.QModelIndex())
-                name = index.data(QtCore.Qt.DisplayRole)
+                name = model.data(index, "name")
 
                 if app == name:
                     index = row
@@ -533,7 +533,8 @@ class Window(QtWidgets.QMainWindow):
         """
 
         index = selected.indexes()[0]
-        app_name = index.data(QtCore.Qt.DisplayRole)
+        model = index.model()
+        app_name = model.data(index, "name")
         self._ctrl.select_application(app_name)
         self._docks["app"].refresh(index)
 

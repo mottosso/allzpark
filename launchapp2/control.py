@@ -1,6 +1,7 @@
 """Orchestrates view.py and model.py"""
 
 import os
+import time
 import logging
 import threading
 import traceback
@@ -24,7 +25,7 @@ log = logging.getLogger(__name__)
 class State(dict):
     """Transient, persistent and machine for state
 
-    The state is used to keep track of which application
+    The state is used to keep track of which applications
     is the "current" one, along with managing the current
     "state" such as whether the application is busy loading,
     whether it's ready for user input. It also manages persistent
@@ -43,10 +44,6 @@ class State(dict):
 
             # Current error, if any
             "error": None,
-
-            # Optional explicit tool
-            "tool": None,
-            "tools": [],
 
             # Currently commands applications
             "commands": [],
@@ -169,7 +166,7 @@ class Controller(QtCore.QObject):
             # Docks
             "packages": model.PackagesModel(),
             "context": model.JsonModel(),
-            "environment": model.JsonModel(),
+            "environment": model.EnvironmentModel(),
             "commands": model.CommandsModel(),
         }
 
@@ -234,9 +231,6 @@ class Controller(QtCore.QObject):
 
     def environ(self, app_name):
         return self._state["rezContexts"][app_name].get_environ()
-
-    def tools(self, app_name):
-        return self._state["tools"]
 
     def resolved_packages(self, app_name):
         return self._state["rezContexts"][app_name].resolved_packages
@@ -361,16 +355,20 @@ class Controller(QtCore.QObject):
                 rez_app.name, rez_app.version
             ))
 
-            tool_name = self._state["tool"] or self._state["defaultTool"]
+            app_model = self._models["apps"]
+            app_index = app_model.findIndex(app_name)
+            is_detached = app_model.data(app_index, "detached")
+            tool_name = app_model.data(app_index, "tool")
 
-            if not tool_name:
-                self.error("No tool found for %s" % app_name)
-                return self._state.to_errored()
-
-            self.info("Launching %s.." % tool_name)
+            assert tool_name
 
             overrides = self._models["packages"]._overrides
             disabled = self._models["packages"]._disabled
+
+            self.info(
+                "Launching %s%s.." % (
+                    tool_name, " (detached)" if is_detached else "")
+            )
 
             cmd = Command(
                 context=rez_context,
@@ -378,6 +376,7 @@ class Controller(QtCore.QObject):
                 package=rez_app,
                 overrides=overrides,
                 disabled=disabled,
+                detached=is_detached,
                 parent=self
             )
 
@@ -388,6 +387,7 @@ class Controller(QtCore.QObject):
             self._models["commands"].append(cmd)
 
             self._state.store("startupApplication", app_name)
+            self._state.store("app/%s/lastUsed" % app_name, time.time())
             self._state.to_launching()
 
         self._state.to_loading()
@@ -486,46 +486,11 @@ class Controller(QtCore.QObject):
 
         self._models["packages"].reset(packages)
         self._models["context"].load(context)
-
-        # Convert PATH environment variables to lists
-        # for improved viewing experience
-        for key, value in environ.copy().items():
-            if os.pathsep in value:
-                value = value.split(os.pathsep)
-            environ[key] = value
-
         self._models["environment"].load(environ)
 
-        rez_pkg = self._state["rezApps"][app_name]
-        tools = getattr(rez_pkg, "tools", [])
-
-        if not tools:
-            tools = [app_name]
-            self.debug("No default tool found for %s, "
-                       "using package name" % app_name)
-
-        self._state["tool"] = tools[0]
-        self._state["tools"] = tools
-
     def select_tool(self, tool_name):
+        self.debug("%s selected" % tool_name)
         self._state["tool"] = tool_name
-
-    def edit_requirements(self, requirements):
-        """Override requirements in project with `requirements`
-
-        Arguments:
-            requirements (list): Rez-requirements, e.g. ["six>=1.21"]
-
-        """
-
-        if requirements == self._state["extraRequirements"]:
-            return
-
-        self.info("Editing requirements..")
-        self._state["extraRequirements"] = requirements
-
-        # Re-select project to re-evaluate context resolve
-        self.select_project(self._state["projectName"])
 
     def _find_project(self, project_name, version):
         try:
@@ -636,6 +601,7 @@ class Command(QtCore.QObject):
                  package,
                  overrides=None,
                  disabled=None,
+                 detached=True,
                  parent=None):
         super(Command, self).__init__(parent)
 
@@ -645,6 +611,7 @@ class Command(QtCore.QObject):
         self.context = context
         self.app = package
         self.popen = None
+        self.detached = detached
 
         # `cmd` rather than `command`, to distinguish
         # between class and argument
@@ -657,12 +624,14 @@ class Command(QtCore.QObject):
         thread.start()
 
         self.thread = thread
+        self._killed = False
 
     def execute(self):
         kwargs = {
             "command": self.cmd,
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
+            "detached": self.detached,
         }
 
         context = self.context
@@ -722,11 +691,12 @@ class Command(QtCore.QObject):
             thread.start()
 
     def is_running(self):
-        return self.popen and self.popen.poll() is None
+        return not self._killed
 
     def listen_on_stdout(self):
         for line in iter(self.popen.stdout.readline, ""):
             self.stdout.emit(line.rstrip())
+        self._killed = True
         self.killed.emit()
 
     def listen_on_stderr(self):
