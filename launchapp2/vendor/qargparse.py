@@ -8,6 +8,12 @@ __version__ = "0.5.0"
 _log = logging.getLogger(__name__)
 _type = type
 
+try:
+    # Python 2
+    _basestring = basestring
+except NameError:
+    _basestring = str
+
 
 class QArgumentParser(QtWidgets.QWidget):
     """User interface arguments
@@ -42,7 +48,6 @@ class QArgumentParser(QtWidgets.QWidget):
             _log.info("Storing settings @ %s" % storage.fileName())
 
         arguments = arguments or []
-        description = QtWidgets.QLabel(description or "")
 
         assert hasattr(arguments, "__iter__"), "arguments must be iterable"
         assert isinstance(storage, (type(None), QtCore.QSettings)), (
@@ -50,8 +55,10 @@ class QArgumentParser(QtWidgets.QWidget):
         )
 
         layout = QtWidgets.QGridLayout(self)
-        layout.addWidget(description, 0, 0, 1, 2)
         layout.setRowStretch(999, 1)
+
+        if description:
+            layout.addWidget(QtWidgets.QLabel(description), 0, 0, 1, 2)
 
         self._row = 1
         self._storage = storage
@@ -149,11 +156,25 @@ class QArgument(QtCore.QObject):
 
         self._data = kwargs
 
+    def __str__(self):
+        return self["name"]
+
+    def __repr__(self):
+        return "%s(\"%s\")" % (type(self).__name__, self["name"])
+
     def __getitem__(self, key):
         return self._data[key]
 
     def __setitem__(self, key, value):
         self._data[key] = value
+
+    def __eq__(self, other):
+        if isinstance(other, _basestring):
+            return self["name"] == other
+        return super(QArgument, self).__eq__(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def create(self):
         return QtWidgets.QWidget()
@@ -197,6 +218,7 @@ class Boolean(QArgument):
             }
 
         self.write = lambda value: widget.setCheckState(state[value])
+        self.changed = widget.clicked
 
         if self["default"] is not None:
             self.write(self["default"])
@@ -325,14 +347,11 @@ class Choice(QArgument):
         return self["items"].index(value)
 
     def create(self):
-        class Model(QtCore.QStringListModel):
-            def data(self, index, role):
-                return super(Model, self).data(index, role)
-
         def on_changed(selected, deselected):
             selected = selected.indexes()[0]
             value = selected.data(QtCore.Qt.DisplayRole)
             self["current"] = value
+            self.changed.emit()
 
         def set_current(current):
             options = model.stringList()
@@ -340,14 +359,19 @@ class Choice(QArgument):
                 if member == current:
                     break
             else:
-                raise ValueError("%s not a member of %s" % (current, self))
+                raise ValueError("%s not a member of %s" % (current, options))
 
             qindex = model.index(index, 0, QtCore.QModelIndex())
             smodel = widget.selectionModel()
             smodel.setCurrentIndex(qindex, smodel.Select)
             self["current"] = options[index]
 
-        model = QtCore.QStringListModel(self["items"])
+        def reset(items, default=None):
+            items = items or ["Empty"]
+            model.setStringList(items)
+            set_current(default or items[0])
+
+        model = QtCore.QStringListModel()
         widget = QtWidgets.QListView()
         widget.setModel(model)
         widget.setEditTriggers(widget.NoEditTriggers)
@@ -356,9 +380,9 @@ class Choice(QArgument):
 
         self.read = lambda: self["current"]
         self.write = lambda value: set_current(value)
+        self.reset = reset
 
-        if self["default"] is not None:
-            self.write(self["default"])
+        reset(self["items"], self["default"])
 
         return widget
 
