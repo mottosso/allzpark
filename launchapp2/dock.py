@@ -490,9 +490,11 @@ class Commands(AbstractDockWidget):
         menu = QtWidgets.QMenu(self)
         kill = QtWidgets.QAction("Kill", menu)
         copy_command = QtWidgets.QAction("Copy command", menu)
+        copy_pid = QtWidgets.QAction("Copy pid", menu)
 
         menu.addAction(kill) if os.name != "nt" else None
         menu.addAction(copy_command)
+        menu.addAction(copy_pid)
         menu.move(QtGui.QCursor.pos())
 
         picked = menu.exec_()
@@ -509,6 +511,13 @@ class Commands(AbstractDockWidget):
             self.message.emit("Killing %s" % name)
             command = model.data(index, "object")
             command.kill()
+
+        if picked == copy_pid:
+            clipboard = QtWidgets.QApplication.instance().clipboard()
+            command = model.data(index, "object")
+            pid = str(command.pid)
+            clipboard.setText(pid)
+            self.message.emit("Copying %s" % pid)
 
         if picked == copy_command:
             clipboard = QtWidgets.QApplication.instance().clipboard()

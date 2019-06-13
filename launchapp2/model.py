@@ -627,18 +627,11 @@ class CommandsModel(AbstractTableModel):
         root = os.path.dirname(app.uri)
         icons = getattr(app, "_icons", {})
 
-        nicecmd = "rez env {request} -- {cmd}".format(
-            request=" ".join(
-                str(pkg)
-                for pkg in command.context.requested_packages()
-            ),
-            cmd=command.cmd
-        )
-
         self.beginInsertRows(QtCore.QModelIndex(), index, index + 1)
         self.items.append({
             "cmd": command.cmd,
-            "niceCmd": nicecmd,
+            "niceCmd": command.nicecmd,
+            "pid": None,
             "running": "waiting..",
             "icon": QtGui.QIcon(
                 icons.get("32x32", "").format(root=root)
@@ -647,6 +640,11 @@ class CommandsModel(AbstractTableModel):
             "appName": app.name,
         })
         self.endInsertRows()
+
+    # def data(self, index, role):
+    #     if role == "pid":
+    #         return self.data(index, "object").pid
+    #     return super(CommandsModel, self).data(index, role)
 
     def poll(self):
         self.layoutAboutToBeChanged.emit()

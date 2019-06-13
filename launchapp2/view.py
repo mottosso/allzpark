@@ -1,6 +1,8 @@
 """The view may access a controller, but not vice versa"""
 
+import os
 import logging
+
 from itertools import chain
 from functools import partial
 from collections import OrderedDict as odict
@@ -234,6 +236,10 @@ class Window(QtWidgets.QMainWindow):
         widgets["continue"].clicked.connect(self.on_continue_clicked)
         widgets["apps"].activated.connect(self.on_app_clicked)
         widgets["projectName"].setText(ctrl.current_project)
+
+        widgets["apps"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        widgets["apps"].customContextMenuRequested.connect(self.on_app_right_click)
+
         selection_model = widgets["apps"].selectionModel()
         selection_model.selectionChanged.connect(self.on_app_changed)
 
@@ -326,6 +332,34 @@ class Window(QtWidgets.QMainWindow):
 
     def on_continue_clicked(self):
         self._ctrl.state.to_ready()
+
+    def on_app_right_click(self, position):
+        menu = QtWidgets.QMenu(self)
+        open_in_cmd = QtWidgets.QAction("Open in cmd.exe", menu)
+        open_in_powershell = QtWidgets.QAction("Open in PowerShell", menu)
+        open_in_bash = QtWidgets.QAction("Open in Bash", menu)
+
+        if os.name == "nt":
+            menu.addAction(open_in_cmd)
+            menu.addAction(open_in_powershell)
+        else:
+            menu.addAction(open_in_bash)
+
+        menu.move(QtGui.QCursor.pos())
+
+        picked = menu.exec_()
+
+        if picked is None:
+            return  # Cancelled
+
+        if picked == open_in_cmd:
+            self._ctrl.launch(command="start cmd")
+
+        if picked == open_in_powershell:
+            self._ctrl.launch(command="start powershell")
+
+        if picked == open_in_bash:
+            self._ctrl.launch(command="bash")
 
     def on_setting_changed(self, argument):
         if isinstance(argument, qargparse.Button):

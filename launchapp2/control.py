@@ -345,7 +345,7 @@ class Controller(QtCore.QObject):
         util.delay(do)
 
     @util.async_
-    def launch(self):
+    def launch(self, **kwargs):
         def do():
             app_name = self._state["appName"]
             rez_context = self._state["rezContexts"][app_name]
@@ -357,8 +357,11 @@ class Controller(QtCore.QObject):
 
             app_model = self._models["apps"]
             app_index = app_model.findIndex(app_name)
-            is_detached = app_model.data(app_index, "detached")
-            tool_name = app_model.data(app_index, "tool")
+
+            tool_name = kwargs.get(
+                "command", app_model.data(app_index, "tool"))
+            is_detached = kwargs.get(
+                "detached", app_model.data(app_index, "detached"))
 
             assert tool_name
 
@@ -617,6 +620,16 @@ class Command(QtCore.QObject):
         # between class and argument
         self.cmd = command
 
+        self.nicecmd = "rez env {request} -- {cmd}".format(
+            request=" ".join(
+                str(pkg)
+                for pkg in context.requested_packages()
+            ),
+            cmd=command
+        )
+
+        self._running = False
+
         # Launching may take a moment, and there's no need
         # for the user to wait around for that to happen.
         thread = threading.Thread(target=self.execute)
@@ -624,7 +637,10 @@ class Command(QtCore.QObject):
         thread.start()
 
         self.thread = thread
-        self._killed = False
+
+    @property
+    def pid(self):
+        return self.popen.pid
 
     def execute(self):
         kwargs = {
@@ -635,6 +651,9 @@ class Command(QtCore.QObject):
         }
 
         context = self.context
+
+        # Output to console
+        log.info("Console command: %s" % self.nicecmd)
 
         if self.overrides or self.disabled:
             # Apply overrides to a new context, to preserve the original
@@ -696,12 +715,13 @@ class Command(QtCore.QObject):
         # not use `Popen(shell=True)` which throws this mechanism off. Instead,
         # we'll let an open pipe to STDOUT determine whether or not a process
         # is currently running.
-        return not self._killed
+        return self._running
 
     def listen_on_stdout(self):
+        self._running = True
         for line in iter(self.popen.stdout.readline, ""):
             self.stdout.emit(line.rstrip())
-        self._killed = True
+        self._running = False
         self.killed.emit()
 
     def listen_on_stderr(self):
