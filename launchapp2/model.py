@@ -467,6 +467,21 @@ class ApplicationModel(AbstractTableModel):
         self.endResetModel()
 
 
+def is_local(pkg):
+    if pkg.resource.repository_type != "filesystem":
+        return False
+
+    local_path = os.getenv("REZ_LOCAL_PACKAGES_PATH")
+    local_path = os.path.abspath(local_path)
+    local_path = os.path.normpath(local_path)
+
+    pkg_path = pkg.resource.location
+    pkg_path = os.path.abspath(pkg_path)
+    pkg_path = os.path.normpath(pkg_path)
+
+    return pkg_path.startswith(local_path)
+
+
 class PackagesModel(AbstractTableModel):
     ColumnToKey = {
         0: {
@@ -475,12 +490,16 @@ class PackagesModel(AbstractTableModel):
         },
         1: {
             QtCore.Qt.DisplayRole: "version",
+        },
+        2: {
+            QtCore.Qt.DisplayRole: "local",
         }
     }
 
     Headers = [
         "package",
         "version",
+        "local",
     ]
 
     def __init__(self, parent=None):
@@ -500,7 +519,9 @@ class PackagesModel(AbstractTableModel):
             data = getattr(pkg, "_data", {})
             icons = data.get("icons")
             icons = icons or getattr(pkg, "_icons", {})  # backwards comp
+            local = "(local)" if is_local(pkg) else ""
             label = data.get("label", pkg.name)
+
             item = {
                 "name": pkg.name,
                 "label": label,
@@ -514,7 +535,8 @@ class PackagesModel(AbstractTableModel):
                 "disabled": self._disabled.get(pkg.name, False),
                 "context": None,
                 "active": True,
-                "versions": None
+                "versions": None,
+                "local": local,
             }
 
             self.items.append(item)
@@ -640,11 +662,6 @@ class CommandsModel(AbstractTableModel):
             "appName": app.name,
         })
         self.endInsertRows()
-
-    # def data(self, index, role):
-    #     if role == "pid":
-    #         return self.data(index, "object").pid
-    #     return super(CommandsModel, self).data(index, role)
 
     def poll(self):
         self.layoutAboutToBeChanged.emit()

@@ -313,6 +313,7 @@ class Packages(AbstractDockWidget):
         earliest = QtWidgets.QAction("Set to earliest", menu)
         latest = QtWidgets.QAction("Set to latest", menu)
         openfile = QtWidgets.QAction("Open file location", menu)
+        copyfile = QtWidgets.QAction("Cope file location", menu)
 
         disable.setCheckable(True)
         disable.setChecked(model.data(index, "disabled"))
@@ -325,6 +326,7 @@ class Packages(AbstractDockWidget):
         menu.addAction(latest)
         menu.addSeparator()
         menu.addAction(openfile)
+        menu.addAction(copyfile)
         menu.move(QtGui.QCursor.pos())
 
         picked = menu.exec_()
@@ -338,25 +340,37 @@ class Packages(AbstractDockWidget):
         if picked == default:
             model.setData(index, None, "override")
             model.setData(index, False, "disabled")
+            self.message.emit("Package set to default")
 
         if picked == earliest:
             versions = model.data(index, "versions")
             model.setData(index, versions[0], "override")
             model.setData(index, False, "disabled")
+            self.message.emit("Package set to earliest")
 
         if picked == latest:
             versions = model.data(index, "versions")
             model.setData(index, versions[-1], "override")
             model.setData(index, False, "disabled")
+            self.message.emit("Package set to latest version")
 
         if picked == openfile:
             package = model.data(index, "package")
             fname = os.path.join(package.root, "package.py")
             util.open_file_location(fname)
+            self.message.emit("Opened %s" % fname)
+
+        if picked == copyfile:
+            package = model.data(index, "package")
+            fname = os.path.join(package.root, "package.py")
+            clipboard = QtWidgets.QApplication.instance().clipboard()
+            clipboard.setText(fname)
+            self.message.emit("Copied %s" % fname)
 
         if picked == disable:
             model.setData(index, None, "override")
             model.setData(index, disable.isChecked(), "disabled")
+            self.message.emit("Package disabled")
 
 
 class Context(AbstractDockWidget):
