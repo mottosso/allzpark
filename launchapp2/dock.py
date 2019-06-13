@@ -442,6 +442,7 @@ class Commands(AbstractDockWidget):
 
         widgets = {
             "view": SlimTableView(),
+            "command": QtWidgets.QLineEdit(),
             "stdout": QtWidgets.QListView(),
             "stderr": QtWidgets.QListView(),
         }
@@ -449,7 +450,7 @@ class Commands(AbstractDockWidget):
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(panels["body"])
-        # layout.addWidget(panels["footer"])
+        layout.addWidget(panels["footer"])
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -457,19 +458,29 @@ class Commands(AbstractDockWidget):
 
         layout = QtWidgets.QVBoxLayout(panels["footer"])
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(widgets["stdout"])
-        layout.addWidget(widgets["stderr"])
+        layout.addWidget(widgets["command"])
+        # layout.addWidget(widgets["stderr"])
+        # layout.addWidget(widgets["stderr"])
 
         widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
+        widgets["command"].setReadOnly(True)
 
         self._panels = panels
         self._widgets = widgets
 
         self.setWidget(panels["central"])
 
+    def on_selection_changed(self, selected, deselected):
+        selected = selected.indexes()[0]
+        model = selected.model()
+        cmd = model.data(selected, "niceCmd")
+        self._widgets["command"].setText(cmd)
+
     def set_model(self, model):
         self._widgets["view"].setModel(model)
+        model = self._widgets["view"].selectionModel()
+        model.selectionChanged.connect(self.on_selection_changed)
 
     def on_right_click(self, position):
         view = self._widgets["view"]
