@@ -44,6 +44,12 @@ Window #apps QHeaderView {
     font-weight: bold;
 }
 
+QMenu QLabel {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
 QHeaderView::section {
     border: 0;
     padding: 5px;

@@ -239,7 +239,6 @@ class Window(QtWidgets.QMainWindow):
         widgets["apps"].activated.connect(self.on_app_clicked)
         widgets["projectName"].setText(ctrl.current_project)
 
-        widgets["apps"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["apps"].customContextMenuRequested.connect(self.on_app_right_click)
 
         selection_model = widgets["apps"].selectionModel()
@@ -336,16 +335,35 @@ class Window(QtWidgets.QMainWindow):
         self._ctrl.state.to_ready()
 
     def on_app_right_click(self, position):
-        menu = QtWidgets.QMenu(self)
-        open_in_cmd = QtWidgets.QAction("Open in cmd.exe", menu)
-        open_in_powershell = QtWidgets.QAction("Open in PowerShell", menu)
-        open_in_bash = QtWidgets.QAction("Open in Bash", menu)
+        view = self._widgets["apps"]
+        index = view.indexAt(position)
 
-        if os.name == "nt":
-            menu.addAction(open_in_cmd)
-            menu.addAction(open_in_powershell)
-        else:
-            menu.addAction(open_in_bash)
+        if not index.isValid():
+            # Clicked outside any item
+            return
+
+        model = index.model()
+        tools = model.data(index, "tools")
+
+        menu = QtWidgets.QMenu(self)
+
+        separator = QtWidgets.QWidgetAction(menu)
+        separator.setDefaultWidget(QtWidgets.QLabel("Quick Launch"))
+        menu.addAction(separator)
+
+        for tool in tools:
+            menu.addAction(QtWidgets.QAction(tool, menu))
+
+        menu.addSeparator()
+
+        extras = (
+            ["start cmd", "start powershell"]
+            if os.name == "nt" else
+            ["bash"]
+        )
+
+        for tool in extras:
+            menu.addAction(QtWidgets.QAction(tool, menu))
 
         menu.move(QtGui.QCursor.pos())
 
@@ -354,14 +372,7 @@ class Window(QtWidgets.QMainWindow):
         if picked is None:
             return  # Cancelled
 
-        if picked == open_in_cmd:
-            self._ctrl.launch(command="start cmd")
-
-        if picked == open_in_powershell:
-            self._ctrl.launch(command="start powershell")
-
-        if picked == open_in_bash:
-            self._ctrl.launch(command="bash")
+        self._ctrl.launch(command=picked.text())
 
     def on_setting_changed(self, argument):
         if isinstance(argument, qargparse.Button):

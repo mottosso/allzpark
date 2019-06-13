@@ -275,7 +275,6 @@ class Packages(AbstractDockWidget):
         widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
         widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
         widgets["view"].verticalHeader().setDefaultSectionSize(px(20))
-        widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
 
         widgets["status"].setSizeGripEnabled(False)
@@ -308,8 +307,12 @@ class Packages(AbstractDockWidget):
     def on_right_click(self, position):
         view = self._widgets["view"]
         index = view.indexAt(position)
-        model = index.model()
 
+        if not index.isValid():
+            # Clicked outside any item
+            return
+
+        model = index.model()
         menu = QtWidgets.QMenu(self)
         edit = QtWidgets.QAction("Edit", menu)
         disable = QtWidgets.QAction("Disable", menu)
@@ -487,7 +490,6 @@ class Commands(AbstractDockWidget):
         # layout.addWidget(widgets["stderr"])
 
         widgets["view"].setSortingEnabled(True)
-        widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
         widgets["command"].setReadOnly(True)
 
@@ -512,6 +514,11 @@ class Commands(AbstractDockWidget):
     def on_right_click(self, position):
         view = self._widgets["view"]
         index = view.indexAt(position)
+
+        if not index.isValid():
+            # Clicked outside any item
+            return
+
         model = index.model()
 
         menu = QtWidgets.QMenu(self)
@@ -670,7 +677,6 @@ class SlimTableView(QtWidgets.QTableView):
         self.refresh()
 
         if isinstance(model_, model.ProxyModel):
-            print("Installing sorting stuff")
             self.doSort.connect(model_.doSort)
             model_.askOrder.connect(self.setSorting)
             self.setSortingEnabled(True)
@@ -696,3 +702,16 @@ class SlimTableView(QtWidgets.QTableView):
 
         self._previous_sort = column
         self.doSort.emit(column, order)
+
+    def mousePressEvent(self, event):
+        """Do request a context menu, but on mouse *press*, not release"""
+
+        # Important, call this first to have the item be selected,
+        # as per default, and *then* ask for a context menu. That
+        # way, the menu and selection aligns.
+        try:
+            return super(SlimTableView, self).mousePressEvent(event)
+
+        finally:
+            if event.button() == QtCore.Qt.RightButton:
+                self.customContextMenuRequested.emit(event.pos())

@@ -381,7 +381,14 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
             return None
 
         try:
-            return data[role]
+            value = data[role]
+
+            if isinstance(value, list):
+                # Prevent edits
+                value = value[:]
+
+            return value
+
         except KeyError:
             try:
                 key = self.ColumnToKey[col][role]
