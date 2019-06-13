@@ -10,7 +10,7 @@ from collections import OrderedDict as odict
 from .vendor.Qt import QtWidgets, QtCore, QtGui
 from .vendor import six, qargparse
 from .version import version
-from . import resources as res, dock
+from . import resources as res, dock, model
 
 px = res.px
 
@@ -226,7 +226,9 @@ class Window(QtWidgets.QMainWindow):
         docks["context"].set_model(ctrl.models["context"])
         docks["environment"].set_model(ctrl.models["environment"])
         docks["commands"].set_model(ctrl.models["commands"])
-        widgets["apps"].setModel(ctrl.models["apps"])
+
+        proxy_model = model.ProxyModel(ctrl.models["apps"])
+        widgets["apps"].setModel(proxy_model)
 
         widgets["projectMenu"].aboutToShow.connect(self.on_show_project_menu)
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)

@@ -692,7 +692,17 @@ class EnvironmentModel(JsonModel):
         super(EnvironmentModel, self).load(data)
 
 
-class ProxyModel(QtCore.QSortFilterProxyModel):
+class TriStateSortFilterProxyModel(QtCore.QSortFilterProxyModel):
+    askOrder = QtCore.Signal(int, QtCore.Qt.SortOrder)  # column, order
+
+    def sort(self, column, order):
+        return self.askOrder.emit(column, order)
+
+    def doSort(self, column, order):
+        return super(TriStateSortFilterProxyModel, self).sort(column, order)
+
+
+class ProxyModel(TriStateSortFilterProxyModel):
     """A QSortFilterProxyModel with custom exclude and include rules"""
 
     def __init__(self, source, excludes=None, includes=None, parent=None):
@@ -704,49 +714,16 @@ class ProxyModel(QtCore.QSortFilterProxyModel):
 
         self.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
-    # def data(self, index, role):
-    #     sindex = self.mapToSource(index)
-    #     smodel = self.sourceModel()
+    def data(self, index, role):
+        """Handle our custom model management"""
+        sindex = self.mapToSource(index)
+        smodel = self.sourceModel()
+        return smodel.data(sindex, role)
 
-    #     row = sindex.row()
-    #     col = sindex.column()
-
-    #     try:
-    #         data = smodel.items[row]
-    #     except IndexError:
-    #         return None
-
-    #     try:
-    #         return data[role]
-    #     except KeyError:
-    #         try:
-    #             key = smodel.ColumnToKey[col][role]
-    #         except KeyError:
-    #             return None
-
-    #     return data[key]
-
-    # def setData(self, index, value, role):
-    #     sindex = self.mapToSource(index)
-    #     smodel = self.sourceModel()
-
-    #     row = sindex.row()
-    #     col = sindex.column()
-
-    #     try:
-    #         data = smodel.items[row]
-    #     except IndexError:
-    #         return False
-
-    #     try:
-    #         data[role] = value
-    #     except KeyError:
-    #         key = smodel.ColumnToKey[col][role]
-    #         data[key] = value
-
-    #     QtCompat.dataChanged(smodel, sindex, sindex, [role])
-
-    #     return True
+    def setData(self, index, value, role):
+        sindex = self.mapToSource(index)
+        smodel = self.sourceModel()
+        return smodel.setData(sindex, value, role)
 
     def setup(self, include=None, exclude=None):
         include = include or []

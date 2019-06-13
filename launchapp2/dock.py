@@ -24,8 +24,8 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
         self.layout().setContentsMargins(15, 15, 15, 15)
 
         panels = {
-            "body": QtWidgets.QStackedWidget(),
             "help": QtWidgets.QLabel(),
+            "body": QtWidgets.QStackedWidget(),
         }
 
         for name, widget in panels.items():
@@ -35,7 +35,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
 
         layout = QtWidgets.QVBoxLayout(central)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        layout.setSpacing(px(5))
         layout.addWidget(panels["help"])
         layout.addWidget(panels["body"])
 
@@ -271,7 +271,7 @@ class Packages(AbstractDockWidget):
         layout.addWidget(widgets["view"])
         layout.addWidget(widgets["status"])
 
-        widgets["view"].setStretch(1)
+        widgets["view"].setStretch(2)
         widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
         widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
         widgets["view"].verticalHeader().setDefaultSectionSize(px(20))
@@ -283,13 +283,17 @@ class Packages(AbstractDockWidget):
         self._ctrl = ctrl
         self._widgets = widgets
 
-    def set_model(self, model):
-        self._widgets["view"].setModel(model)
-        model.modelReset.connect(self.on_model_changed)
-        model.dataChanged.connect(self.on_model_changed)
+    def set_model(self, model_):
+        proxy_model = model.ProxyModel(model_)
+        self._widgets["view"].setModel(proxy_model)
+
+        model_.modelReset.connect(self.on_model_changed)
+        model_.dataChanged.connect(self.on_model_changed)
 
     def on_model_changed(self):
         model = self._widgets["view"].model()
+        model = model.sourceModel()
+
         package_count = model.rowCount()
         override_count = len([i for i in model.items if i["override"]])
         disabled_count = len([i for i in model.items if i["disabled"]])
@@ -399,10 +403,13 @@ class Context(AbstractDockWidget):
         self._panels = panels
         self._widgets = widgets
 
+        widgets["view"].setSortingEnabled(True)
         self.setWidget(panels["central"])
 
-    def set_model(self, model):
-        self._widgets["view"].setModel(model)
+    def set_model(self, model_):
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(model_)
+        self._widgets["view"].setModel(proxy_model)
 
 
 class Environment(AbstractDockWidget):
@@ -431,10 +438,13 @@ class Environment(AbstractDockWidget):
         self._panels = panels
         self._widgets = widgets
 
+        widgets["view"].setSortingEnabled(True)
         self.setWidget(panels["central"])
 
-    def set_model(self, model):
-        self._widgets["view"].setModel(model)
+    def set_model(self, model_):
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(model_)
+        self._widgets["view"].setModel(proxy_model)
 
 
 class Commands(AbstractDockWidget):
@@ -476,6 +486,7 @@ class Commands(AbstractDockWidget):
         # layout.addWidget(widgets["stderr"])
         # layout.addWidget(widgets["stderr"])
 
+        widgets["view"].setSortingEnabled(True)
         widgets["view"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
         widgets["command"].setReadOnly(True)
@@ -491,10 +502,12 @@ class Commands(AbstractDockWidget):
         cmd = model.data(selected, "niceCmd")
         self._widgets["command"].setText(cmd)
 
-    def set_model(self, model):
-        self._widgets["view"].setModel(model)
-        model = self._widgets["view"].selectionModel()
-        model.selectionChanged.connect(self.on_selection_changed)
+    def set_model(self, model_):
+        proxy_model = model.ProxyModel(model_)
+        self._widgets["view"].setModel(proxy_model)
+
+        smodel = self._widgets["view"].selectionModel()
+        smodel.selectionChanged.connect(self.on_selection_changed)
 
     def on_right_click(self, position):
         view = self._widgets["view"]
@@ -631,6 +644,8 @@ class Preferences(AbstractDockWidget):
 
 
 class SlimTableView(QtWidgets.QTableView):
+    doSort = QtCore.Signal(int, QtCore.Qt.SortOrder)
+
     def __init__(self, parent=None):
         super(SlimTableView, self).__init__(parent)
         self.setShowGrid(False)
@@ -638,6 +653,7 @@ class SlimTableView(QtWidgets.QTableView):
         self.setSelectionMode(self.SingleSelection)
         self.setSelectionBehavior(self.SelectRows)
         self._stretch = 0
+        self._previous_sort = 0
 
     def setStretch(self, column):
         self._stretch = column
@@ -647,8 +663,36 @@ class SlimTableView(QtWidgets.QTableView):
         QtCompat.setSectionResizeMode(
             header, self._stretch, QtWidgets.QHeaderView.Stretch)
 
-    def setModel(self, model):
-        model.rowsInserted.connect(self.refresh)
-        model.modelReset.connect(self.refresh)
-        super(SlimTableView, self).setModel(model)
+    def setModel(self, model_):
+        model_.rowsInserted.connect(self.refresh)
+        model_.modelReset.connect(self.refresh)
+        super(SlimTableView, self).setModel(model_)
         self.refresh()
+
+        if isinstance(model_, model.ProxyModel):
+            print("Installing sorting stuff")
+            self.doSort.connect(model_.doSort)
+            model_.askOrder.connect(self.setSorting)
+            self.setSortingEnabled(True)
+
+            # Start out unsorted
+            header = self.horizontalHeader()
+            header.setSortIndicatorShown(False)
+            header.setSortIndicator(0, QtCore.Qt.DescendingOrder)
+            self.doSort.emit(-1, QtCore.Qt.DescendingOrder)
+
+    def setSorting(self, column, order):
+        header = self.horizontalHeader()
+        is_sorted = header.isSortIndicatorShown()
+        is_previous = self._previous_sort == column
+        is_ascending = header.sortIndicatorOrder() == QtCore.Qt.AscendingOrder
+
+        if is_ascending and is_sorted and is_previous:
+            header.setSortIndicator(column, QtCore.Qt.DescendingOrder)
+            header.setSortIndicatorShown(False)
+            column = -1
+        else:
+            header.setSortIndicatorShown(True)
+
+        self._previous_sort = column
+        self.doSort.emit(column, order)

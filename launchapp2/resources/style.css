@@ -36,8 +36,12 @@ Window App QAbstractItemView {
 }
 
 QHeaderView {
+    font-weight: bold;
+}
+
+Window #apps QHeaderView {
     qproperty-defaultAlignment: AlignLeft;
-    font-weight: 10;
+    font-weight: bold;
 }
 
 QHeaderView::section {
