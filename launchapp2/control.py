@@ -40,7 +40,6 @@ class State(dict):
             "projectVersion": None,
             "appName": storage.value("startupApplication"),
             "appVersion": None,
-            "extraRequirements": [],
 
             # Current error, if any
             "error": None,
@@ -528,8 +527,6 @@ class Controller(QtCore.QObject):
 
             apps += [req.name]
 
-        extra = self._state["extraRequirements"]
-
         # Clear existing
         self._state["rezContexts"] = {}
 
@@ -538,7 +535,7 @@ class Controller(QtCore.QObject):
         contexts = odict()
         with util.timing() as t:
             for app_name in apps:
-                request = [project.name, app_name] + extra
+                request = [project.name, app_name]
                 self.debug("Resolving request: %s" % " ".join(request))
 
                 rule = rez.package_filter.Rule.parse_rule("*.beta")
