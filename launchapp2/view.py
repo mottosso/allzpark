@@ -515,7 +515,8 @@ class Window(QtWidgets.QMainWindow):
         elif page_name == "noapps":
             self._widgets["projectBtn"].setEnabled(True)
             self._widgets["noappsMessage"].setText(
-                "No applications found for %s" % self._ctrl.current_project
+                "No Rez package was found for '%s'\n"
+                "Check your REZ_PACKAGES_PATH" % self._ctrl.current_project
             )
 
         if state == "launching":
