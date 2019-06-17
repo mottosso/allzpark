@@ -5,9 +5,6 @@
 :: written to the parent shell
 setlocal
 
-:: These can be overridden
-if "%REZ_PACKAGES_PATH%"=="" (set REZ_PACKAGES_PATH=%USERPROFILE%\packages)
-
 :: Without this, resolving contexts may take seconds to minutes
 if "%REZ_MEMCACHED_URI%"=="" (set REZ_MEMCACHED_URI=127.0.0.1:11211)
 

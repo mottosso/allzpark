@@ -11,13 +11,15 @@ from .version import version
 
 # These can be overridden
 defaults = {
-    "REZ_PACKAGES_PATH": os.path.join(os.path.expanduser("~/packages")),
-
     # Without this, resolving contexts may take seconds to minutes
     "REZ_MEMCACHED_URI": "127.0.0.1:11211",
 
-    # Defaults to finding projects in your home directory
-    "LAUNCHAPP_ROOT": os.path.join(os.path.expanduser("~/projects")),
+    # Defaults to your home directory
+    "LAUNCHAPP_APPS": os.path.join(os.path.expanduser("~/apps")),
+    "LAUNCHAPP_PROJECTS": os.getenv(
+        # Backwards compatibility
+        "LAUNCHAPP_ROOT", os.path.join(os.path.expanduser("~/projects"))
+    ),
 }
 
 for key, default in defaults.items():
@@ -37,10 +39,11 @@ parser.add_argument("--verbose", action="store_true")
 parser.add_argument("--version", action="store_true")
 parser.add_argument("--clear-settings", action="store_true")
 parser.add_argument("--startup-project")
+parser.add_argument("--startup-app")
 parser.add_argument("--root",
-                    default=os.environ["LAUNCHAPP_ROOT"],
+                    default=os.environ["LAUNCHAPP_PROJECTS"],
                     help="Path to where projects live on disk, "
-                         "defaults to LAUNCHAPP_ROOT")
+                         "defaults to LAUNCHAPP_PROJECTS")
 
 opts = parser.parse_args()
 
@@ -110,6 +113,7 @@ defaults = {
     "qtBindingVersion": Qt.__qt_version__,
     "rezLocation": os.path.dirname(_rez_location),
     "rezVersion": _rez_version,
+    "rezConfigFile": os.getenv("REZ_CONFIG_FILE", "None"),
     "rezPackagesPath": config.packages_path,
     "rezLocalPath": config.local_packages_path.split(os.pathsep),
     "rezReleasePath": config.release_packages_path.split(os.pathsep),
@@ -126,6 +130,9 @@ if opts.clear_settings:
 
 if opts.startup_project:
     storage.setValue("startupProject", opts.startup_project)
+
+if opts.startup_app:
+    storage.setValue("startupApp", opts.startup_app)
 
 tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
