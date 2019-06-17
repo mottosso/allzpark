@@ -458,6 +458,7 @@ class ApplicationModel(AbstractTableModel):
                 "package": app,
                 "context": None,
                 "active": True,
+                "hidden": data.get("hidden", False),
 
                 # Whether or not to open a separate console for this app
                 "detached": False,
@@ -472,6 +473,20 @@ class ApplicationModel(AbstractTableModel):
             self.items.append(item)
 
         self.endResetModel()
+
+    def data(self, index, role):
+        row = index.row()
+
+        try:
+            data = self.items[row]
+        except IndexError:
+            return None
+
+        if data["hidden"]:
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("gray")
+
+        return super(ApplicationModel, self).data(index, role)
 
 
 def is_local(pkg):

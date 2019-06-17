@@ -21,6 +21,12 @@ import rez.package_filter
 
 log = logging.getLogger(__name__)
 
+LAUNCHAPP_APPS = os.getenv("LAUNCHAPP_APPS")
+LAUNCHAPP_PROJECTS = os.getenv("LAUNCHAPP_PROJECTS")
+
+# Backwards compatibility
+LAUNCHAPP_PROJECTS = LAUNCHAPP_PROJECTS or os.getenv("LAUNCHAPP_ROOT")
+
 
 class State(dict):
     """Transient, persistent and machine for state
@@ -521,11 +527,17 @@ class Controller(QtCore.QObject):
         # Find it, and keep track of it.
 
         apps = []
-        for req in project.requires:
-            if not req.weak:
-                continue
 
-            apps += [req.name]
+        if self._state.retrieve("showAllApps") and LAUNCHAPP_APPS:
+            apps = os.listdir(LAUNCHAPP_APPS)
+
+        if not apps:
+            apps = []
+            for req in project.requires:
+                if not req.weak:
+                    continue
+
+                apps += [req.name]
 
         # Clear existing
         self._state["rezContexts"] = {}
@@ -569,11 +581,22 @@ class Controller(QtCore.QObject):
         # Find resolved app version
         # E.g. maya -> maya-2018.0.1
         app_packages = []
+        show_hidden = self._state.retrieve("showHiddenApps")
         for app_name, context in contexts.items():
             for package in context.resolved_packages:
                 if package.name in apps:
-                    app_packages += [package]
                     break
+            else:
+                # This cannot happen and would be a bug
+                raise ValueError(
+                    "Could not find package for app %s" % app_name
+                )
+
+            hidden = getattr(package, "_data", {}).get("hidden", False)
+            if hidden and not show_hidden:
+                continue
+
+            app_packages += [package]
 
         self._state["rezContexts"] = contexts
         return app_packages

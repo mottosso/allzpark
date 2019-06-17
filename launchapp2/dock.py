@@ -597,6 +597,13 @@ class Preferences(AbstractDockWidget):
         qargparse.Boolean("showAdvancedControls", help=(
             "Show developer-centric controls"
         )),
+        qargparse.Boolean("showAllApps", help=(
+            "List everything from LAUNCHAPP_APPS\n"
+            "not just the ones specified for a given project."
+        )),
+        qargparse.Boolean("showHiddenApps", help=(
+            "Show apps with _data['hidden'] = True"
+        )),
 
         qargparse.Separator("System"),
 
@@ -608,6 +615,7 @@ class Preferences(AbstractDockWidget):
         qargparse.Info("qtBindingVersion"),
         qargparse.Info("rezLocation"),
         qargparse.Info("rezVersion"),
+        qargparse.Info("rezConfigFile"),
         qargparse.Info("memcachedURI"),
         qargparse.InfoList("rezPackagesPath"),
         qargparse.InfoList("rezLocalPath"),

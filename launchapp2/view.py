@@ -394,6 +394,12 @@ class Window(QtWidgets.QMainWindow):
         if key == "showAdvancedControls":
             self.update_advanced_controls()
 
+        if key == "showAllApps":
+            self._ctrl.reset()
+
+        if key == "showHiddenApps":
+            self._ctrl.reset()
+
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
