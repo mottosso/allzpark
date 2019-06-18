@@ -475,7 +475,7 @@ class Controller(QtCore.QObject):
         self._models["environment"].reset()
         self._models["projectVersions"].setStringList([])
 
-        util.delay(do)
+        do()
 
     def select_application(self, app_name):
         self._state["appName"] = app_name
