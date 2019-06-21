@@ -1,10 +1,10 @@
 """Command-line interface to launchapp2"""
 import os
+import time
 
 # Debugging, measure start-up time
 # NOTE: Handle this prior to importing anything
 if os.getenv("LAUNCHAPP_STARTTIME"):
-    import time
 
     try:
         t0 = float(os.getenv("LAUNCHAPP_STARTTIME"))
