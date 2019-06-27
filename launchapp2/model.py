@@ -130,7 +130,8 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
             key = self.ColumnToKey[col][role]
             data[key] = value
 
-        QtCompat.dataChanged(self, index, index, [role])
+        roles = [role] if isinstance(role, int) else []
+        QtCompat.dataChanged(self, index, index, roles)
 
         return True
 
