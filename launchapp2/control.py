@@ -2,6 +2,7 @@
 
 import os
 import time
+import errno
 import logging
 import threading
 import traceback
@@ -554,7 +555,13 @@ class Controller(QtCore.QObject):
         apps = []
 
         if self._state.retrieve("showAllApps") and LAUNCHAPP_APPS:
-            apps = os.listdir(LAUNCHAPP_APPS)
+            try:
+                apps = os.listdir(LAUNCHAPP_APPS)
+            except OSError as e:
+                if e.errno not in (errno.ENOENT, errno.EEXIST, errno.ENOTDIR):
+                    raise
+                self.info("Could not show all alls, "
+                          "LAUNCHAPP_APPS variable not set")
 
         if not apps:
             apps = []
