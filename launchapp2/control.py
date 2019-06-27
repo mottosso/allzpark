@@ -560,7 +560,7 @@ class Controller(QtCore.QObject):
             except OSError as e:
                 if e.errno not in (errno.ENOENT, errno.EEXIST, errno.ENOTDIR):
                     raise
-                self.info("Could not show all alls, "
+                self.info("Could not show all apps, "
                           "LAUNCHAPP_APPS variable not set")
 
         if not apps:
