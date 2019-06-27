@@ -1,4 +1,4 @@
-"""Command-line interface to launchapp2"""
+"""Command-line interface to allspark"""
 import os
 import time
 
@@ -91,7 +91,7 @@ if opts.version:
     exit(0)
 
 print("=" * 30)
-print(" launchapp2 (%s)" % version)
+print(" allspark (%s)" % version)
 print("=" * 30)
 
 with timings("- Loading Rez.. "):
@@ -100,14 +100,14 @@ with timings("- Loading Rez.. "):
         from rez.utils._version import _rez_version
         from rez.config import config
     except ImportError:
-        tell("ERROR: launchapp2 requires rez")
+        tell("ERROR: allspark requires rez")
         exit(1)
 
 with timings("- Loading Qt.. "):
     try:
         from .vendor import Qt
     except ImportError:
-        tell("ERROR: launchapp2 requires a Python binding for Qt,\n"
+        tell("ERROR: allspark requires a Python binding for Qt,\n"
              "such as PySide, PySide2, PyQt4 or PyQt5.")
         exit(1)
 
@@ -118,7 +118,7 @@ with timings("- Loading Qt.. "):
 sys.modules["Qt"] = Qt
 sys.modules["six"] = six
 
-with timings("- Loading launchapp2.. "):
+with timings("- Loading allspark.. "):
     from . import view, control, resources, util
 
 
@@ -140,7 +140,7 @@ config.catch_rex_errors = False
 with timings("- Loading preferences.. "):
     storage = QtCore.QSettings(QtCore.QSettings.IniFormat,
                                QtCore.QSettings.UserScope,
-                               "Anima", "launchapp2")
+                               "Allspark", "preferences")
 
     defaults = {
         "memcachedURI": os.getenv("REZ_MEMCACHED_URI", "None"),

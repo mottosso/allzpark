@@ -16,7 +16,7 @@ px = res.px
 
 
 class Window(QtWidgets.QMainWindow):
-    title = "Launch App 2.0"
+    title = "Allspark"
 
     def __init__(self, ctrl, parent=None):
         super(Window, self).__init__(parent)
@@ -166,7 +166,7 @@ class Window(QtWidgets.QMainWindow):
 
         addColumn([QtWidgets.QWidget()], stretch=True)  # Spacing
 
-        addColumn([QtWidgets.QLabel("launchapp2"),
+        addColumn([QtWidgets.QLabel("allspark"),
                    widgets["appVersion"]])
         addColumn([widgets["logo"]], 2, 1)  # spans 2 rows
 
