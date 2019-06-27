@@ -2,6 +2,8 @@
 import os
 import time
 
+timing = {}
+
 # Debugging, measure start-up time
 # NOTE: Handle this prior to importing anything
 if os.getenv("LAUNCHAPP_STARTTIME"):
@@ -15,10 +17,8 @@ if os.getenv("LAUNCHAPP_STARTTIME"):
             "LAUNCHAPP_STARTTIME must be in format time.time()"
         )
 
-    timing = {
-        "shellToPython": t1 - t0,
-        "last": time.time()
-    }
+    timing["shellToPython"] = t1 - t0
+    timing["last"] = time.time()
 
     print("shell to python: %.2f s" % timing["shellToPython"])
 

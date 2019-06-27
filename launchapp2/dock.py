@@ -174,9 +174,12 @@ class App(AbstractDockWidget):
     def refresh(self, index):
         name = index.data(QtCore.Qt.DisplayRole)
         icon = index.data(QtCore.Qt.DecorationRole)
-        icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
+
+        if icon:
+            icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
+            self._widgets["icon"].setPixmap(icon)
+
         self._widgets["label"].setText(name)
-        self._widgets["icon"].setPixmap(icon)
 
         last_used = self._ctrl.state.retrieve("app/%s/lastUsed" % name)
         last_used = time.strftime(

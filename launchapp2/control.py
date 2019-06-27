@@ -152,6 +152,7 @@ class Controller(QtCore.QObject):
         _State("errored", help="Something has gone wrong"),
         _State("launching", help="An application is launching"),
         _State("ready", help="Awaiting user input"),
+        _State("noproject", help="A given project package was not found"),
         _State("noapps", help="There were no applications to choose from"),
         _State("notresolved", help="Rez couldn't resolve a request"),
         _State("pkgnotfound", help="One or more packages was not found"),
@@ -163,8 +164,6 @@ class Controller(QtCore.QObject):
         state = State(self, storage)
 
         models = {
-            "main": model.Main(),
-
             "projectVersions": QtCore.QStringListModel(),
             "apps": model.ApplicationModel(),
 
@@ -334,20 +333,22 @@ class Controller(QtCore.QObject):
                     current_project = projects[-1]
 
                 except (IndexError, OSError):
-                    self.error("Couldn't find any projects @ '%s'" % root)
-                    current_project = ""
+                    raise ValueError("Couldn't find any projects @ '%s'" % root)
 
             self._state["projectName"] = current_project
             self._state["root"] = root
 
             self._state.to_ready()
-            self.select_project(current_project)
 
-            # Trigger callback
+        def _on_success():
+            self.select_project(self._state["projectName"])
             on_success()
 
+        def _on_failure(error):
+            self.error(error)
+
         self._state.to_booting()
-        util.delay(do)
+        util.defer(do, on_success=_on_success, on_failure=_on_failure)
 
     @util.async_
     def launch(self, **kwargs):
@@ -434,48 +435,72 @@ class Controller(QtCore.QObject):
 
     @util.async_
     def select_project(self, project_name, version=None):
-        def do():
-            to_state = self._state.to_ready
-            before = self._state["projectName"] or ""
-            project = self._find_project(project_name, version)
-
-            if project:
-                try:
-                    apps = self._find_apps(project)
-                    self._models["apps"].reset(apps)
-
-                except rez.exceptions.PackageNotFoundError as e:
-                    self._state["error"] = e.value
-                    self.error(e.value)
-                    to_state = self._state.to_pkgnotfound
-
-                except rez.exceptions.ResolveError as e:
-                    self._state["error"] = e.value
-                    self.error(e.value)
-                    to_state = self._state.to_notresolved
-
-                except rez.vendor.version.util.VersionError as e:
-                    self._state["error"] = str(e)
-                    self.error(str(e))
-                    to_state = self._state.to_notresolved
-
-            else:
-                to_state = self._state.to_noapps
-
-            self._state["projectName"] = project_name
-            self.project_changed.emit(before, project_name)
-
-            to_state()
-
-        self._state.to_loading()
-
         # Wipe existing data
         self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
         self._models["projectVersions"].setStringList([])
 
-        do()
+        def on_apps_found(apps):
+            self._models["apps"].reset(apps)
+
+            before = self._state["projectName"] or ""
+            self._state["projectName"] = project_name
+            self.project_changed.emit(before, project_name)
+
+            self._state.to_ready()
+
+        def on_apps_not_found(error, trace):
+            print("on_apps_not_found")
+            self._state.to_noapps()
+            print(trace)
+
+        def on_project_found(project):
+            if not project:
+                return self._state.to_noproject()
+
+            # Continue the pipeline
+            util.defer(
+                self._find_apps,
+                args=[project],
+                on_success=on_apps_found,
+                on_failure=on_apps_not_found,
+            )
+
+        def on_project_not_found(error, trace):
+            if isinstance(error, rez.exceptions.PackageNotFoundError):
+                self._state["error"] = error.value
+                self.error(error.value)
+                self._state.to_pkgnotfound()
+
+            elif isinstance(error, rez.exceptions.ResolveError):
+                self._state["error"] = error.value
+                self.error(error.value)
+                self._state.to_notresolved()
+
+            elif isinstance(error, rez.vendor.version.util.VersionError):
+                self._state["error"] = str(error)
+                self.error(str(error))
+                self._state.to_notresolved()
+
+            elif isinstance(error, AssertionError):
+                self._state["error"] = str(error)
+                self.error(str(error))
+                self._state.to_noapps()
+
+            else:
+                self._state["error"] = str(error)
+                self.error(str(error))
+                self._state.to_notresolved()
+
+        self._state.to_loading()
+
+        util.defer(
+            self._find_project,
+            args=[project_name, version],
+            on_success=on_project_found,
+            on_failure=on_project_not_found,
+        )
 
     def select_application(self, app_name):
         self._state["appName"] = app_name
@@ -548,7 +573,7 @@ class Controller(QtCore.QObject):
         with util.timing() as t:
             for app_name in apps:
                 request = [project.name, app_name]
-                self.debug("Resolving request: %s" % " ".join(request))
+                self.info("Resolving request: %s" % " ".join(request))
 
                 rule = rez.package_filter.Rule.parse_rule("*.beta")
                 PackageFilterList = rez.package_filter.PackageFilterList

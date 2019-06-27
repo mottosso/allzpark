@@ -150,7 +150,7 @@ else:
 
 class Thread(QtCore.QThread):
     succeeded = QtCore.Signal(object)
-    failed = QtCore.Signal(_basestring)
+    failed = QtCore.Signal(Exception, _basestring)
 
     def __init__(self,
                  target,
@@ -179,27 +179,11 @@ class Thread(QtCore.QThread):
             result = self.target(*self.args, **self.kwargs)
 
         except Exception as e:
-            return self.failed.emit(e)
+            error = traceback.format_exc()
+            return self.failed.emit(e, error)
 
         else:
-            if iterable(result):
-                while True:
-                    try:
-                        value = next(result)
-
-                    except StopIteration:
-                        break
-
-                    except Exception:
-                        error = traceback.format_exc()
-                        self.failed.emit(error)
-                        break
-
-                    else:
-                        self.succeeded.emit(value)
-
-            else:
-                self.succeeded.emit(result)
+            self.succeeded.emit(result)
 
 
 def iterable(arg):

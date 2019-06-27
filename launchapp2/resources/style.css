@@ -22,6 +22,10 @@ Window #apps {
     min-width: 300px;
 }
 
+Window #loading QLabel {
+    font-size: 16px;
+}
+
 Window App #tools {
     max-height: 100px;
     min-height: 100px;
