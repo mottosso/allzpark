@@ -417,7 +417,11 @@ class CommandsModel(AbstractTableModel):
 
 
 class JsonModel(qjsonmodel.QJsonModel):
-    pass
+    def flags(self, index):
+        return (
+            QtCore.Qt.ItemIsEnabled |
+            QtCore.Qt.ItemIsSelectable
+        )
 
 
 class EnvironmentModel(JsonModel):
