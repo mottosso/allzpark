@@ -1,7 +1,7 @@
 
 ### Allspark
 
-Application laucher and environment management tool for games and digital post-production, built on [Rez](https://github.com/mottosso/bleeding-rez).
+Application launcher and environment management tool for games and digital post-production, built on [Rez](https://github.com/mottosso/bleeding-rez).
 
 <br>
 
