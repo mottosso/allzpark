@@ -142,6 +142,10 @@ with timings("- Loading preferences.. "):
                                QtCore.QSettings.UserScope,
                                "Allspark", "preferences")
 
+    if opts.clear_settings:
+        sys.stdout.write("(clean) ")
+        storage.clear()
+
     defaults = {
         "memcachedURI": os.getenv("REZ_MEMCACHED_URI", "None"),
         "pythonExe": sys.executable,
@@ -160,10 +164,6 @@ with timings("- Loading preferences.. "):
 
     for key, value in defaults.items():
         storage.setValue(key, value)
-
-    if opts.clear_settings:
-        tell("Clearing settings..")
-        storage.clear()
 
     if opts.startup_project:
         storage.setValue("startupProject", opts.startup_project)

@@ -47,6 +47,7 @@ class State(dict):
             "projectVersion": None,
             "appName": storage.value("startupApplication"),
             "appVersion": None,
+            "root": None,
 
             # Current error, if any
             "error": None,
@@ -349,7 +350,11 @@ class Controller(QtCore.QObject):
             self.error(error)
 
         self._state.to_booting()
-        util.defer(do, on_success=_on_success, on_failure=_on_failure)
+        util.defer(
+            do,
+            on_success=_on_success,
+            on_failure=_on_failure
+        )
 
     @util.async_
     def launch(self, **kwargs):
@@ -417,7 +422,7 @@ class Controller(QtCore.QObject):
 
     def error(self, message):
         log.error(message)
-        self.logged.emit(message, logging.ERROR)
+        self.logged.emit(str(message), logging.ERROR)
 
     @util.cached
     def list_projects(self, root=None):
@@ -437,6 +442,7 @@ class Controller(QtCore.QObject):
     @util.async_
     def select_project(self, project_name, version=None):
         # Wipe existing data
+
         self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
@@ -452,7 +458,6 @@ class Controller(QtCore.QObject):
             self._state.to_ready()
 
         def on_apps_not_found(error, trace):
-            print("on_apps_not_found")
             self._state.to_noapps()
             print(trace)
 

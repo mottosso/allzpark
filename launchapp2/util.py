@@ -128,24 +128,7 @@ else:
         except Exception as e:
             on_failure(e)
         else:
-            if iterable(result):
-                while True:
-
-                    try:
-                        value = next(result)
-
-                    except StopIteration:
-                        break
-
-                    except Exception:
-                        error = traceback.format_exc()
-                        on_failure(error)
-                        break
-
-                    else:
-                        on_success(value)
-            else:
-                on_success(result)
+            on_success(result)
 
 
 class Thread(QtCore.QThread):

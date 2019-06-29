@@ -34,6 +34,7 @@ class Window(QtWidgets.QMainWindow):
             ("loading", QtWidgets.QWidget()),
             ("errored", QtWidgets.QWidget()),
             ("noapps", QtWidgets.QWidget()),
+            ("noproject", QtWidgets.QWidget()),
         ))
 
         panels = {
@@ -49,6 +50,7 @@ class Window(QtWidgets.QMainWindow):
             "errorMessage": QtWidgets.QLabel("Uh oh..<br>"
                                              "See Console for details"),
             "noappsMessage": QtWidgets.QLabel("No applications found"),
+            "noprojectMessage": QtWidgets.QLabel("No project found"),
             "pkgnotfoundMessage": QtWidgets.QLabel(
                 "One or more packages could not be found"
             ),
@@ -134,6 +136,13 @@ class Window(QtWidgets.QMainWindow):
         layout.setSpacing(0)
         layout.addWidget(QtWidgets.QWidget(), 1)
         layout.addWidget(widgets["noappsMessage"], 0, QtCore.Qt.AlignHCenter)
+        layout.addWidget(QtWidgets.QWidget(), 1)
+
+        layout = QtWidgets.QVBoxLayout(pages["noproject"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(QtWidgets.QWidget(), 1)
+        layout.addWidget(widgets["noprojectMessage"], 0, QtCore.Qt.AlignHCenter)
         layout.addWidget(QtWidgets.QWidget(), 1)
 
         #  _______________________________________________________
@@ -533,9 +542,8 @@ class Window(QtWidgets.QMainWindow):
             )
 
         elif page_name == "noproject":
-            self._panels["pages"].setCurrentWidget(self._panels["noapps"])
             self._widgets["projectBtn"].setEnabled(True)
-            self._widgets["noappsMessage"].setText(
+            self._widgets["noprojectMessage"].setText(
                 "No Rez package was found for project '%s'\n"
                 "Check your REZ_PACKAGES_PATH" % self._ctrl.current_project
             )
