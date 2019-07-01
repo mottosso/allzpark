@@ -1,14 +1,14 @@
 ---
 site_name: Allspark
 site_description: The supreme application launcher
-site_author: Marcus Ottosson
-site_url: https://github.com/mottosso/allspark
+site_author: mottosso
+site_url: https://allspark.sh
 
 # Repository
 repo_name: mottosso/allspark
 repo_url: https://github.com/mottosso/allspark
 
-copyright: "Copyright &copy; 2019 Marcus Ottosson"
+copyright: "Copyright &copy; 2019 mottosso"
 
 # Page tree
 nav:
