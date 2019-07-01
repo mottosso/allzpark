@@ -1,0 +1,117 @@
+/* Styling specifically for the landing page */
+
+.vboxlayout {
+  display: flex;
+  flex-direction: column;
+}
+
+.hboxlayout {
+  display: flex;
+  flex-direction: row;
+}
+
+.justify-left {
+    justify-content: flex-start;
+}
+
+.justify-right {
+    justify-content: flex-end;
+}
+
+.space {
+    min-height: 20px;
+    min-width: 20px;
+}
+
+.stretch {
+  flex-grow: 1;
+}
+
+.poster {
+}
+
+#description {
+  max-width: 420px;
+}
+
+[data-md-color-primary] .md-typeset a.button {
+  font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
+  max-width: 400px;
+  min-width: 120px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  display: block;
+  border-radius: 3px;
+  margin: 5px;
+  padding: 15px;
+  text-align: center;
+  text-decoration: none;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #eee;
+  transition: background 1s cubic-bezier(0.1, 0.7, 0.1, 1);
+}
+
+/* Little pen icon, to edit the page*/
+.md-content__icon {
+    display: none;
+}
+
+.button:active {
+  position: relative;
+  top: 6px;
+}
+
+.blue {
+  background: #3498db;
+  box-shadow: 0px 6px #2980b9;
+}
+
+.blue:active {
+  background: #2980b9;
+  box-shadow: 0px 0px #2980b9;
+}
+
+.blue:hover {
+  background: #4BA4DE;
+}
+
+.red {
+  box-shadow: 0px 6px #c0392b;
+  background: #e74c3c;
+}
+
+.red:active {
+  box-shadow: 0px 0px #c0392b;
+  background: #c0392b;
+}
+
+.red:hover {
+  background: #E55E50;
+  position: relative;
+}
+
+/* Mobile */
+@media only screen and (max-width: 59em) {
+  .hboxlayout {
+    flex-direction: column;
+    justify-content: center;
+    align-content: start;
+  }
+
+  [data-md-color-primary] .md-typeset a.button {
+    margin: 5px auto;
+  }
+
+  .container {
+    margin: 0px auto;
+    padding-top: 20px;
+  }
+
+  p {
+    text-align: center;
+  }
+
+  .space {
+    min-height: 0px;
+  }
+}
