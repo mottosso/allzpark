@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>https://github.com/mottosso/allspark/</loc>
+     <loc>https://allspark.sh/</loc>
      <lastmod>2019-07-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://github.com/mottosso/allspark/guides/</loc>
+     <loc>https://allspark.sh/guides/</loc>
      <lastmod>2019-07-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
