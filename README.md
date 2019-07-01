@@ -15,7 +15,7 @@ In early development. Stay tuned for a release.
 
 ### More Gifs
 
-> "allspark" was the internal working title during development at [Studio Anima](http://studioanima.co.jp)
+> "launchapp2" was the internal working title during development at [Studio Anima](http://studioanima.co.jp)
 
 ![ALLSPARK_2](https://user-images.githubusercontent.com/2152766/58943970-be4c2f80-8778-11e9-9344-66007ba5cb5b.gif)
 ![ALLSPARK_3](https://user-images.githubusercontent.com/2152766/58943973-bee4c600-8778-11e9-809a-cf2aaf7c94c0.gif)
