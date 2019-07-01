@@ -22,11 +22,11 @@ import rez.package_filter
 
 log = logging.getLogger(__name__)
 
-LAUNCHAPP_APPS = os.getenv("LAUNCHAPP_APPS")
-LAUNCHAPP_PROJECTS = os.getenv("LAUNCHAPP_PROJECTS")
+ALLSPARK_APPS = os.getenv("ALLSPARK_APPS")
+ALLSPARK_PROJECTS = os.getenv("ALLSPARK_PROJECTS")
 
 # Backwards compatibility
-LAUNCHAPP_PROJECTS = LAUNCHAPP_PROJECTS or os.getenv("LAUNCHAPP_ROOT")
+ALLSPARK_PROJECTS = ALLSPARK_PROJECTS or os.getenv("ALLSPARK_ROOT")
 
 
 class State(dict):
@@ -148,7 +148,7 @@ class Controller(QtCore.QObject):
     project_changed = QtCore.Signal(str, str)  # before, after
 
     states = [
-        _State("booting", help="launchapp is booting, hold on"),
+        _State("booting", help="ALLSPARK is booting, hold on"),
         _State("resolving", help="Rez is busy resolving a context"),
         _State("loading", help="Something is taking a moment"),
         _State("errored", help="Something has gone wrong"),
@@ -559,14 +559,14 @@ class Controller(QtCore.QObject):
 
         apps = []
 
-        if self._state.retrieve("showAllApps") and LAUNCHAPP_APPS:
+        if self._state.retrieve("showAllApps") and ALLSPARK_APPS:
             try:
-                apps = os.listdir(LAUNCHAPP_APPS)
+                apps = os.listdir(ALLSPARK_APPS)
             except OSError as e:
                 if e.errno not in (errno.ENOENT, errno.EEXIST, errno.ENOTDIR):
                     raise
                 self.info("Could not show all apps, "
-                          "LAUNCHAPP_APPS variable not set")
+                          "ALLSPARK_APPS variable not set")
 
         if not apps:
             apps = []

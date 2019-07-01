@@ -17,7 +17,7 @@ _threads = []
 _basestring = six.string_types[0]  # For Python 2/3
 _log = logging.getLogger(__name__)
 
-USE_THREADING = not bool(os.getenv("LAUNCHAPP_NOTHREADING"))
+USE_THREADING = not bool(os.getenv("ALLSPARK_NOTHREADING"))
 
 
 @contextlib.contextmanager
@@ -81,7 +81,7 @@ def windows_taskbar_compat():
     import ctypes
     ctypes.windll.shell32.\
         SetCurrentProcessExplicitAppUserModelID(
-            u"launchapp2")
+            u"allspark")
 
 
 if USE_THREADING:

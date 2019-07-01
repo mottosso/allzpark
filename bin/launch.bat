@@ -14,4 +14,4 @@ if "%REZ_MEMCACHED_URI%"=="" (set REZ_MEMCACHED_URI=127.0.0.1:11211)
 :: Defaults to finding projects in your home directory
 if "%LAUNCHAPP_ROOT%"=="" (set LAUNCHAPP_ROOT=%USERPROFILE%\projects)
 
-python -m launchapp2 %*
+python -m allspark %*

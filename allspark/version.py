@@ -1,6 +1,6 @@
 """Version includes the Git revision number
 
-This module separates between deployed and development versions of launchapp2.
+This module separates between deployed and development versions of allspark.
 A development version draws its minor version directly from Git, the total
 number of commits on the current branch equals the revision number. Once
 deployed, this number is embedded into the Python package.

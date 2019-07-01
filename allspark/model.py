@@ -18,7 +18,7 @@ Data Flow:
 
 It is the only module with access to disk and network - either directly or
 indirectly - and can be used independently from both model and view, like an
-API to launchapp2. This also means that the view may access the controller,
+API to allspark. This also means that the view may access the controller,
 but not vice versa as that would implicate a view when using it standalone.
 
 ### Architecture

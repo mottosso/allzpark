@@ -2,7 +2,7 @@
 
 import os
 from setuptools import setup, find_packages
-from launchapp2.version import version
+from allspark.version import version
 
 # Git is required for deployment
 assert len(version.split(".")) == 3, (
@@ -24,24 +24,24 @@ classifiers = [
 
 # Store version alongside package
 dirname = os.path.dirname(__file__)
-fname = os.path.join(dirname, "launchapp2", "__version__.py")
+fname = os.path.join(dirname, "allspark", "__version__.py")
 with open(fname, "w") as f:
     f.write("version = \"%s\"\n" % version)
 
 setup(
-    name="launchapp2",
+    name="allspark",
     version=version,
     description=__doc__,
     keywords="launcher package resolve version software management",
     long_description=__doc__,
-    url="https://github.com/mottosso/launchapp2",
+    url="https://github.com/mottosso/allspark",
     author="Marcus Ottosson",
     author_email="konstruktion@gmail.com",
     license="LGPL",
     zip_safe=False,
     packages=find_packages(),
     package_data={
-        "launchapp2": [
+        "allspark": [
             "resources/*.png",
             "resources/*.css",
         ]

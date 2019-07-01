@@ -6,15 +6,15 @@ timing = {}
 
 # Debugging, measure start-up time
 # NOTE: Handle this prior to importing anything
-if os.getenv("LAUNCHAPP_STARTTIME"):
+if os.getenv("ALLSPARK_STARTTIME"):
 
     try:
-        t0 = float(os.getenv("LAUNCHAPP_STARTTIME"))
+        t0 = float(os.getenv("ALLSPARK_STARTTIME"))
         t1 = time.time()
 
     except ValueError:
         raise ValueError(
-            "LAUNCHAPP_STARTTIME must be in format time.time()"
+            "ALLSPARK_STARTTIME must be in format time.time()"
         )
 
     timing["shellToPython"] = t1 - t0
@@ -37,10 +37,10 @@ defaults = {
     "REZ_MEMCACHED_URI": "127.0.0.1:11211",
 
     # Defaults to your home directory
-    "LAUNCHAPP_APPS": os.path.join(os.path.expanduser("~/apps")),
-    "LAUNCHAPP_PROJECTS": os.getenv(
+    "ALLSPARK_APPS": os.path.join(os.path.expanduser("~/apps")),
+    "ALLSPARK_PROJECTS": os.getenv(
         # Backwards compatibility
-        "LAUNCHAPP_ROOT", os.path.join(os.path.expanduser("~/projects"))
+        "ALLSPARK_ROOT", os.path.join(os.path.expanduser("~/projects"))
     ),
 }
 
@@ -69,7 +69,7 @@ def tell(msg):
     sys.stdout.write("%s\n" % msg)
 
 
-parser = argparse.ArgumentParser("launchapp 2.0", description=(
+parser = argparse.ArgumentParser("ALLSPARK 2.0", description=(
     "An application launcher built on Rez, "
     "pass --help for details"
 ))
@@ -80,9 +80,9 @@ parser.add_argument("--clear-settings", action="store_true")
 parser.add_argument("--startup-project")
 parser.add_argument("--startup-app")
 parser.add_argument("--root",
-                    default=os.environ["LAUNCHAPP_PROJECTS"],
+                    default=os.environ["ALLSPARK_PROJECTS"],
                     help="Path to where projects live on disk, "
-                         "defaults to LAUNCHAPP_PROJECTS")
+                         "defaults to ALLSPARK_PROJECTS")
 
 opts = parser.parse_args()
 
@@ -126,8 +126,8 @@ logging.basicConfig(format=(
     "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
     "%(message)s"
 ))
-logging.getLogger("launchapp2.vendor").setLevel(logging.CRITICAL)
-logging.getLogger("launchapp2").setLevel(logging.DEBUG
+logging.getLogger("allspark.vendor").setLevel(logging.CRITICAL)
+logging.getLogger("allspark").setLevel(logging.DEBUG
                                          if opts.verbose
                                          else logging.INFO)
 
