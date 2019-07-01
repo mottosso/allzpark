@@ -1,2 +1,40 @@
 ---
-site_name: My Docs
+site_name: Allspark
+site_description: The supreme application launcher
+site_author: Marcus Ottosson
+site_url: https://github.com/mottosso/allspark
+
+# Repository
+repo_name: mottosso/allspark
+repo_url: https://github.com/mottosso/allspark
+
+copyright: "Copyright &copy; 2019 Marcus Ottosson"
+
+# Page tree
+nav:
+  - Home: index.md
+  - Guides: guides.md
+
+docs_dir: pages
+
+theme:
+  name: material
+  logo: logo.png
+  custom_dir: theme
+  palette:
+    primary: 'white'
+    accent: 'white'
+
+extra_css:
+  - extra.css
+
+# Options
+extra:
+  feature:
+    tabs: true
+  font:
+    text: 'Ubuntu'
+    code: 'Ubuntu Mono'
+
+markdown_extensions:
+  - pymdownx.tasklist

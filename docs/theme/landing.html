@@ -1,0 +1,98 @@
+<!-- 
+
+The landing page.
+
+Here we'll strip almost everything, making room for visuals and images
+
+-->
+
+{% extends "main.html" %}
+
+{% block site_nav %}
+  {% if nav %}
+    <div style="display: none" class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          {% include "partials/nav.html" %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  {% if page.toc %}
+    <div style="display: none" class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner">
+          {% include "partials/toc.html" %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block htmltitle %}
+    <title>{{ config.site_name }}</title>
+{% endblock %}
+
+<!-- Kill header on landing page
+ ________________________________________
+|              ^        ^                |
+|______________|________|________________|
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|________________________________________|
+
+-->
+
+<!-- Kill footer too
+ ________________________________________
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|________________________________________|
+|              |        |                |
+|______________v________v________________|
+
+-->
+
+{% block footer %}
+{% endblock %}
+
+<!-- Expand space reserved for article to the edges
+ ________________________________________
+|         |                  |           |
+|     [---|                  |---]       |
+|         |                  |           |
+|         |                  |           |
+|         |                  |           |
+|         |                  |           |
+|         |                  |           |
+|         |                  |           |
+|         |                  |           |
+|     [---|                  |---]       |
+|_________|__________________|___________|
+
+-->
+
+{% block styles %}
+{{ super() }}
+<style type="text/css">
+  .md-content {
+      margin-left: 0px;
+      margin-right: 0px;
+  }
+</style>
+
+<!-- Include home-specific stylesheet -->
+<link rel="stylesheet" href="landing.css">
+{% endblock %}
+
