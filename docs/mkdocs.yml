@@ -22,19 +22,36 @@ theme:
   logo: logo.png
   custom_dir: theme
   palette:
-    primary: 'white'
-    accent: 'white'
+    primary: "white"
+    accent: "white"
 
 extra_css:
   - extra.css
+  # Landing page includes additional CSS from landing.html
 
 # Options
 extra:
   feature:
     tabs: true
-  font:
-    text: 'Ubuntu'
-    code: 'Ubuntu Mono'
 
 markdown_extensions:
+  - markdown.extensions.extra
+  - markdown.extensions.admonition
+  - markdown.extensions.codehilite
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - markdown.extensions.toc
+  - pymdownx.arithmatex
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
   - pymdownx.tasklist
+  - pymdownx.tilde

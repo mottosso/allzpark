@@ -10,7 +10,7 @@ Here we'll strip almost everything, making room for visuals and images
 
 {% block site_nav %}
   {% if nav %}
-    <div style="display: none" class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+    <div class="md-sidebar md-sidebar--primary landing" data-md-component="navigation">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
           {% include "partials/nav.html" %}
@@ -19,7 +19,7 @@ Here we'll strip almost everything, making room for visuals and images
     </div>
   {% endif %}
   {% if page.toc %}
-    <div style="display: none" class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+    <div class="md-sidebar md-sidebar--secondary landing" data-md-component="toc">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
           {% include "partials/toc.html" %}
@@ -64,9 +64,6 @@ Here we'll strip almost everything, making room for visuals and images
 
 -->
 
-{% block footer %}
-{% endblock %}
-
 <!-- Expand space reserved for article to the edges
  ________________________________________
 |         |                  |           |
@@ -92,7 +89,5 @@ Here we'll strip almost everything, making room for visuals and images
   }
 </style>
 
-<!-- Include home-specific stylesheet -->
 <link rel="stylesheet" href="landing.css">
 {% endblock %}
-
