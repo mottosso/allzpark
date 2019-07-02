@@ -276,15 +276,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-material-below" title="Test Material Below" class="md-nav__link">
-    Test Material Below
+  <a href="#setup" title="Setup" class="md-nav__link">
+    Setup
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#this-is-it" title="This is it!" class="md-nav__link">
-    This is it!
+  <a href="#package-path" title="Package Path" class="md-nav__link">
+    Package Path
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-packages-pipz" title="External Packages - Pipz" class="md-nav__link">
+    External Packages - Pipz
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-packages-scoopz" title="External Packages - Scoopz" class="md-nav__link">
+    External Packages - Scoopz
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localisation" title="Localisation" class="md-nav__link">
+    Localisation
   </a>
   
 </li>
@@ -332,15 +353,36 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#test-material-below" title="Test Material Below" class="md-nav__link">
-    Test Material Below
+  <a href="#setup" title="Setup" class="md-nav__link">
+    Setup
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#this-is-it" title="This is it!" class="md-nav__link">
-    This is it!
+  <a href="#package-path" title="Package Path" class="md-nav__link">
+    Package Path
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-packages-pipz" title="External Packages - Pipz" class="md-nav__link">
+    External Packages - Pipz
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-packages-scoopz" title="External Packages - Scoopz" class="md-nav__link">
+    External Packages - Scoopz
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#localisation" title="Localisation" class="md-nav__link">
+    Localisation
   </a>
   
 </li>
@@ -372,25 +414,133 @@
                   <h1>Guides</h1>
                 
                 <h2 id="in-development">In development</h2>
-<p>Stay tuned for a release.</p>
-<p><br></p>
-<h3 id="test-material-below">Test Material Below</h3>
-<pre><code class="python">import os
-os.guide()
-</code></pre>
-
-<blockquote>
-<p>And I'm a blockquote.</p>
-</blockquote>
-<h3 id="this-is-it">This is it!</h3>
-<p>Fantasic <em>to the maxx</em>!</p>
-<pre><code class="powershell">PS&gt; Write-Host &quot;Hello&quot;
-</code></pre>
-
+<p>Allspark is currently <a href="https://github.com/mottosso/allspark">being developed</a> and is not yet ready for use.</p>
+<p>If you're interested in early-access to collaborate and or contribute, <a href="marcus@abstractfactory.io">get in touch</a>. A 1.0 is scheduled for release in early August 2019.</p>
 <p><br>
 <br>
-<br>
 <br></p>
+<h3 id="setup">Setup</h3>
+<p>The benefit of using Allspark is that it provides the power and flexibility of <a href="https://github.com/mottosso/bleeding-rez">Rez</a> to developers and package authors and a graphical user interface for artists. Developers gain fine control over what software, libraries, applications and projects are made available to artists, along with any interdependencies therein.</p>
+<p>For example, you may be working on Alita using a particular version of Maya, a specific set of plug-ins made available therein along with their versions, each of which needing to be compatible with both Maya and each other.</p>
+<p>So the first thing we need to do is get you setup with Rez.</p>
+<p><strong>Prerequisities</strong></p>
+<ul>
+<li><code class="codehilite"><span class="n">git</span></code></li>
+<li><code class="codehilite"><span class="n">python</span><span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="mi">7</span><span class="o">+</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">.</span><span class="mi">0</span></code></li>
+<li><code class="codehilite"><span class="n">pip</span><span class="o">-</span><span class="mi">19</span><span class="o">+</span></code></li>
+</ul>
+<blockquote>
+<p>Windows-only for now.</p>
+</blockquote>
+<div class="codehilite"><pre><span></span>python -m pip install bleeding-rez --user
+rez <span class="nb">bind</span> --quickstart
+</pre></div>
+
+<p>This will get Rez setup on your system.</p>
+<details><summary>Trouble?</summary>
+
+If the above command didn't work, ensure your Python `bin/Scripts` path is available on `PATH`.
+
+<div class="codehilite"><pre><span></span>python -c <span class="s2">&quot;import rez;print(rez)&quot;</span>
+<span class="c1"># c:\Python37\Lib\site-packages\rez\__init__.py</span>
+</pre></div>
+
+<div class="codehilite"><pre><span></span><span class="c1"># PowerShell</span>
+<span class="nv">$env</span>:PATH +<span class="o">=</span> <span class="s2">&quot;;c:\python37\scripts&quot;</span>
+
+<span class="c1"># cmd.exe</span>
+<span class="nb">set</span> <span class="nv">PATH</span><span class="o">=</span>c:<span class="se">\p</span>ython37<span class="se">\S</span>cripts<span class="p">;</span>%PATH%
+</pre></div>
+
+</details>
+
+<div class="codehilite"><pre><span></span>git clone https://github.com/mottosso/rez-scoopz.git
+git clone https://github.com/mottosso/rez-pipz.git
+<span class="nb">cd</span> rez-scoopz
+rez build --install
+</pre></div>
+
+<p>Allspark is used to visually list applications in a given project, including their requirements.</p>
+<div class="codehilite"><pre><span></span>python -m pip install bleeding-rez -U --user
+rez env allspark bleeding_rez pyside2 -- python -m allspark
+</pre></div>
+
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png" /></p>
+<p><br></p>
+<h3 id="package-path">Package Path</h3>
+<p>The recommended layout for Rez packages are as follows.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60429696-8c04e500-9bf3-11e9-8b27-af355969d0bf.png" /></p>
+<ul>
+<li><code class="codehilite"><span class="nb">int</span><span class="o">/</span></code> Internal projects, such as <code class="codehilite"><span class="n">core_pipeline</span></code>. You develop and release new versions internally.</li>
+<li><code class="codehilite"><span class="n">ext</span><span class="o">/</span></code> External projects, such as <code class="codehilite"><span class="n">pyblish</span></code> and <code class="codehilite"><span class="n">Qt</span><span class="p">.</span><span class="n">py</span></code>, you typically install these with <code class="codehilite"><span class="n">rez</span> <span class="n">env</span> <span class="n">pipz</span> <span class="c1">-- install</span></code></li>
+<li><code class="codehilite"><span class="n">td</span><span class="o">/</span></code> Packages developed by TDs themselves, such as small utility scripts</li>
+<li><code class="codehilite"><span class="n">proj</span><span class="o">/</span></code> Project such as <code class="codehilite"><span class="n">ATC</span></code> and <code class="codehilite"><span class="n">MST3</span></code></li>
+<li><code class="codehilite"><span class="n">app</span><span class="o">/</span></code> Applications, such as <code class="codehilite"><span class="n">maya</span></code> and <code class="codehilite"><span class="n">nuke</span></code></li>
+<li><code class="codehilite"><span class="n">converted</span><span class="o">/</span></code> Automatically converted packages from the old Template-based system</li>
+</ul>
+<p>There are two additional paths.</p>
+<ul>
+<li><code class="codehilite"><span class="o">~/</span><span class="n">packages</span></code> Your local development packages, from your home directory</li>
+<li><code class="codehilite"><span class="o">~/</span><span class="p">.</span><span class="n">packages</span></code> Your <a href="#localisation">localised packages</a></li>
+</ul>
+<p><br></p>
+<h3 id="external-packages-pipz">External Packages - Pipz</h3>
+<p>Any package from PyPI can be installed using a utility package called <code class="codehilite"><span class="n">pipz</span></code>.</p>
+<div class="codehilite"><pre><span></span>$ rez env pipz -- install pyblish-base --release
+</pre></div>
+
+<ul>
+<li>See <a href="https://github.com/mottosso/rez-pipz">rez-pipz</a> for details.</li>
+</ul>
+<p><br></p>
+<h3 id="external-packages-scoopz">External Packages - Scoopz</h3>
+<p>Any package from Scoop can be installed using another utility package called <code class="codehilite"><span class="n">scoopz</span></code>.</p>
+<div class="codehilite"><pre><span></span>$ rez env scoopz -- install python python27 git
+</pre></div>
+
+<ul>
+<li>See <a href="https://github.com/mottosso/rez-scoopz">rez-scoopz</a> for details.</li>
+</ul>
+<p><br></p>
+<h3 id="localisation">Localisation</h3>
+<p>For greater performance, any package may be localised to your local disk.</p>
+<ul>
+<li>See <a href="https://github.com/mottosso/rez-localz">rez-localz</a> for details.</li>
+</ul>
+<p><strong>Example</strong></p>
+<div class="codehilite"><pre><span></span>$ rez env pyside2 allspark bleeding_rez -- python -m <span class="nv">allspark</span>
+<span class="o">==============================</span>
+ allspark <span class="o">(</span><span class="m">1</span>.1.79<span class="o">)</span>
+<span class="o">==============================</span>
+- Loading Rez.. ok - <span class="m">0</span>.75s
+- Loading Qt.. ok - <span class="m">6</span>.14s
+- Loading allspark.. ok - <span class="m">0</span>.53s
+- Loading preferences.. ok - <span class="m">0</span>.00s
+------------------------------
+</pre></div>
+
+<p>Notice how long it took to load <code class="codehilite"><span class="n">Qt</span></code>, let's localise this.</p>
+<div class="codehilite"><pre><span></span>$ rez env localz -- localise PySide2
+</pre></div>
+
+<p>Now try launching again.</p>
+<div class="codehilite"><pre><span></span>$ rez env pyside2 allspark bleeding_rez -- python -m allspark
+rez env pyside2 allspark bleeding_rez -- python -m <span class="nv">allspark</span>
+<span class="o">==============================</span>
+ allspark <span class="o">(</span><span class="m">1</span>.1.79<span class="o">)</span>
+<span class="o">==============================</span>
+- Loading Rez.. ok - <span class="m">0</span>.91s
+- Loading Qt.. ok - <span class="m">0</span>.36s
+- Loading allspark.. ok - <span class="m">0</span>.70s
+- Loading preferences.. ok - <span class="m">0</span>.00s
+------------------------------
+</pre></div>
+
+<p>That's much better.</p>
+<p><strong>Disk Space</strong></p>
+<p>To save disk space, you can delete any or all localised packages from your <code class="codehilite"><span class="o">~/</span><span class="p">.</span><span class="n">packages</span></code> path.</p>
+<div class="codehilite"><pre><span></span>start %USERPROFILE%<span class="se">\.</span>packages
+</pre></div>
                 
                   
                 

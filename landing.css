@@ -1,5 +1,10 @@
 /* Styling specifically for the landing page */
 
+@font-face {
+    font-family: "Peinture Fraiche";
+    src: url("Peinture Fraiche.ttf") format("truetype");
+}
+
 .vboxlayout {
   display: flex;
   flex-direction: column;
@@ -8,6 +13,30 @@
 .hboxlayout {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.vboxlayout p {
+  margin-top: 0;
+  font-size: 1.3em;
+  font-weight: 300;
+}
+
+.row {
+  flex-direction: row;
+}
+
+.column {
+  flex-direction: column;
+}
+
+.column-reverse {
+  flex-direction: column-reverse;
+}
+
+.row-reverse {
+  flex-direction: row-reverse;
 }
 
 .justify-left {
@@ -18,9 +47,26 @@
     justify-content: flex-end;
 }
 
+.justify-center {
+    justify-content: center;
+}
+
+.align-center {
+  align-items: center;
+}
+
 .space {
-    min-height: 20px;
-    min-width: 20px;
+    min-height: 100px;
+    min-width: 100px;
+}
+
+.smallspace {
+    min-height: 30px;
+    min-width: 30px;
+}
+
+.auto-margin {
+  margin: auto auto;
 }
 
 .stretch {
@@ -28,10 +74,34 @@
 }
 
 .poster {
+  box-shadow: 0 0 1.2rem rgba(0,0,0,.2), 0 0.2rem 0.4rem rgba(0,0,0,.2);
+  border: 1px solid #777;
+}
+
+.md-typeset h2 {
+  font-family: "Peinture Fraiche";
+  font-size: 4.0em;
+  color: #222;
+  margin-top: 0;
+  line-height: 1em;
+}
+
+.landing {
+  display: none;
+}
+
+#landing {
+  align-items: center;
 }
 
 #description {
+  font-size: 1em;
   max-width: 420px;
+  padding-right: 50px;
+}
+
+#conclusion {
+  text-align: center;
 }
 
 [data-md-color-primary] .md-typeset a.button {
@@ -90,21 +160,64 @@
   position: relative;
 }
 
+.md-typeset a {
+    color: #0070e6;
+    font-weight: 400;
+}
+
+.md-typeset .codehilite, .md-typeset .highlight {
+  min-width: 50%;
+}
+
+.codehilite code, .md-typeset .codehilite pre, .md-typeset .highlight code, .md-typeset .highlight pre {
+  font-family: "Source Code Pro";
+  font-size: 1.11em;
+}
+
 /* Mobile */
-@media only screen and (max-width: 59em) {
+@media only screen and (max-width: 60em) {
   .hboxlayout {
     flex-direction: column;
     justify-content: center;
     align-content: start;
+    align-items: center;
+  }
+
+  .landing {
+    display: inherit;
+  }
+
+  .vboxlayout {
+    align-items: center;
+  }
+
+  .vboxlayout p {
+    width: 75%;
+  }
+
+  .md-typeset img {
+    margin: 0 auto;
   }
 
   [data-md-color-primary] .md-typeset a.button {
     margin: 5px auto;
   }
 
+  #description {
+    /*max-width: none;*/
+    padding: 0;
+    width: inherit;
+  }
+
   .container {
     margin: 0px auto;
     padding-top: 20px;
+    text-align: center;
+  }
+
+  h2 {
+    padding-top: 100px;
+    text-align: center;
   }
 
   p {

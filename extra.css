@@ -1,3 +1,8 @@
+body,
+input {
+  font-family: "Roboto", helvetica;
+}
+
 .md-grid {
     max-width: 57rem;
 }
@@ -7,6 +12,30 @@
   color: #727272;
   font-size: 1.3em;
   line-height: 1.6;
+}
+
+.md-typeset .codehilite, .md-typeset .highlight {
+  min-width: 50%;
+  background: transparent;
+  border: 1px solid #eee;
+  margin-top: 0;
+}
+/*
+pre {
+  color: white !important;
+}
+
+.md-clipboard:before {
+    color: rgb(255, 255, 255);
+}
+
+.codehilite:hover .md-clipboard:before,.md-typeset .highlight:hover .md-clipboard:before,pre:hover .md-clipboard:before {
+    color: rgba(255, 255, 255, 0.54) !important
+}
+*/
+.codehilite code, .md-typeset .codehilite pre, .md-typeset .highlight code, .md-typeset .highlight pre {
+  /*background: transparent;*/
+  font-family: "Source Code Pro";
 }
 
 input, select, textarea{
@@ -43,4 +72,8 @@ h2, h3, h4, b {
 
 .md-typeset h1, .md-typeset h2, .md-typeset h3 {
   font-weight: bold;
+}
+
+.md-footer-copyright__highlight {
+  display: none;
 }

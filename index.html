@@ -73,7 +73,6 @@ Here we'll strip almost everything, making room for visuals and images
   }
 </style>
 
-<!-- Include home-specific stylesheet -->
 <link rel="stylesheet" href="landing.css">
 
     
@@ -205,7 +204,7 @@ Here we'll strip almost everything, making room for visuals and images
         <div class="md-main__inner md-grid" data-md-component="container">
           
   
-    <div style="display: none" class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+    <div class="md-sidebar md-sidebar--primary landing" data-md-component="navigation">
       <div class="md-sidebar__scrollwrap">
         <div class="md-sidebar__inner">
           <nav class="md-nav md-nav--primary" data-md-level="0">
@@ -288,27 +287,219 @@ Here we'll strip almost everything, making room for visuals and images
                 
                   <h1>Home</h1>
                 
-                <div class="hboxlayout">
+                <div class="space"></div>
+
+<div class="hboxlayout" id="landing">
     <div class="vboxlayout">
-        <div class="space"></div>
-        <div class="space"></div>
-        <div class="space"></div>
+        <br>
+        <br>
         <div class="container"><img src=allspark.png></div>
+        <br>
         <div class="container">
             <p id="description">
                 Powerful <b>application launcher</b> with <i>reproducible software environments</i>, for visual effects, feature animation and AAA-games productions.
             </p>
         </div>
-        <div class="space"></div>
+        <br>
         <div class="hboxlayout justify-left">
             <a href="guides/#install" class="button blue">Learn more..</a>
             <a href="guides/#install" class="button red">Download</a>
         </div>
+        <br>
+        <br>
     </div>
     <div class="container">
-        <img class="poster" src=landing.png>
+        <img class="poster" src=https://user-images.githubusercontent.com/2152766/60492033-02602080-9ca2-11e9-82f0-a3cc43cd5c5e.png>
+    </div>
+    <!-- Fit to height of the browser window
+    <script language="javascript">
+        function autoResizeDiv() {
+            document.getElementById('landing').style.height = Math.max(500, window.innerHeight + 50) +'px';
+        }
+        window.onresize = autoResizeDiv;
+        autoResizeDiv();
+    </script>
+    -->
+</div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<!--
+
+    Reproducible Environment
+
+-->
+
+<div class="hboxlayout row-reverse">
+    <div class="vboxlayout">
+        <h2>Reproducible Environment</h2>
+        <p>
+
+Precision authoring. Precision use.
+<br>
+<br>
+Control over the environment within which to run software is critical to the success of any studio working on more than one project, not to mention multiple projects concurrently.
+<br>
+<br>
+Establish complex relationships between software, applications and projects with <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>, the underlying framework powering <b>Allspark</b>.
+
+</p>
+    </div>
+    <div class="smallspace"></div>
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60490868-4b62a580-9c9f-11e9-857a-204a5e58ac35.gif>
+</div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<!--
+
+    Command-line
+
+-->
+
+<div class="hboxlayout">
+    <div class="vboxlayout">
+        <h2>Dual Representation</h2>
+        <p>
+
+Allspark is but a shell.
+
+Anything done via the GUI is available via the command-line, using standard Rez commands.
+
+<div class="codehilite"><pre><span></span>$ rez env alita maya -q
+&gt; $ <span class="nb">echo</span> <span class="s2">&quot;Hello Rez!&quot;</span>
+Hello Rez!
+</pre></div>
+
+</p>
+    </div>
+    <div class="smallspace"></div>
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
+</div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<!--
+
+    Environment Management
+
+-->
+
+<div class="hboxlayout justify-left row-reverse">
+    <div class="vboxlayout">
+        <h2>Environment Management</h2>
+<p>
+
+Preview the environment, prior to launching an application. Make changes interactively as you develop or debug complex dependency chains.
+
+</p>
+    </div>
+    <div class="smallspace"></div>
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493787-82d45080-9ca5-11e9-9f0a-c5d7497b396f.gif>
+</div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<!--
+
+    Console
+
+-->
+
+<div class="hboxlayout">
+    <div class="vboxlayout">
+        <h2>Console</h2>
+        <p>
+
+Stay on top of current events.
+<br>
+<br>
+The terminal replicates what a console might say.
+
+</p>
+    </div>
+    <div class="smallspace"></div>
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493788-82d45080-9ca5-11e9-83e8-06f9105d37ad.gif>
+</div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<!--
+
+    Process Management
+
+-->
+
+<div class="hboxlayout justify-left row-reverse">
+    <div class="vboxlayout">
+        <h2>Process Management</h2>
+<p>
+
+Organise your many running processes in a compact way. Give each instance of Maya a unique name, group them, color them, bring-to-front and mass-kill instances to establish available memory in a hurry.
+
+</p>
+    </div>
+    <div class="smallspace"></div>
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493791-82d45080-9ca5-11e9-8f7b-0be30a53d823.gif>
+</div>
+
+<div class="space"></div>
+
+<div class="space"></div>
+
+<!--
+
+    Customisation
+
+-->
+
+<div class="hboxlayout">
+    <div class="vboxlayout">
+        <h2>Customisation</h2>
+        <p>
+            Full theming support with pre-made color palettes to choose from. Interactively edit the underlying CSS and store them as your own.
+            <br>
+            <br>
+            Drag panels around, establish a super-layout with everything visible at once. Make it yours.
+        </p>
+    </div>
+    <div class="smallspace"></div>
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493792-82d45080-9ca5-11e9-8533-ae04803c71e2.gif>
+</div>
+
+<p><br>
+<br>
+<br></p>
+<div class="vboxlayout align-center">
+    <div class="container"><img src=allspark.png></div>
+    <p id="conclusion">
+        Allspark is free and <a href="https://github.com/mottosso/allspark">open source</a> (LGPL).
+        <br>
+        Let's get this show on the road.
+    </p>
+    <div class="hboxlayout justify-center">
+        <a href="guides/#install" class="button blue">Learn more..</a>
+        <a href="guides/#install" class="button red">Download</a>
     </div>
 </div>
+
+<p><br>
+<br>
+<br></p>
                 
                   
                 
@@ -323,7 +514,49 @@ Here we'll strip almost everything, making room for visuals and images
         </div>
       </main>
       
-
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+        
+          <a href="guides/" title="Guides" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Guides
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2019 mottosso
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
     </div>
     
       <script src="assets/javascripts/application.245445c6.js"></script>
