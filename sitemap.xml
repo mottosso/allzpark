@@ -2,12 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>https://allspark.sh/</loc>
-     <lastmod>2019-07-02</lastmod>
+     <lastmod>2019-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://allspark.sh/guides/</loc>
-     <lastmod>2019-07-02</lastmod>
+     <lastmod>2019-07-03</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://allspark.sh/reference/</loc>
+     <lastmod>2019-07-03</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://allspark.sh/rez/</loc>
+     <lastmod>2019-07-03</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://allspark.sh/localisation/</loc>
+     <lastmod>2019-07-03</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://allspark.sh/about/</loc>
+     <lastmod>2019-07-03</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

@@ -272,6 +272,13 @@
     In development
   </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart" title="Quickstart" class="md-nav__link">
+    Quickstart
+  </a>
+  
     <nav class="md-nav">
       <ul class="md-nav__list">
         
@@ -282,36 +289,36 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#package-path" title="Package Path" class="md-nav__link">
     Package Path
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#external-packages-pipz" title="External Packages - Pipz" class="md-nav__link">
-    External Packages - Pipz
+      
+        <li class="md-nav__item">
+  <a href="#pip" title="Pip" class="md-nav__link">
+    Pip
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#external-packages-scoopz" title="External Packages - Scoopz" class="md-nav__link">
-    External Packages - Scoopz
+      
+        <li class="md-nav__item">
+  <a href="#scoop" title="Scoop" class="md-nav__link">
+    Scoop
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#localisation" title="Localisation" class="md-nav__link">
     Localisation
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -323,6 +330,54 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../reference/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../rez/" title="Package Management" class="md-nav__link">
+      Package Management
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../localisation/" title="Localisation" class="md-nav__link">
+      Localisation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../about/" title="About" class="md-nav__link">
+      About
+    </a>
   </li>
 
     
@@ -349,6 +404,13 @@
     In development
   </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart" title="Quickstart" class="md-nav__link">
+    Quickstart
+  </a>
+  
     <nav class="md-nav">
       <ul class="md-nav__list">
         
@@ -359,36 +421,36 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#package-path" title="Package Path" class="md-nav__link">
     Package Path
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#external-packages-pipz" title="External Packages - Pipz" class="md-nav__link">
-    External Packages - Pipz
+      
+        <li class="md-nav__item">
+  <a href="#pip" title="Pip" class="md-nav__link">
+    Pip
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#external-packages-scoopz" title="External Packages - Scoopz" class="md-nav__link">
-    External Packages - Scoopz
+      
+        <li class="md-nav__item">
+  <a href="#scoop" title="Scoop" class="md-nav__link">
+    Scoop
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#localisation" title="Localisation" class="md-nav__link">
     Localisation
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -415,131 +477,110 @@
                 
                 <h2 id="in-development">In development</h2>
 <p>Allspark is currently <a href="https://github.com/mottosso/allspark">being developed</a> and is not yet ready for use.</p>
-<p>If you're interested in early-access to collaborate and or contribute, <a href="marcus@abstractfactory.io">get in touch</a>. A 1.0 is scheduled for release in early August 2019.</p>
+<p>If you're interested in early-access to collaborate and or contribute, <a href="mailto:marcus@abstractfactory.io">get in touch</a>. A 1.0 is scheduled for release in early August 2019.</p>
 <p><br>
 <br>
 <br></p>
+<h2 id="quickstart">Quickstart</h2>
+<p>By the time you're done with this chapter, you'll be able to call the below command, and understand when to use it.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">python-3</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">--root</span> <span style="color: #f8f8f2">/my/projects</span>
+</pre></div>
+
+<p>Where <code>/my/projects</code> is the absolute path to your project Rez packages.</p>
+<p><br></p>
 <h3 id="setup">Setup</h3>
-<p>The benefit of using Allspark is that it provides the power and flexibility of <a href="https://github.com/mottosso/bleeding-rez">Rez</a> to developers and package authors and a graphical user interface for artists. Developers gain fine control over what software, libraries, applications and projects are made available to artists, along with any interdependencies therein.</p>
-<p>For example, you may be working on Alita using a particular version of Maya, a specific set of plug-ins made available therein along with their versions, each of which needing to be compatible with both Maya and each other.</p>
-<p>So the first thing we need to do is get you setup with Rez.</p>
-<p><strong>Prerequisities</strong></p>
-<ul>
-<li><code class="codehilite"><span class="n">git</span></code></li>
-<li><code class="codehilite"><span class="n">python</span><span class="o">-</span><span class="mi">2</span><span class="p">.</span><span class="mi">7</span><span class="o">+</span><span class="p">,</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">.</span><span class="mi">0</span></code></li>
-<li><code class="codehilite"><span class="n">pip</span><span class="o">-</span><span class="mi">19</span><span class="o">+</span></code></li>
-</ul>
-<blockquote>
-<p>Windows-only for now.</p>
-</blockquote>
-<div class="codehilite"><pre><span></span>python -m pip install bleeding-rez --user
-rez <span class="nb">bind</span> --quickstart
+<p>Allspark is all about Rez which is all about managing software, so first thing we need is get Rez setup.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">pip</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">bleeding-rez</span> <span style="color: #f8f8f2">--user</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">bind</span> <span style="color: #f8f8f2">--quickstart</span>
+<span style="color: #f8f8f2">git</span> <span style="color: #f8f8f2">clone</span> <span style="color: #f8f8f2">https</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">//github.com/mottosso/rez-scoopz.git</span>
+<span style="color: #f8f8f2">git</span> <span style="color: #f8f8f2">clone</span> <span style="color: #f8f8f2">https</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">//github.com/mottosso/rez-pipz.git</span>
+<span style="color: #f8f8f2">cd rez-scoopz</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">scoopz</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">git</span>
+<span style="color: #f8f8f2">cd ../rez-pipz</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pipz</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">allspark</span>
 </pre></div>
 
-<p>This will get Rez setup on your system.</p>
-<details><summary>Trouble?</summary>
-
-If the above command didn't work, ensure your Python `bin/Scripts` path is available on `PATH`.
-
-<div class="codehilite"><pre><span></span>python -c <span class="s2">&quot;import rez;print(rez)&quot;</span>
-<span class="c1"># c:\Python37\Lib\site-packages\rez\__init__.py</span>
-</pre></div>
-
-<div class="codehilite"><pre><span></span><span class="c1"># PowerShell</span>
-<span class="nv">$env</span>:PATH +<span class="o">=</span> <span class="s2">&quot;;c:\python37\scripts&quot;</span>
-
-<span class="c1"># cmd.exe</span>
-<span class="nb">set</span> <span class="nv">PATH</span><span class="o">=</span>c:<span class="se">\p</span>ython37<span class="se">\S</span>cripts<span class="p">;</span>%PATH%
-</pre></div>
-
-</details>
-
-<div class="codehilite"><pre><span></span>git clone https://github.com/mottosso/rez-scoopz.git
-git clone https://github.com/mottosso/rez-pipz.git
-<span class="nb">cd</span> rez-scoopz
-rez build --install
-</pre></div>
-
-<p>Allspark is used to visually list applications in a given project, including their requirements.</p>
-<div class="codehilite"><pre><span></span>python -m pip install bleeding-rez -U --user
-rez env allspark bleeding_rez pyside2 -- python -m allspark
+<p>And there you have it.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">--root</span> 
 </pre></div>
 
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png" /></p>
 <p><br></p>
-<h3 id="package-path">Package Path</h3>
+<h2 id="package-path">Package Path</h2>
 <p>The recommended layout for Rez packages are as follows.</p>
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60429696-8c04e500-9bf3-11e9-8b27-af355969d0bf.png" /></p>
 <ul>
-<li><code class="codehilite"><span class="nb">int</span><span class="o">/</span></code> Internal projects, such as <code class="codehilite"><span class="n">core_pipeline</span></code>. You develop and release new versions internally.</li>
-<li><code class="codehilite"><span class="n">ext</span><span class="o">/</span></code> External projects, such as <code class="codehilite"><span class="n">pyblish</span></code> and <code class="codehilite"><span class="n">Qt</span><span class="p">.</span><span class="n">py</span></code>, you typically install these with <code class="codehilite"><span class="n">rez</span> <span class="n">env</span> <span class="n">pipz</span> <span class="c1">-- install</span></code></li>
-<li><code class="codehilite"><span class="n">td</span><span class="o">/</span></code> Packages developed by TDs themselves, such as small utility scripts</li>
-<li><code class="codehilite"><span class="n">proj</span><span class="o">/</span></code> Project such as <code class="codehilite"><span class="n">ATC</span></code> and <code class="codehilite"><span class="n">MST3</span></code></li>
-<li><code class="codehilite"><span class="n">app</span><span class="o">/</span></code> Applications, such as <code class="codehilite"><span class="n">maya</span></code> and <code class="codehilite"><span class="n">nuke</span></code></li>
-<li><code class="codehilite"><span class="n">converted</span><span class="o">/</span></code> Automatically converted packages from the old Template-based system</li>
+<li><code>int/</code> Internal projects, such as <code>core_pipeline</code>. You develop and release new versions internally.</li>
+<li><code>ext/</code> External projects, such as <code>pyblish</code> and <code>Qt.py</code>, you typically install these with <code>rez env pipz -- install</code></li>
+<li><code>td/</code> Packages developed by TDs themselves, such as small utility scripts</li>
+<li><code>proj/</code> Project such as <code>ATC</code> and <code>MST3</code></li>
+<li><code>app/</code> Applications, such as <code>maya</code> and <code>nuke</code></li>
+<li><code>converted/</code> Automatically converted packages from the old Template-based system</li>
 </ul>
 <p>There are two additional paths.</p>
 <ul>
-<li><code class="codehilite"><span class="o">~/</span><span class="n">packages</span></code> Your local development packages, from your home directory</li>
-<li><code class="codehilite"><span class="o">~/</span><span class="p">.</span><span class="n">packages</span></code> Your <a href="#localisation">localised packages</a></li>
+<li><code>~/packages</code> Your local development packages, from your home directory</li>
+<li><code>~/.packages</code> Your <a href="#localisation">localised packages</a></li>
 </ul>
 <p><br></p>
-<h3 id="external-packages-pipz">External Packages - Pipz</h3>
-<p>Any package from PyPI can be installed using a utility package called <code class="codehilite"><span class="n">pipz</span></code>.</p>
-<div class="codehilite"><pre><span></span>$ rez env pipz -- install pyblish-base --release
+<h2 id="pip">Pip</h2>
+<p>Any package from PyPI can be installed using a utility package called <code>pipz</code>.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pipz</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">pyblish-base</span> <span style="color: #f8f8f2">--release</span>
 </pre></div>
 
 <ul>
 <li>See <a href="https://github.com/mottosso/rez-pipz">rez-pipz</a> for details.</li>
 </ul>
 <p><br></p>
-<h3 id="external-packages-scoopz">External Packages - Scoopz</h3>
-<p>Any package from Scoop can be installed using another utility package called <code class="codehilite"><span class="n">scoopz</span></code>.</p>
-<div class="codehilite"><pre><span></span>$ rez env scoopz -- install python python27 git
+<h2 id="scoop">Scoop</h2>
+<p>Any package from Scoop can be installed using another utility package called <code>scoopz</code>.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">scoopz</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">python27</span> <span style="color: #f8f8f2">git</span>
 </pre></div>
 
 <ul>
 <li>See <a href="https://github.com/mottosso/rez-scoopz">rez-scoopz</a> for details.</li>
 </ul>
 <p><br></p>
-<h3 id="localisation">Localisation</h3>
+<h2 id="localisation">Localisation</h2>
 <p>For greater performance, any package may be localised to your local disk.</p>
 <ul>
 <li>See <a href="https://github.com/mottosso/rez-localz">rez-localz</a> for details.</li>
 </ul>
 <p><strong>Example</strong></p>
-<div class="codehilite"><pre><span></span>$ rez env pyside2 allspark bleeding_rez -- python -m <span class="nv">allspark</span>
-<span class="o">==============================</span>
- allspark <span class="o">(</span><span class="m">1</span>.1.79<span class="o">)</span>
-<span class="o">==============================</span>
-- Loading Rez.. ok - <span class="m">0</span>.75s
-- Loading Qt.. ok - <span class="m">6</span>.14s
-- Loading allspark.. ok - <span class="m">0</span>.53s
-- Loading preferences.. ok - <span class="m">0</span>.00s
-------------------------------
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">bleeding_rez</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">-m</span> <span style="color: #f8f8f2">allspark</span>
+<span style="color: #f8f8f2">==============================</span>
+ <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">(1.1.79)</span>
+<span style="color: #f8f8f2">==============================</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">Rez..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.75s</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">Qt..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">6.14s</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">allspark..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.53s</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">preferences..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.00s</span>
+<span style="color: #f8f8f2">------------------------------</span>
 </pre></div>
 
-<p>Notice how long it took to load <code class="codehilite"><span class="n">Qt</span></code>, let's localise this.</p>
-<div class="codehilite"><pre><span></span>$ rez env localz -- localise PySide2
+<p>Notice how long it took to load <code>Qt</code>, let's localise this.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">localz</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">localise</span> <span style="color: #f8f8f2">PySide2</span>
 </pre></div>
 
 <p>Now try launching again.</p>
-<div class="codehilite"><pre><span></span>$ rez env pyside2 allspark bleeding_rez -- python -m allspark
-rez env pyside2 allspark bleeding_rez -- python -m <span class="nv">allspark</span>
-<span class="o">==============================</span>
- allspark <span class="o">(</span><span class="m">1</span>.1.79<span class="o">)</span>
-<span class="o">==============================</span>
-- Loading Rez.. ok - <span class="m">0</span>.91s
-- Loading Qt.. ok - <span class="m">0</span>.36s
-- Loading allspark.. ok - <span class="m">0</span>.70s
-- Loading preferences.. ok - <span class="m">0</span>.00s
-------------------------------
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">bleeding_rez</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">-m</span> <span style="color: #f8f8f2">allspark</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">bleeding_rez</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">-m</span> <span style="color: #f8f8f2">allspark</span>
+<span style="color: #f8f8f2">==============================</span>
+ <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">(1.1.79)</span>
+<span style="color: #f8f8f2">==============================</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">Rez..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.91s</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">Qt..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.36s</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">allspark..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.70s</span>
+<span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">Loading</span> <span style="color: #f8f8f2">preferences..</span> <span style="color: #f8f8f2">ok</span> <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">0.00s</span>
+<span style="color: #f8f8f2">------------------------------</span>
 </pre></div>
 
 <p>That's much better.</p>
 <p><strong>Disk Space</strong></p>
-<p>To save disk space, you can delete any or all localised packages from your <code class="codehilite"><span class="o">~/</span><span class="p">.</span><span class="n">packages</span></code> path.</p>
-<div class="codehilite"><pre><span></span>start %USERPROFILE%<span class="se">\.</span>packages
+<p>To save disk space, you can delete any or all localised packages from your <code>~/.packages</code> path.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">start </span><span style="color: #66d9ef">%</span><span style="color: #f8f8f2">USERPROFILE%\.packages</span>
 </pre></div>
                 
                   
@@ -575,6 +616,20 @@ rez env pyside2 allspark bleeding_rez -- python -m <span class="nv">allspark</sp
             </div>
           </a>
         
+        
+          <a href="../reference/" title="Reference" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Reference
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
         
       </nav>
     </div>
