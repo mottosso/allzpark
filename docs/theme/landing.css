@@ -1,10 +1,5 @@
 /* Styling specifically for the landing page */
 
-@font-face {
-    font-family: "Peinture Fraiche";
-    src: url("Peinture Fraiche.ttf") format("truetype");
-}
-
 .vboxlayout {
   display: flex;
   flex-direction: column;

@@ -2,73 +2,52 @@
 
 Allspark is currently [being developed](https://github.com/mottosso/allspark) and is not yet ready for use.
 
-If you're interested in early-access to collaborate and or contribute, [get in touch](marcus@abstractfactory.io). A 1.0 is scheduled for release in early August 2019.
+If you're interested in early-access to collaborate and or contribute, [get in touch](mailto:marcus@abstractfactory.io). A 1.0 is scheduled for release in early August 2019.
 
 <br>
 <br>
+<br>
+
+## Quickstart
+
+By the time you're done with this chapter, you'll be able to call the below command, and understand when to use it.
+
+```powershell
+rez env allspark pyside2 python-3 -- allspark --root /my/projects
+```
+
+Where `/my/projects` is the absolute path to your project Rez packages.
+
 <br>
 
 ### Setup
 
-The benefit of using Allspark is that it provides the power and flexibility of [Rez](https://github.com/mottosso/bleeding-rez) to developers and package authors and a graphical user interface for artists. Developers gain fine control over what software, libraries, applications and projects are made available to artists, along with any interdependencies therein.
+Allspark is all about Rez which is all about managing software, so first thing we need is get Rez setup.
 
-For example, you may be working on Alita using a particular version of Maya, a specific set of plug-ins made available therein along with their versions, each of which needing to be compatible with both Maya and each other.
-
-So the first thing we need to do is get you setup with Rez.
-
-**Prerequisities**
-
-- `git`
-- `python-2.7+,<4.0`
-- `pip-19+`
-
-> Windows-only for now.
-
-```bash
-python -m pip install bleeding-rez --user
+```powershell
+pip install bleeding-rez --user
 rez bind --quickstart
-```
-
-This will get Rez setup on your system.
-
-<details><summary>Trouble?</summary>
-
-If the above command didn't work, ensure your Python `bin/Scripts` path is available on `PATH`.
-
-```bash
-python -c "import rez;print(rez)"
-# c:\Python37\Lib\site-packages\rez\__init__.py
-```
-
-```bash
-# PowerShell
-$env:PATH += ";c:\python37\scripts"
-
-# cmd.exe
-set PATH=c:\python37\Scripts;%PATH%
-```
-
-</details>
-
-```bash
 git clone https://github.com/mottosso/rez-scoopz.git
 git clone https://github.com/mottosso/rez-pipz.git
 cd rez-scoopz
 rez build --install
+rez env scoopz -- install python git
+cd ../rez-pipz
+rez build --install
+rez env pipz -- install pyside2 allspark
 ```
 
-Allspark is used to visually list applications in a given project, including their requirements.
+And there you have it.
 
-```bash
-python -m pip install bleeding-rez -U --user
-rez env allspark bleeding_rez pyside2 -- python -m allspark
+```powershell
+rez env pyside2 allspark -- allspark --root 
 ```
 
 ![image](https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png)
 
 <br>
 
-### Package Path
+## Package Path
 
 The recommended layout for Rez packages are as follows.
 
@@ -88,11 +67,11 @@ There are two additional paths.
 
 <br>
 
-### External Packages - Pipz
+## Pip
 
 Any package from PyPI can be installed using a utility package called `pipz`.
 
-```bash
+```powershell
 $ rez env pipz -- install pyblish-base --release
 ```
 
@@ -100,11 +79,11 @@ $ rez env pipz -- install pyblish-base --release
 
 <br>
 
-### External Packages - Scoopz
+## Scoop
 
 Any package from Scoop can be installed using another utility package called `scoopz`.
 
-```bash
+```powershell
 $ rez env scoopz -- install python python27 git
 ```
 
@@ -112,7 +91,7 @@ $ rez env scoopz -- install python python27 git
 
 <br>
 
-### Localisation
+## Localisation
 
 For greater performance, any package may be localised to your local disk.
 
@@ -120,7 +99,7 @@ For greater performance, any package may be localised to your local disk.
 
 **Example**
 
-```bash
+```powershell
 $ rez env pyside2 allspark bleeding_rez -- python -m allspark
 ==============================
  allspark (1.1.79)
@@ -134,13 +113,13 @@ $ rez env pyside2 allspark bleeding_rez -- python -m allspark
 
 Notice how long it took to load `Qt`, let's localise this.
 
-```bash
+```powershell
 $ rez env localz -- localise PySide2
 ```
 
 Now try launching again.
 
-```bash
+```powershell
 $ rez env pyside2 allspark bleeding_rez -- python -m allspark
 rez env pyside2 allspark bleeding_rez -- python -m allspark
 ==============================
@@ -159,6 +138,6 @@ That's much better.
 
 To save disk space, you can delete any or all localised packages from your `~/.packages` path.
 
-```bash
+```powershell
 start %USERPROFILE%\.packages
 ```

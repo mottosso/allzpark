@@ -14,6 +14,10 @@ copyright: "Copyright &copy; 2019 mottosso"
 nav:
   - Home: index.md
   - Guides: guides.md
+  - Reference: reference.md
+  - Package Management: rez.md
+  - Localisation: localisation.md
+  - About: about.md
 
 docs_dir: pages
 
@@ -35,9 +39,14 @@ extra:
     tabs: true
 
 markdown_extensions:
+  - codehilite:
+      guess_lang: false
+      use_pygments: true
+      noclasses: true
+      # linenums: true
+      pygments_style: monokai
   - markdown.extensions.extra
   - markdown.extensions.admonition
-  - markdown.extensions.codehilite
   - markdown.extensions.def_list
   - markdown.extensions.footnotes
   - markdown.extensions.meta

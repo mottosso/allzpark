@@ -15,7 +15,7 @@ template: landing.html
         </div>
         <br>
         <div class="hboxlayout justify-left">
-            <a href="guides/#install" class="button blue">Learn more..</a>
+            <a href="guides/#install" class="button blue">Learn more</a>
             <a href="guides/#install" class="button red">Download</a>
         </div>
         <br>
@@ -24,15 +24,6 @@ template: landing.html
     <div class="container">
         <img class="poster" src=https://user-images.githubusercontent.com/2152766/60492033-02602080-9ca2-11e9-82f0-a3cc43cd5c5e.png>
     </div>
-    <!-- Fit to height of the browser window
-    <script language="javascript">
-        function autoResizeDiv() {
-            document.getElementById('landing').style.height = Math.max(500, window.innerHeight + 50) +'px';
-        }
-        window.onresize = autoResizeDiv;
-        autoResizeDiv();
-    </script>
-    -->
 </div>
 
 <div class="space"></div>
@@ -123,36 +114,11 @@ Preview the environment, prior to launching an application. Make changes interac
 
 <!-- 
 
-    Console
-
--->
-
-<div class="hboxlayout">
-    <div class="vboxlayout">
-        <h2>Console</h2>
-        <p>
-
-Stay on top of current events.
-<br>
-<br>
-The terminal replicates what a console might say.
-
-</p>
-    </div>
-    <div class="smallspace"></div>
-    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493788-82d45080-9ca5-11e9-83e8-06f9105d37ad.gif>
-</div>
-
-<div class="space"></div>
-<div class="space"></div>
-
-<!-- 
-
     Process Management
 
 -->
 
-<div class="hboxlayout justify-left row-reverse">
+<div class="hboxlayout">
     <div class="vboxlayout">
         <h2>Process Management</h2>
 <p>
@@ -174,14 +140,14 @@ Organise your many running processes in a compact way. Give each instance of May
 
 -->
 
-<div class="hboxlayout">
+<div class="hboxlayout justify-left row-reverse">
     <div class="vboxlayout">
         <h2>Customisation</h2>
         <p>
             Full theming support with pre-made color palettes to choose from. Interactively edit the underlying CSS and store them as your own.
             <br>
             <br>
-            Drag panels around, establish a super-layout with everything visible at once. Make it yours.
+            Drag panels around, establish a super-layout with everything visible at once.
         </p>
     </div>
     <div class="smallspace"></div>
@@ -196,12 +162,12 @@ Organise your many running processes in a compact way. Give each instance of May
 <div class="vboxlayout align-center">
     <div class="container"><img src=allspark.png></div>
     <p id="conclusion">
-        Allspark is free and <a href="https://github.com/mottosso/allspark">open source</a> (LGPL).
+        Allspark is free and <a href="https://github.com/mottosso/allspark">open source</a> (LGPL)
         <br>
-        Let's get this show on the road.
+        Let's get this show on the road
     </p>
     <div class="hboxlayout justify-center">
-        <a href="guides/#install" class="button blue">Learn more..</a>
+        <a href="guides/#install" class="button blue">Learn more</a>
         <a href="guides/#install" class="button red">Download</a>
     </div>
 </div>
