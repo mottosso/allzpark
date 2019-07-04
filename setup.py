@@ -30,7 +30,7 @@ with open(fname, "w") as f:
     f.write("version = \"%s\"\n" % version)
 
 setup(
-    name="allspark",
+    name="allzpark",
     version=version,
     description=__doc__,
     keywords="launcher package resolve version software management",
