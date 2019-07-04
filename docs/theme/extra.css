@@ -127,6 +127,10 @@ nav.md-nav.md-nav--primary {
     font-size: .65rem;
 }
 
+.md-footer {
+  padding-top: 100px;
+}
+
 @media only screen and (min-width: 60em) {
   [data-md-toggle]:checked~.md-header .md-search__input+.md-search__icon, [data-md-toggle]:checked~.md-header .md-search__input::placeholder {
       color: rgba(0, 0, 0, .30);
