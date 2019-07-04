@@ -6,7 +6,8 @@ from allspark.version import version
 
 # Git is required for deployment
 assert len(version.split(".")) == 3, (
-    "Could not compute patch version, see version.py")
+    "Could not compute patch version, make sure `git` is\n"
+    "available and see version.py for details")
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -44,6 +45,11 @@ setup(
         "allspark": [
             "resources/*.png",
             "resources/*.css",
+        ]
+    },
+    entry_points={
+        "console_scripts": [
+            "allspark = allspark.cli:main"
         ]
     },
     classifiers=classifiers,
