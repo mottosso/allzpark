@@ -99,6 +99,10 @@
   text-align: center;
 }
 
+img.poster {
+    min-width: 581px;
+}
+
 [data-md-color-primary] .md-typeset a.button {
   font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
   max-width: 400px;
