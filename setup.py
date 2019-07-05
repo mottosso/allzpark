@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
-    "Topic :: Utilities"
+    "Topic :: Utilities",
     "Topic :: Software Development",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
@@ -30,7 +30,7 @@ with open(fname, "w") as f:
     f.write("version = \"%s\"\n" % version)
 
 setup(
-    name="allzpark",
+    name="allspark",
     version=version,
     description=__doc__,
     keywords="launcher package resolve version software management",
