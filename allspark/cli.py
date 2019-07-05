@@ -9,19 +9,28 @@ import argparse
 import contextlib
 
 from .version import version
+from . import allsparkconfig
 
 timing = {}
-environment = {
-    # Without this, resolving contexts may take seconds to minutes
-    "REZ_MEMCACHED_URI": "127.0.0.1:11211",
 
-    # Defaults to your home directory
-    "ALLSPARK_APPS": os.path.join(os.path.expanduser("~/apps")),
-    "ALLSPARK_PROJECTS": os.getenv(
-        # Backwards compatibility
-        "ALLSPARK_ROOT", os.path.join(os.path.expanduser("~/projects"))
-    ),
-}
+
+def _load_userconfig(fname=None):
+    fname = fname or os.getenv(
+        "ALLSPARK_CONFIG_FILE",
+        os.path.expanduser("~/allsparkconfig.py")
+    )
+
+    mod = {}
+    with open(fname) as f:
+        exec(compile(f.read(), f.name, 'exec'), mod)
+
+    tell("- Loading custom allsparkconfig..")
+    for key, value in mod.items():
+        if key.startswith("__"):
+            continue
+
+        tell("  - %s=%r" % (key, value))
+        setattr(allsparkconfig, key, value)
 
 
 @contextlib.contextmanager
@@ -46,23 +55,26 @@ def tell(msg):
 
 
 def main():
-    for key, default in environment.items():
-        os.environ[key] = os.getenv(key, default)
-
-    parser = argparse.ArgumentParser("ALLSPARK 2.0", description=(
+    parser = argparse.ArgumentParser("allspark", description=(
         "An application launcher built on Rez, "
         "pass --help for details"
     ))
 
-    parser.add_argument("--verbose", action="store_true")
-    parser.add_argument("--version", action="store_true")
-    parser.add_argument("--clear-settings", action="store_true")
-    parser.add_argument("--startup-project")
-    parser.add_argument("--startup-app")
-    parser.add_argument("--root",
-                        default=os.environ["ALLSPARK_PROJECTS"],
-                        help="Path to where projects live on disk, "
-                             "defaults to ALLSPARK_PROJECTS")
+    parser.add_argument("--verbose", action="store_true", help=(
+        "Print additional information about Allspark during operation"))
+    parser.add_argument("--version", action="store_true", help=(
+        "Print version and exit"))
+    parser.add_argument("--clear-settings", action="store_true", help=(
+        "Start fresh with user preferences"))
+    parser.add_argument("--config-file", type=str, help=(
+        "Absolute path to allsparkconfig.py, takes precedence "
+        "over ALLSPARK_CONFIG_FILE"))
+    parser.add_argument("--no-config", action="store_true", help=(
+        "Do not load custom allsparkconfig.py"))
+    parser.add_argument("--root", help=(
+        "Path to where projects live on disk, "
+        "defaults to allsparkconfig.projects_dir"
+    ))
 
     opts = parser.parse_args()
 
@@ -100,6 +112,12 @@ def main():
 
     with timings("- Loading allspark.. "):
         from . import view, control, resources, util
+
+    try:
+        _load_userconfig(opts.config_file)
+    except OSError:
+        # That's OK
+        pass
 
     logging.basicConfig(format=(
         "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
@@ -143,11 +161,11 @@ def main():
         for key, value in defaults.items():
             storage.setValue(key, value)
 
-        if opts.startup_project:
-            storage.setValue("startupProject", opts.startup_project)
+        if allsparkconfig.startup_project:
+            storage.setValue("startupProject", allsparkconfig.startup_project)
 
-        if opts.startup_app:
-            storage.setValue("startupApp", opts.startup_app)
+        if allsparkconfig.startup_application:
+            storage.setValue("startupApp", allsparkconfig.startup_application)
 
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
@@ -176,7 +194,8 @@ def main():
 
     def init():
         timing["beforeReset"] = time.time()
-        ctrl.reset(opts.root, on_success=measure)
+        ctrl.reset(opts.root or allsparkconfig.projects_dir,
+                   on_success=measure)
 
     # Give the window a moment to appear before occupying it
     QtCore.QTimer.singleShot(50, init)

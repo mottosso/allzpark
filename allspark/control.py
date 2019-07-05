@@ -12,7 +12,7 @@ from collections import OrderedDict as odict
 
 from .vendor.Qt import QtCore
 from .vendor import transitions
-from . import model, util
+from . import model, util, allsparkconfig
 
 # Third-party dependencies
 from rez.packages_ import iter_packages
@@ -21,12 +21,6 @@ import rez.exceptions
 import rez.package_filter
 
 log = logging.getLogger(__name__)
-
-ALLSPARK_APPS = os.getenv("ALLSPARK_APPS")
-ALLSPARK_PROJECTS = os.getenv("ALLSPARK_PROJECTS")
-
-# Backwards compatibility
-ALLSPARK_PROJECTS = ALLSPARK_PROJECTS or os.getenv("ALLSPARK_ROOT")
 
 
 class State(dict):
@@ -558,15 +552,16 @@ class Controller(QtCore.QObject):
         # Find it, and keep track of it.
 
         apps = []
+        apps_dir = allsparkconfig.applications_dir
 
-        if self._state.retrieve("showAllApps") and ALLSPARK_APPS:
+        if self._state.retrieve("showAllApps") and apps_dir:
             try:
-                apps = os.listdir(ALLSPARK_APPS)
+                apps = os.listdir(apps_dir)
             except OSError as e:
                 if e.errno not in (errno.ENOENT, errno.EEXIST, errno.ENOTDIR):
                     raise
                 self.info("Could not show all apps, "
-                          "ALLSPARK_APPS variable not set")
+                          "missing `allsparkconfig.applications_dir`")
 
         if not apps:
             apps = []
