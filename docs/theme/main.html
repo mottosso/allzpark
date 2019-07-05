@@ -1,5 +1,11 @@
 {% extends "base.html" %}
+
 {% block site_meta %}
 {{ super() }}
 <link href="https://fonts.googleapis.com/css?family=Roboto:400,500|Source+Code+Pro" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<small class="modified-date"><br><i>Updated {{ page.meta.revision_date }}</i></small>
+{{ super() }}
 {% endblock %}

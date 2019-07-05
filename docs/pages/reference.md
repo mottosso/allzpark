@@ -1,6 +1,12 @@
+Short bite-sized snippets of information. This builds on information provided in the [guides](../guides) chapter.
+
+<br>
+
 ## Assumptions
 
 In order to leverage Allspark, these are the assumptions it makes about your setup.
+
+![image](https://user-images.githubusercontent.com/2152766/60737073-4dec2600-9f51-11e9-88a6-958ab4e20db1.png)
 
 1. Project Packages MUST be of type `FileSystemRepository`
 1. Allspark MUST distinguish between a Project package and other packages

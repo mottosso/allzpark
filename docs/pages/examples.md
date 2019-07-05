@@ -1,3 +1,7 @@
+Learn Allspark by example. This assumes you've already accumulated the knowledge from the [guides](../guides) chapter.
+
+<br>
+
 ## Examples
 
 This page contains a series of solutions to specific problems.

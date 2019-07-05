@@ -1,3 +1,9 @@
+The starting point to using and understanding Allspark.
+
+![image](https://user-images.githubusercontent.com/2152766/60737617-5ba2ab00-9f53-11e9-8a8b-4d7e1d0527eb.png)
+
+<br>
+
 ## In development
 
 Allspark is currently [being developed](https://github.com/mottosso/allspark) and is not yet ready for use. If you're interested in early-access to collaborate and or contribute, [get in touch](mailto:marcus@abstractfactory.io). A 1.0 is scheduled for release in early August 2019.
@@ -16,8 +22,6 @@ By the time you're done with this chapter, you'll be able to call the below comm
 rez env allspark bleeding_rez-2.31+ pyside2 python-3 -- allspark
 ```
 
-![image](https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png)
-
 <br>
 
 ## Package Management
@@ -26,9 +30,11 @@ Allspark isn't just a pretty face, it's the backbone of any competent production
 
 That backbone is made up of **packages**.
 
-**What is a package?**
+### What is a package?
 
-Packages are portable sets of files with metadata, declaring a name, version and requirements to other packages. When one package requires another, a *requirement hierarchy* is formed.
+![image](https://user-images.githubusercontent.com/2152766/60737613-55acca00-9f53-11e9-846f-cb482acb1099.png)
+
+A package is a group of files with some metadata attached, declaring a name, version and requirements to other packages. When one package requires another, a *requirement hierarchy* is formed.
 
 For example, consider this requirement.
 
@@ -112,9 +118,13 @@ This will make `rez` available via the command-line and establish a few default 
 
 ## Your first project
 
-In order launch an application in the context of a project using Allspark, you must first create one.
+In order launch an application in the context of a project using Allspark, we must create one.
+
+![image](https://user-images.githubusercontent.com/2152766/60737328-46794c80-9f52-11e9-9601-7cf7d58f96ee.png)
 
 ### Spiderman
+
+Your project will be a directory with a file inside called `package.py`.
 
 ```powershell
 mkdir spiderman
@@ -271,6 +281,8 @@ In this example, we're making some assumptions that may or may not be appropriat
 ## Weak References
 
 Let's now update our project to require `maya` and see what we end up with.
+
+![image](https://user-images.githubusercontent.com/2152766/60737361-6a3c9280-9f52-11e9-8139-7ccc67b2c60c.png)
 
 **spiderman/package.py**
 

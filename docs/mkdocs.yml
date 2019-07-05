@@ -66,3 +66,7 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tasklist
   - pymdownx.tilde
+
+plugins:
+  - search
+  - git-revision-date
