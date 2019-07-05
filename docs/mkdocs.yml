@@ -21,6 +21,7 @@ nav:
   - About: about.md
 
 docs_dir: pages
+edit_uri: edit/master/docs/pages/
 
 theme:
   name: material
