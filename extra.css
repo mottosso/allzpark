@@ -14,17 +14,32 @@ input {
 
 .md-typeset {
   text-size-adjust: 100%;
-  color: #727272;
   font-size: 1.5em;
   line-height: 1.6;
+  color: #424242;
+  font-weight: 100;
 }
 
 .md-typeset code {
   box-shadow: none;
   border: 1px solid #eee;
   color: #222;
-  padding: 3px;
+  padding: 0 3px;
   background-color: transparent;
+}
+
+.md-typeset ol, .md-typeset ul {
+    line-height: 1.3em;
+}
+
+/* Reduce distance between help-boxes */
+.md-typeset .admonition, .md-typeset details {
+  margin: 6px 0;
+}
+
+/* Remove padding from lists, it doesn't look good */
+.md-typeset ol, .md-typeset ul {
+  margin-left: 0;
 }
 
 .md-typeset .codehilite, .md-typeset .highlight {
@@ -79,6 +94,7 @@ input, select, textarea{
   font-family: "Peinture Fraiche";
   font-size: 5em;
   color: #222;
+  line-height: 0.8;
 }
 
 [data-md-color-primary=white] .md-search__input {
@@ -86,7 +102,7 @@ input, select, textarea{
     border: 1px solid #f3f3f3;
 }
 
-h2, h3, h4, b {
+h2, h3, h4, b, strong {
     color: #333;
 }
 
@@ -125,6 +141,10 @@ h2, h3, h4, b {
 
 nav.md-nav.md-nav--primary {
     font-size: .65rem;
+}
+
+.md-footer {
+  padding-top: 100px;
 }
 
 @media only screen and (min-width: 60em) {

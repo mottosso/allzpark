@@ -245,8 +245,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../guides/" title="Guides" class="md-nav__link">
-      Guides
+    <a href="../guides/" title="Guide" class="md-nav__link">
+      Guide
     </a>
   </li>
 
@@ -300,6 +300,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#allsparkconfigpy" title="allsparkconfig.py" class="md-nav__link">
+    allsparkconfig.py
+  </a>
+  
+</li>
+      
       
       
       
@@ -317,8 +324,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../rez/" title="Package Management" class="md-nav__link">
-      Package Management
+    <a href="../rez/" title="Packaging" class="md-nav__link">
+      Packaging
     </a>
   </li>
 
@@ -329,8 +336,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../localisation/" title="Localisation" class="md-nav__link">
-      Localisation
+    <a href="../examples/" title="Examples" class="md-nav__link">
+      Examples
     </a>
   </li>
 
@@ -382,6 +389,13 @@
         <li class="md-nav__item">
   <a href="#application" title="Application" class="md-nav__link">
     Application
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allsparkconfigpy" title="allsparkconfig.py" class="md-nav__link">
+    allsparkconfig.py
   </a>
   
 </li>
@@ -447,6 +461,40 @@
 </pre></div>
 
 <p>This will result in <code>maya</code>, <code>nuke</code> and <code>zbrush</code> being visualised in Allspark, at these particular versions. Because they are <code>~weak</code>, Rez can resolve an environment with or without either one, which enables you to specify requirements that conflict across different applications; such as <code>ilmbase-1.1</code> for Maya and <code>ilmbase-3.6</code> for Nuke.</p>
+<p><br></p>
+<h2 id="allsparkconfigpy">allsparkconfig.py</h2>
+<p>Configure allspark using the <code>allsparkconfig.py</code>.</p>
+<ul>
+<li><a href="https://github.com/mottosso/allspark/blob/master/allspark/allsparkconfig.py">allspark/allsparkconfig.py</a></li>
+<li><code>touch ~/allsparkconfig.py</code> Store in your <code>$HOME</code> directory</li>
+<li><code>allspark --config-file path/to/allsparkconfig.py</code> Or pass directly</li>
+</ul>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #e6db74">&quot;&quot;&quot;The Allspark configuration file</span>
+
+<span style="color: #e6db74">Copy this onto your local drive and make modifications.</span>
+<span style="color: #e6db74">Anything not specified in your copy is inherited from here.</span>
+
+<span style="color: #e6db74">ALLSPARK_CONFIG_FILE=/path/to/allsparkconfig.py</span>
+
+<span style="color: #e6db74">&quot;&quot;&quot;</span>
+
+
+<span style="color: #75715e"># Absolute path to where project packages reside</span>
+<span style="color: #75715e"># Allspark uses this to establish a listing or available projects</span>
+<span style="color: #f8f8f2">projects_dir</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;~/projects&quot;</span>
+
+<span style="color: #75715e"># Absolute path to where applicaion packages reside</span>
+<span style="color: #75715e"># Allspark optionally uses this to enable the &quot;Show all apps&quot; button</span>
+<span style="color: #f8f8f2">applications_dir</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">None</span>  <span style="color: #75715e"># (optional)</span>
+
+<span style="color: #75715e"># Load this project on startup.</span>
+<span style="color: #75715e"># Defaults to the first available from `projects_dir`</span>
+<span style="color: #f8f8f2">startup_application</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">None</span>  <span style="color: #75715e"># (optional)</span>
+
+<span style="color: #75715e"># Pre-select this application in the list of applications,</span>
+<span style="color: #75715e"># if it exists in the startup project.</span>
+<span style="color: #f8f8f2">startup_project</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">None</span>  <span style="color: #75715e"># (optional)</span>
+</pre></div>
                 
                   
                 
@@ -467,7 +515,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../guides/" title="Guides" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../guides/" title="Guide" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -476,19 +524,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Guides
+                Guide
               </span>
             </div>
           </a>
         
         
-          <a href="../rez/" title="Package Management" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../rez/" title="Packaging" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Package Management
+                Packaging
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
