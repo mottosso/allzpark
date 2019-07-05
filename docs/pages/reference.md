@@ -52,3 +52,41 @@ requires = ["~maya-2018", "~nuke-11", "~zbrush-2019"]
 ```
 
 This will result in `maya`, `nuke` and `zbrush` being visualised in Allspark, at these particular versions. Because they are `~weak`, Rez can resolve an environment with or without either one, which enables you to specify requirements that conflict across different applications; such as `ilmbase-1.1` for Maya and `ilmbase-3.6` for Nuke.
+
+<br>
+
+## allsparkconfig.py
+
+Configure allspark using the `allsparkconfig.py`.
+
+- [allspark/allsparkconfig.py](https://github.com/mottosso/allspark/blob/master/allspark/allsparkconfig.py)
+- `touch ~/allsparkconfig.py` Store in your `$HOME` directory
+- `allspark --config-file path/to/allsparkconfig.py` Or pass directly
+
+```python
+"""The Allspark configuration file
+
+Copy this onto your local drive and make modifications.
+Anything not specified in your copy is inherited from here.
+
+ALLSPARK_CONFIG_FILE=/path/to/allsparkconfig.py
+
+"""
+
+
+# Absolute path to where project packages reside
+# Allspark uses this to establish a listing or available projects
+projects_dir = "~/projects"
+
+# Absolute path to where applicaion packages reside
+# Allspark optionally uses this to enable the "Show all apps" button
+applications_dir = None  # (optional)
+
+# Load this project on startup.
+# Defaults to the first available from `projects_dir`
+startup_application = None  # (optional)
+
+# Pre-select this application in the list of applications,
+# if it exists in the startup project.
+startup_project = None  # (optional)
+```
