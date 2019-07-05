@@ -290,6 +290,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#what-is-a-package" title="What is a package?" class="md-nav__link">
+    What is a package?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#resolve" title="Resolve" class="md-nav__link">
     Resolve
   </a>
@@ -505,6 +512,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#what-is-a-package" title="What is a package?" class="md-nav__link">
+    What is a package?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#resolve" title="Resolve" class="md-nav__link">
     Resolve
   </a>
@@ -635,13 +649,18 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
+<small class="modified-date"><br><i>Updated 2019-07-05</i></small>
+
                 
                   <a href="https://github.com/mottosso/allspark/edit/master/docs/guides.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
                   <h1>Guide</h1>
                 
-                <h2 id="in-development">In development</h2>
+                <p>The starting point to using and understanding Allspark.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60737617-5ba2ab00-9f53-11e9-8a8b-4d7e1d0527eb.png" /></p>
+<p><br></p>
+<h2 id="in-development">In development</h2>
 <p>Allspark is currently <a href="https://github.com/mottosso/allspark">being developed</a> and is not yet ready for use. If you're interested in early-access to collaborate and or contribute, <a href="mailto:marcus@abstractfactory.io">get in touch</a>. A 1.0 is scheduled for release in early August 2019.</p>
 <p><br>
 <br>
@@ -654,13 +673,13 @@
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">bleeding_rez-2.31+</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">python-3</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">allspark</span>
 </pre></div>
 
-<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png" /></p>
 <p><br></p>
 <h2 id="package-management">Package Management</h2>
 <p>Allspark isn't just a pretty face, it's the backbone of any competent production studio working in visual effects, feature animation, commercials or games.</p>
 <p>That backbone is made up of <strong>packages</strong>.</p>
-<p><strong>What is a package?</strong></p>
-<p>Packages are portable sets of files with metadata, declaring a name, version and requirements to other packages. When one package requires another, a <em>requirement hierarchy</em> is formed.</p>
+<h3 id="what-is-a-package">What is a package?</h3>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60737613-55acca00-9f53-11e9-846f-cb482acb1099.png" /></p>
+<p>A package is a group of files with some metadata attached, declaring a name, version and requirements to other packages. When one package requires another, a <em>requirement hierarchy</em> is formed.</p>
 <p>For example, consider this requirement.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>requires = [&quot;maya-2019&quot;, &quot;arnold&quot;, &quot;cmuscle&quot;]
 </pre></div>
@@ -723,8 +742,10 @@ $ rez-install<span style="color: #ae81ff">\S</span>cripts<span style="color: #ae
 <p>This will make <code>rez</code> available via the command-line and establish a few default "packages" in your <code>~/packages</code> directory, which we'll talk about later.</p>
 <p><br></p>
 <h2 id="your-first-project">Your first project</h2>
-<p>In order launch an application in the context of a project using Allspark, you must first create one.</p>
+<p>In order launch an application in the context of a project using Allspark, we must create one.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60737328-46794c80-9f52-11e9-9601-7cf7d58f96ee.png" /></p>
 <h3 id="spiderman">Spiderman</h3>
+<p>Your project will be a directory with a file inside called <code>package.py</code>.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">spiderman</span>
 <span style="color: #f8f8f2">cd spiderman</span>
 <span style="color: #f8f8f2">touch</span> <span style="color: #f8f8f2">package.py</span>
@@ -848,6 +869,7 @@ $ rez build --install
 <p><br></p>
 <h2 id="weak-references">Weak References</h2>
 <p>Let's now update our project to require <code>maya</code> and see what we end up with.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60737361-6a3c9280-9f52-11e9-8139-7ccc67b2c60c.png" /></p>
 <p><strong>spiderman/package.py</strong></p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;spiderman&quot;</span>
 <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.3&quot;</span>
@@ -1022,6 +1044,7 @@ ls <span style="color: #f8f8f2">$HOME</span>/packages  <span style="color: #7571
                   
                 
               
+
               
                 
 
