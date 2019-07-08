@@ -18,6 +18,8 @@ nav:
   - Packaging: rez.md
   # - Localisation: localisation.md
   - Examples: examples.md
+  - Shells: shells.md
+  - Windows: windows.md
   - About: about.md
 
 docs_dir: pages

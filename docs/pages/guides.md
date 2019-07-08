@@ -34,7 +34,7 @@ That backbone is made up of **packages**.
 
 ![image](https://user-images.githubusercontent.com/2152766/60737613-55acca00-9f53-11e9-846f-cb482acb1099.png)
 
-A package is a group of files with some metadata attached, declaring a name, version and requirements to other packages. When one package requires another, a *requirement hierarchy* is formed.
+A package is a group of files with some metadata attached, declaring a name, version and its relationship to other packages. When one package requires another, a *requirement hierarchy* is formed.
 
 For example, consider this requirement.
 
@@ -42,7 +42,7 @@ For example, consider this requirement.
 requires = ["maya-2019", "arnold", "cmuscle"]
 ```
 
-From looking at this, you'd expect a version of `arnold` and `cmuscle` compatible with `maya-2019` (note that we didn't request a particular version of these). Because only a subset of versions of `arnold` are compatible with `maya-2019` what has to happen is a *resolve*.
+From looking at this, you'd expect a version of `arnold` and `cmuscle` compatible with `maya-2019` (note that we didn't request a particular version of these). Because only a subset of versions of `arnold` are compatible with `maya-2019` what happens is a *resolve*.
 
 ### Resolve
 
@@ -597,7 +597,6 @@ def commands():
     env["PYTHONPATH"].append("/a")
 ```
 
-
 **b/package.py**
 
 ```python
@@ -633,3 +632,7 @@ def commands():
 ```
 
 Including this package in your resolve results in Maya exposing the Legacy Viewport option, to circumvent that pesky Viewport 2.0.
+
+<br>
+
+###
