@@ -378,8 +378,22 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#under-development" title="Under Development" class="md-nav__link">
+    Under Development
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#shared-packages" title="Shared Packages" class="md-nav__link">
     Shared Packages
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-order" title="Loading Order" class="md-nav__link">
+    Loading Order
   </a>
   
 </li>
@@ -409,6 +423,46 @@
   <a href="#localisation" title="Localisation" class="md-nav__link">
     Localisation
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overrides" title="Overrides" class="md-nav__link">
+    Overrides
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirements_1" title="Requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment_1" title="Environment" class="md-nav__link">
+    Environment
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-legacy-viewport" title="Example - Legacy Viewport" class="md-nav__link">
+    Example - Legacy Viewport
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -600,8 +654,22 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#under-development" title="Under Development" class="md-nav__link">
+    Under Development
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#shared-packages" title="Shared Packages" class="md-nav__link">
     Shared Packages
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-order" title="Loading Order" class="md-nav__link">
+    Loading Order
   </a>
   
 </li>
@@ -634,6 +702,46 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#overrides" title="Overrides" class="md-nav__link">
+    Overrides
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requirements_1" title="Requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environment_1" title="Environment" class="md-nav__link">
+    Environment
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-legacy-viewport" title="Example - Legacy Viewport" class="md-nav__link">
+    Example - Legacy Viewport
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
       
       
       
@@ -649,7 +757,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-05</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-08</i></small>
 
                 
                   <a href="https://github.com/mottosso/allspark/edit/master/docs/pages/guides.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -957,7 +1065,39 @@ $ rez build --install
 </pre></div>
 
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png" /></p>
-<p><br></p>
+<p><br>
+<br>
+<br>
+<br></p>
+<p><br>
+<br>
+<br>
+<br></p>
+<p><br>
+<br>
+<br>
+<br></p>
+<p><br>
+<br>
+<br>
+<br></p>
+<h2 id="under-development">Under Development</h2>
+<p><br>
+<br>
+<br>
+<br></p>
+<p><br>
+<br>
+<br>
+<br></p>
+<p><br>
+<br>
+<br>
+<br></p>
+<p><br>
+<br>
+<br>
+<br></p>
 <h2 id="shared-packages">Shared Packages</h2>
 <p>One of the thing that separates Res from other package managers like <code>virtualenv</code> and <code>conda</code> is that packages you install are <em>shared</em>. Not only can they be shared across multiple machines, but also across multiple operating systems. Once a package has been installed, you'll never have to install it again. It is permanent, immutable in fact. This is how you can build up a personal- or studio-repository of packages that you can build a pipeline upon, making strong and controlled assumptions about what packages are available, which version they are at, and that they are compatible with each other.</p>
 <p>So far, we've installed all packages into their default location, which is <code>~/packages</code>.</p>
@@ -965,6 +1105,9 @@ $ rez build --install
 ls <span style="color: #f8f8f2">$HOME</span>/packages  <span style="color: #75715e"># With Bash</span>
 </pre></div>
 
+<p><br></p>
+<h2 id="loading-order">Loading Order</h2>
+<p>If your graphical application depends on Qt.py, then Qt.py needs to be loaded <em>before</em> your application. This is where loading order comes in. By establishing a requirements hierarchy, the order in which libraries load is included for free.</p>
 <p><br></p>
 <h2 id="package-path">Package Path</h2>
 <p>The recommended layout for Rez packages are as follows.</p>
@@ -1040,6 +1183,58 @@ ls <span style="color: #f8f8f2">$HOME</span>/packages  <span style="color: #7571
 <p>To save disk space, you can delete any or all localised packages from your <code>~/.packages</code> path.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">start </span><span style="color: #66d9ef">%</span><span style="color: #f8f8f2">USERPROFILE%\.packages</span>
 </pre></div>
+
+<p><br></p>
+<h2 id="overrides">Overrides</h2>
+<p>Packages, like Python modules, are discovered from a list of paths. If there are identical packages on two or more paths, the first one is picked.</p>
+<p>We can leverage this behavior to <em>override</em> one package with another.</p>
+<p><br></p>
+<h3 id="requirements_1">Requirements</h3>
+<p>Overriding requirements enable you to test new packages, or packages of different versions, in an existing project and works like this.</p>
+<ol>
+<li>Copy project onto local development directory</li>
+<li>Edit</li>
+<li>Install</li>
+</ol>
+<p>If the version remains the same <em>or higher</em> then your edited project is now picked up in place of the original, providing final control over which packages are used in a given project.</p>
+<p><br></p>
+<h3 id="environment_1">Environment</h3>
+<p>Overriding environment variables can be achieved in a similar fashion to <a href="#requirements">requirements</a>, but is even more flexible.</p>
+<p>Packages with regards to environment variables act akin to CSS, or Cascading Style Sheets, from the world wide web in that every change augments - or cascades - a previous change.</p>
+<p><strong>a/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">env</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PYTHONPATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">append(</span><span style="color: #e6db74">&quot;/a&quot;</span><span style="color: #f8f8f2">)</span>
+</pre></div>
+
+<p><strong>b/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;a&quot;</span><span style="color: #f8f8f2">]</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">env</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PYTHONPATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">append(</span><span style="color: #e6db74">&quot;/b&quot;</span><span style="color: #f8f8f2">)</span>
+</pre></div>
+
+<p>In this example, the package <code>b</code> augments an existing <code>PYTHONPATH</code> created by package <code>a</code>. It does so by <em>appending</em> the value <code>"/b"</code>. You can also <code>prepend</code> and overwrite by assigning it directly.</p>
+<ul>
+<li><code>env[].append("")</code></li>
+<li><code>env[].prepend("")</code></li>
+<li><code>env[] = ""</code></li>
+</ul>
+<p><br></p>
+<h4 id="example-legacy-viewport">Example - Legacy Viewport</h4>
+<p>We can leverage this behavior to override the behavior of a program using dedicated "override packages".</p>
+<p><strong>maya_legacy_viewport/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya_legacy_viewport&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+<span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;maya&quot;</span><span style="color: #f8f8f2">]</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">env</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;MAYA_ENABLE_LEGACY_VIEWPORT&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1&quot;</span>
+</pre></div>
+
+<p>Including this package in your resolve results in Maya exposing the Legacy Viewport option, to circumvent that pesky Viewport 2.0.</p>
                 
                   
                 
