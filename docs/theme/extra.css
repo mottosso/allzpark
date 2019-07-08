@@ -12,10 +12,25 @@ input {
     max-width: 57rem;
 }
 
+/* There's typically some space at the top of each article 
+   that we don't need, since we aren't showing h1 */
+.md-content__inner:before {
+  height: 0;
+}
+
+.md-content__inner {
+  padding-top: 0;
+}
+
+/* Items in a list are typically too far apart */
+.md-typeset ol li, .md-typeset ul li {
+    margin-bottom: 5px;
+}
+
 .md-typeset {
   text-size-adjust: 100%;
   font-size: 1.5em;
-  line-height: 1.6;
+  line-height: 1.4;
   color: #424242;
   font-weight: 100;
 }
