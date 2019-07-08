@@ -406,6 +406,46 @@ rez env allspark python pyside2 -- allspark --root ~/packages
 ![image](https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png)
 
 <br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+## Under Development
+
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+<br>
+<br>
 
 ## Shared Packages
 
@@ -417,6 +457,12 @@ So far, we've installed all packages into their default location, which is `~/pa
 ls $env:USERPROFILE/packages  # With PowerShell
 ls $HOME/packages  # With Bash
 ```
+
+<br>
+
+## Loading Order
+
+If your graphical application depends on Qt.py, then Qt.py needs to be loaded *before* your application. This is where loading order comes in. By establishing a requirements hierarchy, the order in which libraries load is included for free.
 
 <br>
 
@@ -514,3 +560,76 @@ To save disk space, you can delete any or all localised packages from your `~/.p
 ```powershell
 start %USERPROFILE%\.packages
 ```
+
+<br>
+
+## Overrides
+
+Packages, like Python modules, are discovered from a list of paths. If there are identical packages on two or more paths, the first one is picked.
+
+We can leverage this behavior to *override* one package with another.
+
+<br>
+
+### Requirements
+
+Overriding requirements enable you to test new packages, or packages of different versions, in an existing project and works like this.
+
+1. Copy project onto local development directory
+2. Edit
+3. Install
+
+If the version remains the same *or higher* then your edited project is now picked up in place of the original, providing final control over which packages are used in a given project.
+
+<br>
+
+### Environment
+
+Overriding environment variables can be achieved in a similar fashion to [requirements](#requirements), but is even more flexible.
+
+Packages with regards to environment variables act akin to CSS, or Cascading Style Sheets, from the world wide web in that every change augments - or cascades - a previous change.
+
+**a/package.py**
+
+```python
+def commands():
+    global env
+    env["PYTHONPATH"].append("/a")
+```
+
+
+**b/package.py**
+
+```python
+requires = ["a"]
+
+def commands():
+    global env
+    env["PYTHONPATH"].append("/b")
+```
+
+In this example, the package `b` augments an existing `PYTHONPATH` created by package `a`. It does so by *appending* the value `"/b"`. You can also `prepend` and overwrite by assigning it directly.
+
+- `env[].append("")`
+- `env[].prepend("")`
+- `env[] = ""`
+
+<br>
+
+#### Example - Legacy Viewport
+
+We can leverage this behavior to override the behavior of a program using dedicated "override packages".
+
+**maya_legacy_viewport/package.py**
+
+```python
+name = "maya_legacy_viewport"
+version = "1.0"
+requires = ["maya"]
+
+def commands():
+    global env
+    env["MAYA_ENABLE_LEGACY_VIEWPORT"] = "1"
+```
+
+Including this package in your resolve results in Maya exposing the Legacy Viewport option, to circumvent that pesky Viewport 2.0.
