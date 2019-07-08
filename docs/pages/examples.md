@@ -167,3 +167,112 @@ platform_map = {
 Typically, playblasting to `.mp4` or `.mov` with Maya requires a recent install of Quicktime on the local machine. Let's have a look at how to approach this with Rez.
 
 > How *does* one approach this with Rez? Submit [a PR](https://github.com/mottosso/allspark) today!
+
+<br>
+
+### Package version and Python
+
+Every package containing a payload typically involves two version numbers.
+
+- Version of the package
+- Version of the payload
+
+Preferably, these would always line up, but how can you expose the version of a package to Python?
+
+**package.py**
+
+```python
+name = "my_library"
+version = "1.0"
+```
+
+**my_library/python/my_library.py**
+
+```python
+version = "?"
+```
+
+#### 1. Package to Python
+
+What if Python was the one defining a version, and `package.py` picking this up instead? You certainly can, except it moves complexity away from your library and into your `package.py`, which is generally not a good idea.
+
+**package.py**
+
+Option 1, plain-text
+
+```python
+name = "my_library"
+
+with open("python\my_library.py") as f:
+    for line in f:
+        if line.startswith("version = "):
+            _, version = line.rstrip().split(" = ")
+            break
+```
+
+This works, but makes a few fragile assumptions about how the version is formatted in the file.
+
+Option 2.
+
+```python
+import os
+name = "my_library"
+
+cwd = os.getcwd()
+os.chmod("python")
+import my_library
+version = my_library.version
+```
+
+This is a little ugly, but works. The assumption made is that whatever is being executed in the imported module doesn't have any side effects or negatively impacts performance. Some modules, for example, establish database connections or temporary directories on import.
+
+<br>
+
+#### 2. Embedded
+
+This next approach addresses the above concerns in a more compact manner.
+
+In order to use a package, it must first be built. We can leverage this build step to modify a Python library and embed the package version.
+
+**my_library/__init__.py**
+
+```py
+try:
+    from . import __version__
+    version = __version__.version
+except ImportError:
+    version = "dev"
+```
+
+At this point, `version` will read `"dev"` until the module `__version__.py` has been written into the library. We can write this file during build.
+
+**package.py**
+
+```python
+name = "my_library"
+version = "1.0"
+build_command = "python {root}/install.py"
+```
+
+**install.py**
+
+```python
+import os
+import shutil
+
+root = os.path.dirname(__file__)
+build_dir = os.environ["REZ_BUILD_PATH"]
+
+# Copy library
+shutil.copytree(os.path.join(root, "my_library"),
+                os.path.join(build_dir, "my_library"))
+
+# Inject version
+version_fname = os.path.join(build_dir, "my_library", "__version__.py")
+version = os.getenv("REZ_BUILD_PROJECT_VERSION")
+
+with open(version_fname, "w") as f:
+    f.write("version = \"%s\"" % version)
+```
+
+And there you go. Now the version will read `"dev"` unless the package has been built, in which case it would read `"1.0"`.
