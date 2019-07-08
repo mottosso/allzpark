@@ -26,6 +26,16 @@
      <changefreq>daily</changefreq>
     </url>
     <url>
+     <loc>https://allspark.sh/shells/</loc>
+     <lastmod>2019-07-08</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://allspark.sh/windows/</loc>
+     <lastmod>2019-07-08</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
      <loc>https://allspark.sh/about/</loc>
      <lastmod>2019-07-08</lastmod>
      <changefreq>daily</changefreq>

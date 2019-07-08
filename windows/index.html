@@ -1,0 +1,769 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="The package-based application launcher">
+      
+      
+        <link rel="canonical" href="https://allspark.sh/windows/">
+      
+      
+        <meta name="author" content="mottosso">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.0">
+    
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,500|Source+Code+Pro" rel="stylesheet">
+
+    
+      
+        <title>Windows - Allspark</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.0284f74d.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.01803549.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../extra.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="white">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#long-file-paths" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://allspark.sh" title="Allspark" class="md-header-nav__button md-logo">
+          
+            <img src="../logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Allspark
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Windows
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/mottosso/allspark/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    mottosso/allspark
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://allspark.sh" title="Allspark" class="md-nav__button md-logo">
+      
+        <img src="../logo.png" width="48" height="48">
+      
+    </a>
+    Allspark
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/mottosso/allspark/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    mottosso/allspark
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../guides/" title="Guide" class="md-nav__link">
+      Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../reference/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../rez/" title="Packaging" class="md-nav__link">
+      Packaging
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../examples/" title="Examples" class="md-nav__link">
+      Examples
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../shells/" title="Shells" class="md-nav__link">
+      Shells
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Windows
+      </label>
+    
+    <a href="./" title="Windows" class="md-nav__link md-nav__link--active">
+      Windows
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#long-file-paths" title="Long File Paths" class="md-nav__link">
+    Long File Paths
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem" title="Problem" class="md-nav__link">
+    Problem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution" title="Solution" class="md-nav__link">
+    Solution
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#long-environment-variables" title="Long Environment Variables" class="md-nav__link">
+    Long Environment Variables
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced" title="Advanced" class="md-nav__link">
+    Advanced
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-map" title="Platform map" class="md-nav__link">
+    Platform map
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-tree" title="Process Tree" class="md-nav__link">
+    Process Tree
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maya-and-quicktime" title="Maya and Quicktime" class="md-nav__link">
+    Maya and Quicktime
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../about/" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#long-file-paths" title="Long File Paths" class="md-nav__link">
+    Long File Paths
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem" title="Problem" class="md-nav__link">
+    Problem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution" title="Solution" class="md-nav__link">
+    Solution
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#long-environment-variables" title="Long Environment Variables" class="md-nav__link">
+    Long Environment Variables
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#advanced" title="Advanced" class="md-nav__link">
+    Advanced
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-map" title="Platform map" class="md-nav__link">
+    Platform map
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-tree" title="Process Tree" class="md-nav__link">
+    Process Tree
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maya-and-quicktime" title="Maya and Quicktime" class="md-nav__link">
+    Maya and Quicktime
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+<small class="modified-date"><br><i>Updated 2019-07-08</i></small>
+
+                
+                  <a href="https://github.com/mottosso/allspark/edit/master/docs/pages/windows.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Windows</h1>
+                
+                <p>Both Allspark and Rez are cross-platform, but each platform has a few gotchas to keep in mind. Here's a quick primer on how to make the most out of Allspark and Rez on the Windows operating system.</p>
+<p><br></p>
+<h2 id="long-file-paths">Long File Paths</h2>
+<p>Windows has a max path length of 260 characters, which can become an issue for packages on a long repository path and multiple variants.</p>
+<p><br></p>
+<h3 id="problem">Problem</h3>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># Repository root</span>
+<span style="color: #ae81ff">\\</span>mylongstudioaddress.local<span style="color: #ae81ff">\m</span>ain<span style="color: #ae81ff">\c</span>ommon<span style="color: #ae81ff">\u</span>tilities<span style="color: #ae81ff">\p</span>ackages<span style="color: #ae81ff">\i</span>nternal
+
+<span style="color: #75715e"># Package</span>
+<span style="color: #ae81ff">\m</span>aya_essentials<span style="color: #ae81ff">\1</span>.42.5beta<span style="color: #ae81ff">\p</span>latform-windows<span style="color: #ae81ff">\a</span>rch-AMD64<span style="color: #ae81ff">\o</span>s-windows-10.0.1803
+
+<span style="color: #75715e"># Payload</span>
+<span style="color: #ae81ff">\p</span>ython<span style="color: #ae81ff">\m</span>aya_essentials<span style="color: #ae81ff">\u</span>tilities<span style="color: #ae81ff">\_</span>_init__.py
+</pre></div>
+
+<p><strong>188 characters</strong></p>
+<p>That's a relatively common path to a Python package, packaged with Rez, and we're already close to the 260 character limit. Now take backslashes into account, and that Python and friends escape those prior to using them. There are 16 backslashes in there, which adds another 16 characters.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># Before</span>
+<span style="color: #ae81ff">\l</span>ong<span style="color: #ae81ff">\p</span>ath
+
+<span style="color: #75715e"># After</span>
+<span style="color: #ae81ff">\\</span>long<span style="color: #ae81ff">\\</span>path
+</pre></div>
+
+<p><strong>204 characters</strong></p>
+<p>We still haven't changed the path, and yet the length has increased. Now take into account some libraries taking extra precautions and escapes even estaped backslashes.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># Before</span>
+<span style="color: #ae81ff">\\</span>long<span style="color: #ae81ff">\\</span>path
+
+<span style="color: #75715e"># After</span>
+<span style="color: #ae81ff">\\\\</span>long<span style="color: #ae81ff">\\\\</span>path
+</pre></div>
+
+<p>That adds yet another 32 characters.</p>
+<p><strong>236 characters</strong></p>
+<p>And again, we haven't changed our path, and yet this is what some tools will be working with, leaving you with very little room.</p>
+<p><br></p>
+<h3 id="solution">Solution</h3>
+<p>You've got at least three options here.</p>
+<ol>
+<li>Patch your paths</li>
+<li>Patch Rez</li>
+<li>Patch Windows</li>
+</ol>
+<p><strong>Patch Paths</strong></p>
+<p>The most straightforward, but likely difficult, thing to do is to avoid long paths altogether.</p>
+<ul>
+<li>Use a short hostname</li>
+<li>Use a short repository path</li>
+<li>Abbreviate Python libraries</li>
+<li>Don't use Python packages from PyPI with long names</li>
+</ul>
+<p>But a lot of this is not practical, and merely postpones the issue.</p>
+<p><strong>Patch Rez</strong></p>
+<p>I've investigated what it would take to make changes to Rez that facilitate longer paths, and found that there is a prefix you can use for paths that will "force" Windows to interpret paths longer than 260 characters.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># Before</span>
+c:<span style="color: #ae81ff">\l</span>ong<span style="color: #ae81ff">\p</span>ath.exe
+
+<span style="color: #75715e"># After</span>
+<span style="color: #ae81ff">\\</span>?<span style="color: #ae81ff">\c</span>:<span style="color: #ae81ff">\l</span>ong<span style="color: #ae81ff">\p</span>ath.exe
+</pre></div>
+
+<p>Since paths are entirely managed by Rez, it wouldn't be unreasonable to wrap any path creation call to prefix the results with <code>\\?\</code> if the user was running Windows. But I couldn't find a single-point-of-entry for these, as paths were generated all over the place. Rightly so; it would be borderline overengineering to wrap all calls to e.g. <code>os.path.join</code> or <code>os.getcwd</code> into a "prefixer" just for this occasion. It would however have helped in this particular case.</p>
+<p>Furthermore, this would only really apply to Windows 10 and above, since from what I gather this (poorly documented) feature is only available there; possibly related to this next feature.</p>
+<p><strong>Patch Windows</strong></p>
+<p>You wouldn't think this is an option, but it just might be.</p>
+<p>This technically doesn't count as patching Windows, but because we're changing a fundamental component of the OS - something each applications has till now taken for granted - it may cause all sorts of havok for applications that depend on the 260 character limit.</p>
+<blockquote>
+<p>Relevant comic <a href="https://xkcd.com/1172/">https://xkcd.com/1172/</a></p>
+</blockquote>
+<p>Since June 20<sup>th</sup> 2017, users of Windows 10 1607 have had the ability to enable support for "long paths".</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># From an administrator PowerShell session</span>
+<span style="color: #f8f8f2">Set-ItemProperty</span> <span style="color: #f8f8f2">-Path</span> <span style="color: #f8f8f2">HKLM</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\SYSTEM\CurrentControlSet\Control\FileSystem</span> <span style="color: #f8f8f2">-Name</span> <span style="color: #f8f8f2">LongPathsEnabled</span> <span style="color: #f8f8f2">-Value</span> <span style="color: #f8f8f2">1</span> <span style="color: #f8f8f2">-Type</span> <span style="color: #f8f8f2">DWord</span>
+</pre></div>
+
+<p>This would effectively prepend <code>\\?\</code> to every path "under the hood", solving the issue. But at what cost?</p>
+<p>Let the community know if you encounter any issues by making <a href="https://github.com/mottosso/allspark/issues/new">an issue</a>.
+<br></p>
+<h2 id="long-environment-variables">Long Environment Variables</h2>
+<p>See <a href="../shells#long-environment-variables">Shells</a> for things to keep an eye on with regards to environment variables.</p>
+<p>To work around this issue, it is recommended that you use PowerShell on Windows.</p>
+<p><strong>Environment variable</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">REZ_DEFAULT_SHELL=powershell</span>
+</pre></div>
+
+<p><strong>rezconfig.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">default_shell</span> <span style="color: #f8f8f2">=</span> <span style="color: #e6db74">&quot;powershell&quot;</span>
+</pre></div>
+
+<p><br></p>
+<h4 id="advanced">Advanced</h4>
+<p>Why does the <code>cmd.exe</code> limit apply? It's because whenever you <code>execute_shell</code> or enter into a context using <code>rez env</code>, Rez is creating a <code>.bat</code> script with a series of commands that look like this.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">set</span> <span style="color: #f8f8f2">PATH</span><span style="color: #f92672">=</span>c:<span style="color: #ae81ff">\s</span>ome<span style="color: #ae81ff">\p</span>ath<span style="color: #f8f8f2">;</span>%PATH%
+<span style="color: #f8f8f2">set</span> <span style="color: #f8f8f2">PATH</span><span style="color: #f92672">=</span>c:<span style="color: #ae81ff">\s</span>ome<span style="color: #ae81ff">\o</span>ther<span style="color: #ae81ff">\p</span>ath<span style="color: #f8f8f2">;</span>%PATH%
+<span style="color: #f8f8f2">set</span> <span style="color: #f8f8f2">PATH</span><span style="color: #f92672">=</span>c:<span style="color: #ae81ff">\y</span>et<span style="color: #ae81ff">\a</span>nother<span style="color: #ae81ff">\p</span>ath<span style="color: #f8f8f2">;</span>%PATH%
+...
+</pre></div>
+
+<p>With one line of <code>set</code> for every call to <code>env</code> from within your <code>package.py:commands()</code> function. And this is where the problem lies, for you see launching <code>cmd</code> with a environment containing values longer than 2,000 characters work fine.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">import</span> <span style="color: #f8f8f2">subprocess</span>
+<span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen(</span><span style="color: #e6db74">&quot;cmd&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">env</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">{</span><span style="color: #e6db74">&quot;a&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;really&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;long&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;environment&quot;</span><span style="color: #f8f8f2">})</span>
+<span style="color: #75715e"># Works</span>
+</pre></div>
+
+<p>But <code>cmd.exe</code> itself has issues handling anything longer than 2,000 characters which is why one of those lines of <code>set</code> will eventually stop growing.</p>
+<p><br></p>
+<h2 id="platform-map">Platform map</h2>
+<p>You'll want to use a brutal <a href="https://github.com/mottosso/bleeding-rez/wiki/Configuring-Rez#platform_map"><code>platform_map</code></a> for your Windows setup, because of stunts like this.</p>
+<p><strong>Machine A</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ C:<span style="color: #ae81ff">\U</span>sers<span style="color: #ae81ff">\m</span>arcus<span style="color: #ae81ff">\D</span>esktop&gt;systeminfo <span style="color: #f8f8f2">|</span> findstr /B /C:<span style="color: #e6db74">&quot;OS Name&quot;</span> /C:<span style="color: #e6db74">&quot;OS Version&quot;</span>
+OS Name:                   Microsoft Windows <span style="color: #ae81ff">10</span> Pro
+OS Version:                <span style="color: #ae81ff">10</span>.0.17134 N/A Build <span style="color: #ae81ff">17134</span>
+$ python
+&gt;&gt;&gt; import platform
+&gt;&gt;&gt; platform.platform<span style="color: #f92672">()</span>
+<span style="color: #e6db74">&#39;Windows-8-6.2.9200&#39;</span>
+&gt;&gt;&gt; from rez.utils.platform_ import platform_
+&gt;&gt;&gt; platform_.os
+<span style="color: #e6db74">&#39;windows-6.2.9200&#39;</span>
+</pre></div>
+
+<p><strong>Machine B</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ C:<span style="color: #ae81ff">\U</span>sers<span style="color: #ae81ff">\m</span>arcus<span style="color: #ae81ff">\D</span>esktop&gt;systeminfo <span style="color: #f8f8f2">|</span> findstr /B /C:<span style="color: #e6db74">&quot;OS Name&quot;</span> /C:<span style="color: #e6db74">&quot;OS Version&quot;</span>
+OS Name:                   Microsoft Windows <span style="color: #ae81ff">10</span> Pro
+OS Version:                <span style="color: #ae81ff">10</span>.0.18362 N/A Build <span style="color: #ae81ff">18362</span>
+$ python
+&gt;&gt;&gt; import platform
+&gt;&gt;&gt; platform.platform<span style="color: #f92672">()</span>
+<span style="color: #e6db74">&#39;Windows-10-10.0.18362&#39;</span>
+&gt;&gt;&gt; from rez.utils.platform_ import platform_
+&gt;&gt;&gt; platform_.os
+<span style="color: #e6db74">&#39;windows-10.0.18362.SP0&#39;</span>
+</pre></div>
+
+<p><strong>rezconfig.py</strong></p>
+<p>For a <code>platform_map</code>, try this. It'll make any modern version of Windows (8-10) look like Windows 10.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">platform_map</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #e6db74">&quot;os&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">{</span>
+        <span style="color: #e6db74">r&quot;windows-6(.*)&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">r&quot;windows-10&quot;</span><span style="color: #f8f8f2">,</span>
+        <span style="color: #e6db74">r&quot;windows-10(.*)&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">r&quot;windows-10&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f8f8f2">},</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+<p>This then applies to <code>rez env</code> and friends whenever the implict <code>~os</code> package is requested. Sadly, this has to happen early in your package repository authoring days, as variants being created also use this value. If a variant has been created using <code>os-windows-10.0.1803</code> then that value will have been made into a physical folder on disk that cannot (or should not) change. If the implicit request is then changed to <code>os-windows-10</code>, then none of your existing packages with this variants will work.</p>
+<ul>
+<li><a href="https://github.com/mottosso/bleeding-rez/issues/61">Related issue</a></li>
+</ul>
+<h2 id="process-tree">Process Tree</h2>
+<p>Virtualenv is one way of using Rez on Windows, and if you do then the <code>rez.exe</code> executable is generated during <code>pip install</code> and works by spawning a <code>python.exe</code> process, also generated by <code>pip</code>, which in turn calls on your system <code>python.exe</code>. Here's what spawning your own Python session from within a Rez context looks like.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/59964221-e6b48780-94f5-11e9-8300-390d0587f5e3.png" /></p>
+<p><br></p>
+<h2 id="maya-and-quicktime">Maya and Quicktime</h2>
+<p>Typically, playblasting to <code>.mp4</code> or <code>.mov</code> with Maya requires a recent install of Quicktime on the local machine. Let's have a look at how to approach this with Rez.</p>
+<blockquote>
+<p>How <em>does</em> one approach this with Rez? Submit <a href="https://github.com/mottosso/allspark">a PR</a> today!</p>
+</blockquote>
+<p><br></p>
+                
+                  
+                
+              
+
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../shells/" title="Shells" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Shells
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../about/" title="About" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                About
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2019 mottosso
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.245445c6.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>

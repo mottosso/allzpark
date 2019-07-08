@@ -1,0 +1,931 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="The package-based application launcher">
+      
+      
+        <link rel="canonical" href="https://allspark.sh/shells/">
+      
+      
+        <meta name="author" content="mottosso">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.0">
+    
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,500|Source+Code+Pro" rel="stylesheet">
+
+    
+      
+        <title>Shells - Allspark</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.0284f74d.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.01803549.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../extra.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="white">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#powershell" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://allspark.sh" title="Allspark" class="md-header-nav__button md-logo">
+          
+            <img src="../logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Allspark
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Shells
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/mottosso/allspark/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    mottosso/allspark
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://allspark.sh" title="Allspark" class="md-nav__button md-logo">
+      
+        <img src="../logo.png" width="48" height="48">
+      
+    </a>
+    Allspark
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/mottosso/allspark/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    mottosso/allspark
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../guides/" title="Guide" class="md-nav__link">
+      Guide
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../reference/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../rez/" title="Packaging" class="md-nav__link">
+      Packaging
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../examples/" title="Examples" class="md-nav__link">
+      Examples
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Shells
+      </label>
+    
+    <a href="./" title="Shells" class="md-nav__link md-nav__link--active">
+      Shells
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#powershell" title="PowerShell" class="md-nav__link">
+    PowerShell
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#process-management" title="Process Management" class="md-nav__link">
+    Process Management
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aliases" title="Aliases" class="md-nav__link">
+    Aliases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-with-processes" title="Working with processes" class="md-nav__link">
+    Working with processes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bashrc-on-powershell" title=".bashrc on PowerShell" class="md-nav__link">
+    .bashrc on PowerShell
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-with-double-click" title="Run with double-click" class="md-nav__link">
+    Run with double-click
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commands-to-variables" title="Commands to variables" class="md-nav__link">
+    Commands to variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#undoredo" title="Undo/Redo" class="md-nav__link">
+    Undo/Redo
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ctrlspace" title="Ctrl+Space" class="md-nav__link">
+    Ctrl+Space
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#send-to-clipboard" title="Send to Clipboard" class="md-nav__link">
+    Send to Clipboard
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#navigate-registry-and-environment-like-files" title="Navigate registry and environment like files" class="md-nav__link">
+    Navigate registry and environment like files
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-startup-environment-from-running-process" title="Get startup environment from running process" class="md-nav__link">
+    Get startup environment from running process
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmd" title="cmd" class="md-nav__link">
+    cmd
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#long-environment-variables" title="Long Environment Variables" class="md-nav__link">
+    Long Environment Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#history" title="History" class="md-nav__link">
+    History
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alias" title="Alias" class="md-nav__link">
+    Alias
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bash" title="bash" class="md-nav__link">
+    bash
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../windows/" title="Windows" class="md-nav__link">
+      Windows
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../about/" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#powershell" title="PowerShell" class="md-nav__link">
+    PowerShell
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#process-management" title="Process Management" class="md-nav__link">
+    Process Management
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aliases" title="Aliases" class="md-nav__link">
+    Aliases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#working-with-processes" title="Working with processes" class="md-nav__link">
+    Working with processes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bashrc-on-powershell" title=".bashrc on PowerShell" class="md-nav__link">
+    .bashrc on PowerShell
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-with-double-click" title="Run with double-click" class="md-nav__link">
+    Run with double-click
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#commands-to-variables" title="Commands to variables" class="md-nav__link">
+    Commands to variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#undoredo" title="Undo/Redo" class="md-nav__link">
+    Undo/Redo
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ctrlspace" title="Ctrl+Space" class="md-nav__link">
+    Ctrl+Space
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#send-to-clipboard" title="Send to Clipboard" class="md-nav__link">
+    Send to Clipboard
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#navigate-registry-and-environment-like-files" title="Navigate registry and environment like files" class="md-nav__link">
+    Navigate registry and environment like files
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-startup-environment-from-running-process" title="Get startup environment from running process" class="md-nav__link">
+    Get startup environment from running process
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmd" title="cmd" class="md-nav__link">
+    cmd
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#long-environment-variables" title="Long Environment Variables" class="md-nav__link">
+    Long Environment Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#history" title="History" class="md-nav__link">
+    History
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alias" title="Alias" class="md-nav__link">
+    Alias
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bash" title="bash" class="md-nav__link">
+    bash
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+<small class="modified-date"><br><i>Updated 2019-07-08</i></small>
+
+                
+                  <a href="https://github.com/mottosso/allspark/edit/master/docs/pages/shells.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Shells</h1>
+                
+                <p>Rez provides support for a number of shells on Windows, Linux and MacOS. Each of which operate almost identically, some having their own special powers.</p>
+<p><strong>Supported shells</strong></p>
+<ul>
+<li><a href="#powershell">Windows PowerShell</a></li>
+<li><a href="#cmd">cmd</a></li>
+<li><a href="#bash">bash</a></li>
+</ul>
+<p><br></p>
+<h2 id="powershell">PowerShell</h2>
+<p>On Windows, you'll likely want to use PowerShell.</p>
+<blockquote>
+<p>Note that "Windows Powershell" is different from PowerShell 6 and above which is cross-platform but not yet supported by Rez.</p>
+</blockquote>
+<ul>
+<li>Aliases are created as <code>function ()</code></li>
+</ul>
+<p><strong>Resources</strong></p>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=a85QLUJ0Wbs">Scoop Package Manager</a></li>
+<li><a href="https://github.com/lukesampson/scoop/wiki/Why-PowerShell">Why PowerShell</a></li>
+<li><a href="https://www.youtube.com/watch?v=IHrGresKu2w">Getting Started</a></li>
+<li><a href="https://www.youtube.com/playlist?list=PLlVtbbG169nFq_hR7FcMYg32xsSAObuq8">PowerShell Masterclass</a></li>
+</ul>
+<h3 id="process-management">Process Management</h3>
+<p>PowerShell, like Python, works with objects rather than text like <code>cmd</code> and <code>bash</code>.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$fx</span> <span style="color: #f8f8f2">=</span> <span style="color: #f8f8f2">get-process</span> <span style="color: #f8f8f2">-name</span> <span style="color: #f8f8f2">firefox</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$fx.path</span>
+<span style="color: #75715e"># C:\Program Files\Mozilla Firefox\firefox.exe</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$fx.workingset</span> <span style="color: #f8f8f2">/</span> <span style="color: #f8f8f2">1mb</span>
+<span style="color: #75715e"># 414.23828125</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$fx.kill()</span>
+</pre></div>
+
+<h3 id="aliases">Aliases</h3>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">ls</span>
+<span style="color: #75715e"># </span>
+<span style="color: #75715e">#     Directory: C:\Users\marcus\.ssh</span>
+<span style="color: #75715e"># </span>
+<span style="color: #75715e"># Mode                LastWriteTime         Length Name</span>
+<span style="color: #75715e"># ----                -------------         ------ ----</span>
+<span style="color: #75715e"># -a----       11/02/2018     15:52           1766 id_rsa</span>
+<span style="color: #75715e"># -a----       18/02/2018     11:30           1486 id_rsa.ppk</span>
+<span style="color: #75715e"># -a----       11/02/2018     15:52            392 id_rsa.pub</span>
+<span style="color: #75715e"># -a----       18/03/2019     08:05           3514 known_hosts</span>
+
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">get-alias</span> <span style="color: #f8f8f2">clear</span>
+<span style="color: #75715e"># CommandType     Name                                               Version    Source</span>
+<span style="color: #75715e"># -----------     ----                                               -------    ------</span>
+<span style="color: #75715e"># Alias           cls -&gt; Clear-Host</span>
+</pre></div>
+
+<h3 id="working-with-processes">Working with processes</h3>
+<p><code>Get-Member</code> is akin to Python's <code>dir()</code>.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$notepad</span> <span style="color: #f8f8f2">=</span> <span style="color: #f8f8f2">start-process</span> <span style="color: #f8f8f2">notepad</span> <span style="color: #f8f8f2">-passthru</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$notepad</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">get-member</span>
+<span style="color: #75715e">#    TypeName: System.Diagnostics.Process</span>
+<span style="color: #75715e"># </span>
+<span style="color: #75715e"># Name                       MemberType     Definition</span>
+<span style="color: #75715e"># ----                       ----------     ----------</span>
+<span style="color: #75715e"># ...</span>
+<span style="color: #75715e"># Name                       AliasProperty  Name = ProcessName</span>
+<span style="color: #75715e"># Company                    ScriptProperty System.Object Company # {get=$this.Mainmodule.FileVersionInfo.CompanyName;}</span>
+<span style="color: #75715e"># ...</span>
+<span style="color: #75715e"># Path                       ScriptProperty System.Object Path {get=$this.Mainmodule.FileName;}</span>
+<span style="color: #75715e"># WorkingSet                 Property       int WorkingSet {get;}</span>
+<span style="color: #75715e"># Kill                       Method         void Kill()</span>
+<span style="color: #75715e"># Refresh                    Method         void Refresh()</span>
+<span style="color: #75715e"># Start                      Method         bool Start()</span>
+<span style="color: #75715e"># ToString                   Method         string ToString()</span>
+<span style="color: #75715e"># ...</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$notepad.company</span>
+<span style="color: #75715e"># Microsoft Corporation</span>
+</pre></div>
+
+<h3 id="bashrc-on-powershell">.bashrc on PowerShell</h3>
+<p>Also found out that PowerShell has a startup script like Bash does; that's amazing. It means you can store not just environment variables "globally" but also functions and aliases like with Bash.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$profile</span>
+<span style="color: #75715e"># C:\Users\marcus\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">echo </span><span style="color: #e6db74">&#39;set-alias -name eco -value echo&#39;</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">$profile</span>
+</pre></div>
+
+<h3 id="run-with-double-click">Run with double-click</h3>
+<p>Normally, <code>.ps1</code> scripts, unlike <code>.bat</code>, open with notepad. Here's how you can change that.</p>
+<blockquote>
+<p>This time you do need to be admin, unless there's another variable for the local user?</p>
+</blockquote>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">reg</span> <span style="color: #f8f8f2">add</span> <span style="color: #e6db74">&quot;HKEY_CLASSES_ROOT\Microsoft.PowerShellScript.1\Shell\Open\Command&quot;</span> <span style="color: #f8f8f2">/d</span> <span style="color: #e6db74">&quot;\</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe\</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74"> -noLogo -ExecutionPolicy unrestricted -file \</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">%1\</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">&quot;</span>
+<span style="color: #75715e"># Value  exists, overwrite(Yes/No)? yes</span>
+<span style="color: #75715e"># The operation completed successfully.</span>
+</pre></div>
+
+<p>The interesting bit being <code>ExecutionPolicy unrestricted</code>. Running PS scripts are not allowed per default on Windows. You can either allow it per invokation like this, or globally like this:</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">Set-ExecutionPolicy</span> <span style="color: #f8f8f2">unrestricted</span> <span style="color: #f8f8f2">-scope</span> <span style="color: #f8f8f2">CurrentUser</span>
+</pre></div>
+
+<h3 id="commands-to-variables">Commands to variables</h3>
+<p>Like Bash, the result of a command can be passed to a variable.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$cd</span> <span style="color: #f8f8f2">=</span> <span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$(pwd)</span><span style="color: #e6db74">&quot;</span>
+</pre></div>
+
+<p>This example is particularly important, as <code>$(pwd)</code> in Bash returns a string (Bash doesn't have types) whereas in PS it returns an object. Wrapping it in <code>"</code> is akin to <code>str()</code> in that it converts the object to its string representation.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">temp</span>
+<span style="color: #f8f8f2">$</span> <span style="color: #f8f8f2">cd </span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$(pwd)</span><span style="color: #e6db74">\temp&quot;</span>
+</pre></div>
+
+<p>The cool thing about an object is that it's got properties and methods. :)</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$(pwd)</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Get-Member</span>
+<span style="color: #75715e"># </span>
+<span style="color: #75715e">#    TypeName: System.Management.Automation.PathInfo</span>
+<span style="color: #75715e"># </span>
+<span style="color: #75715e"># Name         MemberType Definition</span>
+<span style="color: #75715e"># ----         ---------- ----------</span>
+<span style="color: #75715e"># Equals       Method     bool Equals(System.Object obj)</span>
+<span style="color: #75715e"># GetHashCode  Method     int GetHashCode()</span>
+<span style="color: #75715e"># GetType      Method     type GetType()</span>
+<span style="color: #75715e"># ToString     Method     string ToString()</span>
+<span style="color: #75715e"># Drive        Property   System.Management.Automation.PSDriveInfo Drive {get;}</span>
+<span style="color: #75715e"># Path         Property   string Path {get;}</span>
+<span style="color: #75715e"># Provider     Property   System.Management.Automation.ProviderInfo Provider {get;}</span>
+<span style="color: #75715e"># ProviderPath Property   string ProviderPath {get;}</span>
+</pre></div>
+
+<h3 id="undoredo">Undo/Redo</h3>
+<p>Yes, ctrl+z/ctrl+y works on the command-line, similar to a text-editor.</p>
+<h3 id="ctrlspace">Ctrl+Space</h3>
+<p>You can list commands from a partial entry with ctrl+space.</p>
+<p><img alt="powershell_ctrlspace" src="https://user-images.githubusercontent.com/2152766/59553473-5c1bd780-8f8d-11e9-8e90-eee6faf1fc32.gif" /></p>
+<h3 id="send-to-clipboard">Send to Clipboard</h3>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">get-process</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">clip</span>
+</pre></div>
+
+<p>And ctrl+v to paste.</p>
+<h3 id="navigate-registry-and-environment-like-files">Navigate registry and environment like files</h3>
+<p>Apparently, PS doesn't distinguish between what is a filesystem and what is an environment or registry, each referred to as a "drive".</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">cd c</span><span style="color: #960050; background-color: #1e0010">:</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">cd hkcu</span><span style="color: #960050; background-color: #1e0010">:</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">cd env</span><span style="color: #960050; background-color: #1e0010">:</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">pwd</span>
+<span style="color: #f8f8f2">Path</span>
+<span style="color: #f8f8f2">----</span>
+<span style="color: #f8f8f2">Env</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\</span>
+
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">Get-PSDrive</span>                                                                     
+<span style="color: #f8f8f2">Name</span>           <span style="color: #f8f8f2">Used</span> <span style="color: #f8f8f2">(GB)</span>     <span style="color: #f8f8f2">Free</span> <span style="color: #f8f8f2">(GB)</span> <span style="color: #f8f8f2">Provider</span>      <span style="color: #f8f8f2">Root</span>
+<span style="color: #f8f8f2">----</span>           <span style="color: #f8f8f2">---------</span>     <span style="color: #f8f8f2">---------</span> <span style="color: #f8f8f2">--------</span>      <span style="color: #f8f8f2">----</span>
+<span style="color: #66d9ef">Alias</span>                                  <span style="color: #66d9ef">Alias</span>
+<span style="color: #f8f8f2">C</span>                 <span style="color: #f8f8f2">460.97</span>         <span style="color: #f8f8f2">13.79</span> <span style="color: #f8f8f2">FileSystem</span>    <span style="color: #f8f8f2">C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\</span>
+<span style="color: #f8f8f2">Cert</span>                                   <span style="color: #f8f8f2">Certificate</span>   <span style="color: #f8f8f2">\</span>
+<span style="color: #f8f8f2">Env</span>                                    <span style="color: #f8f8f2">Environment</span>
+<span style="color: #66d9ef">Function</span>                               <span style="color: #66d9ef">Function</span>
+<span style="color: #f8f8f2">HKCU</span>                                   <span style="color: #f8f8f2">Registry</span>      <span style="color: #f8f8f2">HKEY_CURRENT_USER</span>
+<span style="color: #f8f8f2">HKLM</span>                                   <span style="color: #f8f8f2">Registry</span>      <span style="color: #f8f8f2">HKEY_LOCAL_MACHINE</span>
+<span style="color: #f8f8f2">Variable</span>                               <span style="color: #f8f8f2">Variable</span>
+<span style="color: #f8f8f2">WSMan</span>                                  <span style="color: #f8f8f2">WSMan</span>
+</pre></div>
+
+<h3 id="get-startup-environment-from-running-process">Get startup environment from running process</h3>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$maya</span> <span style="color: #f8f8f2">=</span> <span style="color: #f8f8f2">get-process</span> <span style="color: #f8f8f2">-name</span> <span style="color: #f8f8f2">maya</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$si</span> <span style="color: #f8f8f2">=</span> <span style="color: #f8f8f2">$maya.startupinfo</span>
+<span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">$si.environment[</span><span style="color: #e6db74">&quot;PATH&quot;</span><span style="color: #f8f8f2">]</span>
+<span style="color: #f8f8f2">C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\Program</span> <span style="color: #f8f8f2">Files\Docker\Docker\Resources\bin;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\WINDOWS\system32;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\WINDOWS;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\WINDOWS\System32\Wbem;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\WINDOWS\System32\WindowsPowerShell\v1.0\;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\Program</span> <span style="color: #f8f8f2">Files\Git\cmd;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\Program</span> <span style="color: #f8f8f2">Files\Git\mingw64\bin;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\Program</span> <span style="color: #f8f8f2">Files\Git\usr\bin;C</span><span style="color: #960050; background-color: #1e0010">:</span><span style="color: #f8f8f2">\WINDOWS\System32\OpenSSH\</span>
+</pre></div>
+
+<p><br></p>
+<h2 id="cmd">cmd</h2>
+<p>Things to be aware of when using Rez with <code>cmd</code>.</p>
+<h3 id="long-environment-variables">Long Environment Variables</h3>
+<p><code>cmd.exe</code> is both familiar and available on every Windows machine dating back to Windows 95. It does however suffer from one major limitation; environment variables are limited in length to <strong>2,000 characters</strong>.</p>
+<p>It isn't quite as simple as that, as there is a limit in the Windows API, another limit in <code>conhost.exe</code> and yet another in <code>cmd.exe</code>. When using Rez with <code>cmd.exe</code>, it is this limit you must take into consideration, and it is the most limiting of them all.</p>
+<h3 id="history">History</h3>
+<p>A normal Rez context generates <a href="../windows#process-tree">a deep process hierarchy</a>.</p>
+<ol>
+<li>Under normal circumstances, Rez is made available as <code>rez.exe</code>, generated by <code>pip install</code> into a virtual environment.</li>
+<li>This executable calls another executable <code>python.exe</code> from that same install</li>
+<li>Which in turn calls the parent Python process from which your virtual environment was made, e.g. <code>c:\python37\python.exe</code></li>
+<li>From here, Rez instantiates your <code>REZ_DEFAULT_SHELL</code>, e.g. <code>cmd</code></li>
+</ol>
+<p>That's 4 layers of processes, one calling the next.</p>
+<p>It just so happens that 4 is the default number of buffers the windows ConHost.exe is configured to keep track of, which means that when you launch a 5<sup>th</sup> layer you lose history.</p>
+<p>To account for this, configure your shell to keep track of 5 or more buffers.</p>
+<p><img alt="" src="https://user-images.githubusercontent.com/2152766/59965565-cc83a500-9507-11e9-859d-0df5b583b41c.png" /></p>
+<h3 id="alias">Alias</h3>
+<p>The use of <code>alias()</code> in packages with <code>cmd.exe</code> has a few quicks worth considering.</p>
+<ul>
+<li>Utilises <code>doskey</code>, which works similar to <code>alias</code> on Linux</li>
+<li>Does not work with <code>rez env -- arbitrary command</code></li>
+<li>Does not carry across shell, e.g. <code>start</code></li>
+<li>Does not respect cmd.exe scope, e.g. <code>cmd /Q /K doskey python=c:\python27\python.exe $*</code> affects parent too</li>
+</ul>
+<p><br></p>
+<h2 id="bash">bash</h2>
+<p>The default shell on Linux and MacOS.</p>
+<ul>
+<li>Aliases are created as <code>function()</code></li>
+</ul>
+                
+                  
+                
+              
+
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../examples/" title="Examples" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Examples
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../windows/" title="Windows" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Windows
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2019 mottosso
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.245445c6.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>

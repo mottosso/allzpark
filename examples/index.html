@@ -393,6 +393,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#package-version-and-python" title="Package version and Python" class="md-nav__link">
+    Package version and Python
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-package-to-python" title="1. Package to Python" class="md-nav__link">
+    1. Package to Python
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-embedded" title="2. Embedded" class="md-nav__link">
+    2. Embedded
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -406,6 +433,30 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../shells/" title="Shells" class="md-nav__link">
+      Shells
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../windows/" title="Windows" class="md-nav__link">
+      Windows
+    </a>
   </li>
 
     
@@ -529,6 +580,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#package-version-and-python" title="Package version and Python" class="md-nav__link">
+    Package version and Python
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-package-to-python" title="1. Package to Python" class="md-nav__link">
+    1. Package to Python
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-embedded" title="2. Embedded" class="md-nav__link">
+    2. Embedded
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -549,7 +627,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-05</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-08</i></small>
 
                 
                   <a href="https://github.com/mottosso/allspark/edit/master/docs/pages/examples.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -675,6 +753,87 @@ $ python
 <blockquote>
 <p>How <em>does</em> one approach this with Rez? Submit <a href="https://github.com/mottosso/allspark">a PR</a> today!</p>
 </blockquote>
+<p><br></p>
+<h3 id="package-version-and-python">Package version and Python</h3>
+<p>Every package containing a payload typically involves two version numbers.</p>
+<ul>
+<li>Version of the package</li>
+<li>Version of the payload</li>
+</ul>
+<p>Preferably, these would always line up, but how can you expose the version of a package to Python?</p>
+<p><strong>package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+</pre></div>
+
+<p><strong>my_library/python/my_library.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;?&quot;</span>
+</pre></div>
+
+<h4 id="1-package-to-python">1. Package to Python</h4>
+<p>What if Python was the one defining a version, and <code>package.py</code> picking this up instead? You certainly can, except it moves complexity away from your library and into your <code>package.py</code>, which is generally not a good idea.</p>
+<p><strong>package.py</strong></p>
+<p>Option 1, plain-text</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+
+<span style="color: #66d9ef">with</span> <span style="color: #f8f8f2">open(</span><span style="color: #e6db74">&quot;python\my_library.py&quot;</span><span style="color: #f8f8f2">)</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">f:</span>
+    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">line</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">f:</span>
+        <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">line</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">startswith(</span><span style="color: #e6db74">&quot;version = &quot;</span><span style="color: #f8f8f2">):</span>
+            <span style="color: #f8f8f2">_,</span> <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">line</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">rstrip()</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">split(</span><span style="color: #e6db74">&quot; = &quot;</span><span style="color: #f8f8f2">)</span>
+            <span style="color: #66d9ef">break</span>
+</pre></div>
+
+<p>This works, but makes a few fragile assumptions about how the version is formatted in the file.</p>
+<p>Option 2.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">import</span> <span style="color: #f8f8f2">os</span>
+<span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+
+<span style="color: #f8f8f2">cwd</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">getcwd()</span>
+<span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">chmod(</span><span style="color: #e6db74">&quot;python&quot;</span><span style="color: #f8f8f2">)</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">my_library</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">my_library</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version</span>
+</pre></div>
+
+<p>This is a little ugly, but works. The assumption made is that whatever is being executed in the imported module doesn't have any side effects or negatively impacts performance. Some modules, for example, establish database connections or temporary directories on import.</p>
+<p><br></p>
+<h4 id="2-embedded">2. Embedded</h4>
+<p>This next approach addresses the above concerns in a more compact manner.</p>
+<p>In order to use a package, it must first be built. We can leverage this build step to modify a Python library and embed the package version.</p>
+<p><strong>my_library/<strong>init</strong>.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+    <span style="color: #f92672">from</span> <span style="color: #f8f8f2">.</span> <span style="color: #f92672">import</span> <span style="color: #f8f8f2">__version__</span>
+    <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">__version__</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version</span>
+<span style="color: #66d9ef">except</span> <span style="color: #a6e22e">ImportError</span><span style="color: #f8f8f2">:</span>
+    <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;dev&quot;</span>
+</pre></div>
+
+<p>At this point, <code>version</code> will read <code>"dev"</code> until the module <code>__version__.py</code> has been written into the library. We can write this file during build.</p>
+<p><strong>package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+<span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;python {root}/install.py&quot;</span>
+</pre></div>
+
+<p><strong>install.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">import</span> <span style="color: #f8f8f2">os</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">shutil</span>
+
+<span style="color: #f8f8f2">root</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">dirname(__file__)</span>
+<span style="color: #f8f8f2">build_dir</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">environ[</span><span style="color: #e6db74">&quot;REZ_BUILD_PATH&quot;</span><span style="color: #f8f8f2">]</span>
+
+<span style="color: #75715e"># Copy library</span>
+<span style="color: #f8f8f2">shutil</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">copytree(os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join(root,</span> <span style="color: #e6db74">&quot;my_library&quot;</span><span style="color: #f8f8f2">),</span>
+                <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join(build_dir,</span> <span style="color: #e6db74">&quot;my_library&quot;</span><span style="color: #f8f8f2">))</span>
+
+<span style="color: #75715e"># Inject version</span>
+<span style="color: #f8f8f2">version_fname</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join(build_dir,</span> <span style="color: #e6db74">&quot;my_library&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;__version__.py&quot;</span><span style="color: #f8f8f2">)</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">getenv(</span><span style="color: #e6db74">&quot;REZ_BUILD_PROJECT_VERSION&quot;</span><span style="color: #f8f8f2">)</span>
+
+<span style="color: #66d9ef">with</span> <span style="color: #f8f8f2">open(version_fname,</span> <span style="color: #e6db74">&quot;w&quot;</span><span style="color: #f8f8f2">)</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">f:</span>
+    <span style="color: #f8f8f2">f</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;version = </span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">%s</span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">&quot;</span> <span style="color: #f92672">%</span> <span style="color: #f8f8f2">version)</span>
+</pre></div>
+
+<p>And there you go. Now the version will read <code>"dev"</code> unless the package has been built, in which case it would read <code>"1.0"</code>.</p>
                 
                   
                 
@@ -711,13 +870,13 @@ $ python
           </a>
         
         
-          <a href="../about/" title="About" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../shells/" title="Shells" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                About
+                Shells
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
