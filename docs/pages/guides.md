@@ -1,4 +1,4 @@
-The starting point to using and understanding Allspark.
+The starting point to using and understanding Allzpark.
 
 ![image](https://user-images.githubusercontent.com/2152766/60737617-5ba2ab00-9f53-11e9-8a8b-4d7e1d0527eb.png)
 
@@ -6,7 +6,7 @@ The starting point to using and understanding Allspark.
 
 ## In development
 
-Allspark is currently [being developed](https://github.com/mottosso/allspark) and is not yet ready for use. If you're interested in early-access to collaborate and or contribute, [get in touch](mailto:marcus@abstractfactory.io). A 1.0 is scheduled for release in early August 2019.
+Allzpark is currently [being developed](https://github.com/mottosso/allzpark) and is not yet ready for use. If you're interested in early-access to collaborate and or contribute, [get in touch](mailto:marcus@abstractfactory.io). A 1.0 is scheduled for release in early August 2019.
 
 <br>
 <br>
@@ -19,14 +19,14 @@ Allspark is currently [being developed](https://github.com/mottosso/allspark) an
 By the time you're done with this chapter, you'll be able to call the below command, and understand what it does.
 
 ```powershell
-rez env allspark bleeding_rez-2.31+ pyside2 python-3 -- allspark
+rez env allzpark bleeding_rez-2.31+ pyside2 python-3 -- allzpark
 ```
 
 <br>
 
 ## Package Management
 
-Allspark isn't just a pretty face, it's the backbone of any competent production studio working in visual effects, feature animation, commercials or games.
+Allzpark isn't just a pretty face, it's the backbone of any competent production studio working in visual effects, feature animation, commercials or games.
 
 That backbone is made up of **packages**.
 
@@ -118,7 +118,7 @@ This will make `rez` available via the command-line and establish a few default 
 
 ## Your first project
 
-In order launch an application in the context of a project using Allspark, we must create one.
+In order launch an application in the context of a project using Allzpark, we must create one.
 
 ![image](https://user-images.githubusercontent.com/2152766/60737328-46794c80-9f52-11e9-9601-7cf7d58f96ee.png)
 
@@ -348,13 +348,13 @@ This is how you can tie applications to your project, without including each of 
 
 <br>
 
-## Allspark
+## Allzpark
 
-So you've made a project and given it a unique environment and applications. What's stopping you from launching these applications directly from the command-line? Why do you need Allspark?
+So you've made a project and given it a unique environment and applications. What's stopping you from launching these applications directly from the command-line? Why do you need Allzpark?
 
 You don't!
 
-Every command we've typed so far has been entirely in the hands of Rez and you can safely run productions in this way. What Allspark does is put a face on this system, something for the less technical-minded artists to wrap their heads around, and establish a few ground-rules about how to make the most out of Rez. We'll get into these rules a little later, but for now, let's see what Allspark looks like on your machine.
+Every command we've typed so far has been entirely in the hands of Rez and you can safely run productions in this way. What Allzpark does is put a face on this system, something for the less technical-minded artists to wrap their heads around, and establish a few ground-rules about how to make the most out of Rez. We'll get into these rules a little later, but for now, let's see what Allzpark looks like on your machine.
 
 For this next part, we'll need `git`.
 
@@ -368,7 +368,7 @@ git --verison
 
     - https://git-scm.com/
 
-Allspark is a Python package, and whilst we *could* install it like any other Python package, what we're going to do instead is install it as another Rez package. For that, we'll need `pipz`.
+Allzpark is a Python package, and whilst we *could* install it like any other Python package, what we're going to do instead is install it as another Rez package. For that, we'll need `pipz`.
 
 ```powershell
 git clone https://github.com/mottosso/rez-pipz.git
@@ -384,23 +384,23 @@ To test out the installation, let's install `six` as Rez package.
 rez env pipz -- install six -y
 ```
 
-This is the equivalent of `pip install six`. Now let's try it with Allspark.
+This is the equivalent of `pip install six`. Now let's try it with Allzpark.
 
 ```powershell
-git clone https://github.com/mottosso/allspark.git
-rez env pipz -- install ./allspark
+git clone https://github.com/mottosso/allzpark.git
+rez env pipz -- install ./allzpark
 ```
 
-In this case, we'll install Allspark from the cloned repository directly (as it isn't yet on PyPI). We'll also need a Qt binding. Any binding will do, in this example we'll use PySide2.
+In this case, we'll install Allzpark from the cloned repository directly (as it isn't yet on PyPI). We'll also need a Qt binding. Any binding will do, in this example we'll use PySide2.
 
 ```powershell
 rez env pipz -- install pyside2 -y
 ```
 
-And there you have it. We are now ready to launch Allspark.
+And there you have it. We are now ready to launch Allzpark.
 
 ```powershell
-rez env allspark python pyside2 -- allspark --root ~/packages
+rez env allzpark python pyside2 -- allzpark --root ~/packages
 ```
 
 ![image](https://user-images.githubusercontent.com/2152766/60429751-aa6ae080-9bf3-11e9-82bf-cc79ce99fe5c.png)
@@ -519,13 +519,13 @@ For greater performance, any package may be localised to your local disk.
 **Example**
 
 ```powershell
-$ rez env pyside2 allspark bleeding_rez -- python -m allspark
+$ rez env pyside2 allzpark bleeding_rez -- python -m allzpark
 ==============================
- allspark (1.1.79)
+ allzpark (1.1.79)
 ==============================
 - Loading Rez.. ok - 0.75s
 - Loading Qt.. ok - 6.14s
-- Loading allspark.. ok - 0.53s
+- Loading allzpark.. ok - 0.53s
 - Loading preferences.. ok - 0.00s
 ------------------------------
 ```
@@ -539,14 +539,14 @@ $ rez env localz -- localise PySide2
 Now try launching again.
 
 ```powershell
-$ rez env pyside2 allspark bleeding_rez -- python -m allspark
-rez env pyside2 allspark bleeding_rez -- python -m allspark
+$ rez env pyside2 allzpark bleeding_rez -- python -m allzpark
+rez env pyside2 allzpark bleeding_rez -- python -m allzpark
 ==============================
- allspark (1.1.79)
+ allzpark (1.1.79)
 ==============================
 - Loading Rez.. ok - 0.91s
 - Loading Qt.. ok - 0.36s
-- Loading allspark.. ok - 0.70s
+- Loading allzpark.. ok - 0.70s
 - Loading preferences.. ok - 0.00s
 ------------------------------
 ```

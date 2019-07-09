@@ -1,4 +1,4 @@
-Both Allspark and Rez are cross-platform, but each platform has a few gotchas to keep in mind. Here's a quick primer on how to make the most out of Allspark and Rez on the Windows operating system.
+Both Allzpark and Rez are cross-platform, but each platform has a few gotchas to keep in mind. Here's a quick primer on how to make the most out of Allzpark and Rez on the Windows operating system.
 
 <br>
 
@@ -105,7 +105,7 @@ Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem -Name L
 
 This would effectively prepend `\\?\` to every path "under the hood", solving the issue. But at what cost?
 
-Let the community know if you encounter any issues by making [an issue](https://github.com/mottosso/allspark/issues/new).
+Let the community know if you encounter any issues by making [an issue](https://github.com/mottosso/allzpark/issues/new).
 <br>
 
 ## Long Environment Variables
@@ -214,6 +214,6 @@ Virtualenv is one way of using Rez on Windows, and if you do then the `rez.exe` 
 
 Typically, playblasting to `.mp4` or `.mov` with Maya requires a recent install of Quicktime on the local machine. Let's have a look at how to approach this with Rez.
 
-> How *does* one approach this with Rez? Submit [a PR](https://github.com/mottosso/allspark) today!
+> How *does* one approach this with Rez? Submit [a PR](https://github.com/mottosso/allzpark) today!
 
 <br>

@@ -1,13 +1,13 @@
 """Version includes the Git revision number
 
-This module separates between deployed and development versions of allspark.
+This module separates between deployed and development versions of allzpark.
 A development version draws its minor version directly from Git, the total
 number of commits on the current branch equals the revision number. Once
 deployed, this number is embedded into the Python package.
 
 """
 
-version = "1.1"
+version = "1.2"
 
 try:
     # Look for serialised version
@@ -30,6 +30,9 @@ except ImportError:
             universal_newlines=True,
 
         ).rstrip())
+
+        # Builds since previous minor version
+        _patch -= 105
 
     except Exception:
         # Otherwise, no big deal

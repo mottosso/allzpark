@@ -1,12 +1,12 @@
 ---
-site_name: Allspark
+site_name: Allzpark
 site_description: The package-based application launcher
 site_author: mottosso
-site_url: https://allspark.sh
+site_url: https://allzpark.sh
 
 # Repository
-repo_name: mottosso/allspark
-repo_url: https://github.com/mottosso/allspark
+repo_name: mottosso/allzpark
+repo_url: https://github.com/mottosso/allzpark
 
 copyright: "Copyright &copy; 2019 mottosso"
 

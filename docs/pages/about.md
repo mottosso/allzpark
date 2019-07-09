@@ -1,4 +1,4 @@
-This section outlines the rationale behind Allspark, to help you determine whether or not it is of use to you.
+This section outlines the rationale behind Allzpark, to help you determine whether or not it is of use to you.
 
 <br>
 

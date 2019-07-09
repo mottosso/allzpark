@@ -1,4 +1,4 @@
-"""Command-line interface to allspark"""
+"""Command-line interface to allzpark"""
 
 import os
 import sys
@@ -9,28 +9,28 @@ import argparse
 import contextlib
 
 from .version import version
-from . import allsparkconfig
+from . import allzparkconfig
 
 timing = {}
 
 
 def _load_userconfig(fname=None):
     fname = fname or os.getenv(
-        "ALLSPARK_CONFIG_FILE",
-        os.path.expanduser("~/allsparkconfig.py")
+        "ALLZPARK_CONFIG_FILE",
+        os.path.expanduser("~/allzparkconfig.py")
     )
 
     mod = {}
     with open(fname) as f:
         exec(compile(f.read(), f.name, 'exec'), mod)
 
-    tell("- Loading custom allsparkconfig..")
+    tell("- Loading custom allzparkconfig..")
     for key, value in mod.items():
         if key.startswith("__"):
             continue
 
         tell("  - %s=%r" % (key, value))
-        setattr(allsparkconfig, key, value)
+        setattr(allzparkconfig, key, value)
 
 
 @contextlib.contextmanager
@@ -55,25 +55,25 @@ def tell(msg):
 
 
 def main():
-    parser = argparse.ArgumentParser("allspark", description=(
+    parser = argparse.ArgumentParser("allzpark", description=(
         "An application launcher built on Rez, "
         "pass --help for details"
     ))
 
     parser.add_argument("--verbose", action="store_true", help=(
-        "Print additional information about Allspark during operation"))
+        "Print additional information about Allzpark during operation"))
     parser.add_argument("--version", action="store_true", help=(
         "Print version and exit"))
     parser.add_argument("--clear-settings", action="store_true", help=(
         "Start fresh with user preferences"))
     parser.add_argument("--config-file", type=str, help=(
-        "Absolute path to allsparkconfig.py, takes precedence "
-        "over ALLSPARK_CONFIG_FILE"))
+        "Absolute path to allzparkconfig.py, takes precedence "
+        "over ALLZPARK_CONFIG_FILE"))
     parser.add_argument("--no-config", action="store_true", help=(
-        "Do not load custom allsparkconfig.py"))
+        "Do not load custom allzparkconfig.py"))
     parser.add_argument("--root", help=(
         "Path to where projects live on disk, "
-        "defaults to allsparkconfig.projects_dir"
+        "defaults to allzparkconfig.projects_dir"
     ))
 
     opts = parser.parse_args()
@@ -83,7 +83,7 @@ def main():
         exit(0)
 
     print("=" * 30)
-    print(" allspark (%s)" % version)
+    print(" allzpark (%s)" % version)
     print("=" * 30)
 
     with timings("- Loading Rez.. "):
@@ -92,14 +92,14 @@ def main():
             from rez.utils._version import _rez_version
             from rez.config import config
         except ImportError:
-            tell("ERROR: allspark requires rez")
+            tell("ERROR: allzpark requires rez")
             exit(1)
 
     with timings("- Loading Qt.. "):
         try:
             from .vendor import Qt
         except ImportError:
-            tell("ERROR: allspark requires a Python binding for Qt,\n"
+            tell("ERROR: allzpark requires a Python binding for Qt,\n"
                  "such as PySide, PySide2, PyQt4 or PyQt5.")
             exit(1)
 
@@ -110,7 +110,7 @@ def main():
     sys.modules["Qt"] = Qt
     sys.modules["six"] = six
 
-    with timings("- Loading allspark.. "):
+    with timings("- Loading allzpark.. "):
         from . import view, control, resources, util
 
     try:
@@ -123,8 +123,8 @@ def main():
         "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
         "%(message)s"
     ))
-    logging.getLogger("allspark.vendor").setLevel(logging.CRITICAL)
-    logging.getLogger("allspark").setLevel(logging.DEBUG
+    logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
+    logging.getLogger("allzpark").setLevel(logging.DEBUG
                                            if opts.verbose
                                            else logging.INFO)
 
@@ -136,7 +136,7 @@ def main():
     with timings("- Loading preferences.. "):
         storage = QtCore.QSettings(QtCore.QSettings.IniFormat,
                                    QtCore.QSettings.UserScope,
-                                   "Allspark", "preferences")
+                                   "Allzpark", "preferences")
 
         if opts.clear_settings:
             sys.stdout.write("(clean) ")
@@ -161,11 +161,11 @@ def main():
         for key, value in defaults.items():
             storage.setValue(key, value)
 
-        if allsparkconfig.startup_project:
-            storage.setValue("startupProject", allsparkconfig.startup_project)
+        if allzparkconfig.startup_project:
+            storage.setValue("startupProject", allzparkconfig.startup_project)
 
-        if allsparkconfig.startup_application:
-            storage.setValue("startupApp", allsparkconfig.startup_application)
+        if allzparkconfig.startup_application:
+            storage.setValue("startupApp", allzparkconfig.startup_application)
 
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
@@ -194,8 +194,8 @@ def main():
 
     def init():
         timing["beforeReset"] = time.time()
-        ctrl.reset(opts.root or allsparkconfig.projects_dir,
-                   on_success=measure)
+        root = opts.root or allzparkconfig.projects
+        ctrl.reset(root, on_success=measure)
 
     # Give the window a moment to appear before occupying it
     QtCore.QTimer.singleShot(50, init)

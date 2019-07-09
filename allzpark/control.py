@@ -12,7 +12,7 @@ from collections import OrderedDict as odict
 
 from .vendor.Qt import QtCore
 from .vendor import transitions
-from . import model, util, allsparkconfig
+from . import model, util, allzparkconfig
 
 # Third-party dependencies
 from rez.packages_ import iter_packages
@@ -41,6 +41,8 @@ class State(dict):
             "projectVersion": None,
             "appName": storage.value("startupApplication"),
             "appVersion": None,
+
+            # String or callable, returning list of project names
             "root": None,
 
             # Current error, if any
@@ -142,7 +144,7 @@ class Controller(QtCore.QObject):
     project_changed = QtCore.Signal(str, str)  # before, after
 
     states = [
-        _State("booting", help="ALLSPARK is booting, hold on"),
+        _State("booting", help="ALLZPARK is booting, hold on"),
         _State("resolving", help="Rez is busy resolving a context"),
         _State("loading", help="Something is taking a moment"),
         _State("errored", help="Something has gone wrong"),
@@ -303,7 +305,8 @@ class Controller(QtCore.QObject):
         with its corresponding Rez package.
 
         Arguments:
-            root (str): Absolute path to projects on disk
+            root (str): Absolute path to projects on disk, or callable
+                returning names of projects
 
         """
 
@@ -329,7 +332,9 @@ class Controller(QtCore.QObject):
                     current_project = projects[-1]
 
                 except (IndexError, OSError):
-                    raise ValueError("Couldn't find any projects @ '%s'" % root)
+                    raise ValueError(
+                        "Couldn't find any projects @ '%s'" % root
+                    )
 
             self._state["projectName"] = current_project
             self._state["root"] = root
@@ -418,18 +423,29 @@ class Controller(QtCore.QObject):
         log.error(message)
         self.logged.emit(str(message), logging.ERROR)
 
-    @util.cached
     def list_projects(self, root=None):
         root = root or self._state["root"]
+        assert root, "Tried listing without a root, this is a bug"
+
+        if isinstance(root, (tuple, list)):
+            return root
 
         try:
-            _, dirs, files = next(os.walk(root))
-        except StopIteration:
-            self.error("Could not find projects in %s" % root)
-            return []
+            if callable(root):
+                projects = root()
 
-        # Packages use _ in place of -
-        projects = [p.replace("-", "_") for p in dirs]
+            else:
+                _, projects, _ = next(os.walk(root))
+
+                # Support directory names that use dash in place of underscore
+                projects = [p.replace("-", "_") for p in projects]
+
+        except Exception:
+            if log.level < logging.INFO:
+                traceback.print_exc()
+
+            self.error("Could not find projects in %s" % root)
+            projects = []
 
         return projects
 
@@ -461,7 +477,7 @@ class Controller(QtCore.QObject):
 
             # Continue the pipeline
             util.defer(
-                self._find_apps,
+                self._list_apps,
                 args=[project],
                 on_success=on_apps_found,
                 on_failure=on_apps_not_found,
@@ -547,22 +563,36 @@ class Controller(QtCore.QObject):
 
         return latest
 
-    def _find_apps(self, project):
+    def _list_apps(self, project):
         # Each app has a unique context relative the current project
         # Find it, and keep track of it.
 
         apps = []
-        apps_dir = allsparkconfig.applications_dir
+        _apps = allzparkconfig.applications
 
-        if self._state.retrieve("showAllApps") and apps_dir:
-            try:
-                apps = os.listdir(apps_dir)
-            except OSError as e:
-                if e.errno not in (errno.ENOENT, errno.EEXIST, errno.ENOTDIR):
-                    raise
-                self.info("Could not show all apps, "
-                          "missing `allsparkconfig.applications_dir`")
+        if self._state.retrieve("showAllApps") and not _apps:
+            self.info("Requires allzparkconfig.applications")
 
+        elif self._state.retrieve("showAllApps"):
+            if isinstance(_apps, (tuple, list)):
+                apps = _apps
+
+            else:
+                try:
+                    if callable(_apps):
+                        apps = _apps()
+                    else:
+                        apps = os.listdir(_apps)
+                except OSError as e:
+                    if e.errno not in (errno.ENOENT,
+                                       errno.EEXIST,
+                                       errno.ENOTDIR):
+                        raise
+
+                    self.info("Could not show all apps, "
+                              "missing `allzparkconfig.applications`")
+
+        # Fetch applications from project weak references
         if not apps:
             apps = []
             for req in project.requires:

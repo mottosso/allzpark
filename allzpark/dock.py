@@ -601,7 +601,7 @@ class Preferences(AbstractDockWidget):
             "Show developer-centric controls"
         )),
         qargparse.Boolean("showAllApps", help=(
-            "List everything from ALLSPARK_APPS\n"
+            "List everything from ALLZPARK_APPS\n"
             "not just the ones specified for a given project."
         )),
         qargparse.Boolean("showHiddenApps", help=(

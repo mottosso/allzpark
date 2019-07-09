@@ -6,7 +6,7 @@ template: landing.html
     <div class="vboxlayout">
         <br>
         <br>
-        <div class="container"><img src=allspark.png></div>
+        <div class="container"><p id="title">Allzpark</p></div>
         <br>
         <div class="container">
             <p id="description">
@@ -44,10 +44,10 @@ template: landing.html
 Libraries, applications, projects.. package everything!
 <br>
 <br>
-Allspark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed <a href=guides/#package-management>"packages"</a>.
+Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed <a href=guides/#package-management>"packages"</a>.
 <br>
 <br>
-Establish complex relationships between software, applications and projects with <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>, the underlying framework powering <b>Allspark</b>.
+Establish complex relationships between software, applications and projects with <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>, the underlying framework powering <b>Allzpark</b>.
 
 </p>
     </div>
@@ -70,7 +70,7 @@ Establish complex relationships between software, applications and projects with
         <h2>Dual Representation</h2>
         <p>
 
-Allspark is but a shell.
+Allzpark is but a shell.
 
 Anything done via the GUI is available via the command-line, using standard Rez commands.
 
@@ -162,9 +162,9 @@ Organise your many running processes in a compact way. Give each instance of May
 <br>
 
 <div class="vboxlayout align-center">
-    <div class="container"><img src=allspark.png></div>
+    <div class="container"><p id="title">Allzpark</p></div>
     <p id="conclusion">
-        Allspark is free and <a href="https://github.com/mottosso/allspark">open source</a> (LGPL)
+        Allzpark is free and <a href="https://github.com/mottosso/allzpark">open source</a> (LGPL)
         <br>
         Let's get this show on the road
     </p>
