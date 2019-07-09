@@ -1,4 +1,3 @@
-
 ### Allzpark
 
 Application launcher and environment management tool for games and digital post-production, built on [Rez](https://github.com/mottosso/bleeding-rez).
@@ -7,7 +6,11 @@ Application launcher and environment management tool for games and digital post-
 
 ### Usage
 
-In early development. Stay tuned for a release.
+> In early development. Stay tuned for a release.
+
+Press the **Watch** icon top-right for notifications.
+
+![image](https://user-images.githubusercontent.com/2152766/60902299-4dac9d00-a267-11e9-893d-b3801fa422e9.png)
 
 ![ALLZPARK_1](https://user-images.githubusercontent.com/2152766/58943971-bee4c600-8778-11e9-8117-f50fe260cee0.gif)
 
