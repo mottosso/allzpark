@@ -14,7 +14,7 @@
         <meta name="description" content="The package-based application launcher">
       
       
-        <link rel="canonical" href="https://allspark.sh/reference/">
+        <link rel="canonical" href="https://allzpark.sh/reference/">
       
       
         <meta name="author" content="mottosso">
@@ -45,7 +45,7 @@
 
     
       
-        <title>Reference - Allspark</title>
+        <title>Reference - Allzpark</title>
       
     
     
@@ -105,7 +105,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="https://allspark.sh" title="Allspark" class="md-header-nav__button md-logo">
+        <a href="https://allzpark.sh" title="Allzpark" class="md-header-nav__button md-logo">
           
             <img src="../logo.png" width="24" height="24">
           
@@ -118,7 +118,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Allspark
+              Allzpark
             </span>
             <span class="md-header-nav__topic">
               
@@ -164,7 +164,7 @@
 
   
 
-<a href="https://github.com/mottosso/allspark/" title="Go to repository" class="md-source" data-md-source="github">
+<a href="https://github.com/mottosso/allzpark/" title="Go to repository" class="md-source" data-md-source="github">
   
     <div class="md-source__icon">
       <svg viewBox="0 0 24 24" width="24" height="24">
@@ -173,7 +173,7 @@
     </div>
   
   <div class="md-source__repository">
-    mottosso/allspark
+    mottosso/allzpark
   </div>
 </a>
           </div>
@@ -197,12 +197,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="https://allspark.sh" title="Allspark" class="md-nav__button md-logo">
+    <a href="https://allzpark.sh" title="Allzpark" class="md-nav__button md-logo">
       
         <img src="../logo.png" width="48" height="48">
       
     </a>
-    Allspark
+    Allzpark
   </label>
   
     <div class="md-nav__source">
@@ -211,7 +211,7 @@
 
   
 
-<a href="https://github.com/mottosso/allspark/" title="Go to repository" class="md-source" data-md-source="github">
+<a href="https://github.com/mottosso/allzpark/" title="Go to repository" class="md-source" data-md-source="github">
   
     <div class="md-source__icon">
       <svg viewBox="0 0 24 24" width="24" height="24">
@@ -220,7 +220,7 @@
     </div>
   
   <div class="md-source__repository">
-    mottosso/allspark
+    mottosso/allzpark
   </div>
 </a>
     </div>
@@ -301,8 +301,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#allsparkconfigpy" title="allsparkconfig.py" class="md-nav__link">
-    allsparkconfig.py
+  <a href="#allzparkconfigpy" title="allzparkconfig.py" class="md-nav__link">
+    allzparkconfig.py
   </a>
   
 </li>
@@ -418,8 +418,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#allsparkconfigpy" title="allsparkconfig.py" class="md-nav__link">
-    allsparkconfig.py
+  <a href="#allzparkconfigpy" title="allzparkconfig.py" class="md-nav__link">
+    allzparkconfig.py
   </a>
   
 </li>
@@ -439,10 +439,10 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-05</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-09</i></small>
 
                 
-                  <a href="https://github.com/mottosso/allspark/edit/master/docs/pages/reference.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/reference.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
                   <h1>Reference</h1>
@@ -450,17 +450,17 @@
                 <p>Short bite-sized snippets of information. This builds on information provided in the <a href="../guides">guides</a> chapter.</p>
 <p><br></p>
 <h2 id="assumptions">Assumptions</h2>
-<p>In order to leverage Allspark, these are the assumptions it makes about your setup.</p>
+<p>In order to leverage Allzpark, these are the assumptions it makes about your setup.</p>
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/60737073-4dec2600-9f51-11e9-88a6-958ab4e20db1.png" /></p>
 <ol>
 <li>Project Packages MUST be of type <code>FileSystemRepository</code></li>
-<li>Allspark MUST distinguish between a Project package and other packages</li>
-<li>Allspark MAY distinguish between an Application package and other packages</li>
+<li>Allzpark MUST distinguish between a Project package and other packages</li>
+<li>Allzpark MAY distinguish between an Application package and other packages</li>
 </ol>
-<p>Project packages should reside in a single directory; the contents of this folder is what your artists are able to see from Allspark.</p>
+<p>Project packages should reside in a single directory; the contents of this folder is what your artists are able to see from Allzpark.</p>
 <p><br></p>
 <h2 id="project">Project</h2>
-<p>Allspark associates software and applications with a project via a Rez package.</p>
+<p>Allzpark associates software and applications with a project via a Rez package.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">myproject</span>
 <span style="color: #f8f8f2">cd myproject</span>
 <span style="color: #e6db74">&quot;name = </span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">myproject</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">&quot;</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">package.py</span>
@@ -468,9 +468,9 @@
 <span style="color: #e6db74">&quot;build_command = False&quot;</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">package.py</span>
 </pre></div>
 
-<p>With a project created, point allspark to it.</p>
+<p>With a project created, point allzpark to it.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd ..</span>
-<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">allspark</span> <span style="color: #f8f8f2">--root</span> <span style="color: #f8f8f2">$(pwd)</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">allzpark</span> <span style="color: #f8f8f2">--root</span> <span style="color: #f8f8f2">$(pwd)</span>
 </pre></div>
 
 <p>With this in mind, it is recommended you separate your Project Packages from other packages.</p>
@@ -482,38 +482,38 @@
 
 <p><br></p>
 <h2 id="application">Application</h2>
-<p>Allspark visualises applications relative a given project. A project can specify relevant applications using <code>~weak</code> references in its <code>requires = []</code>.</p>
+<p>Allzpark visualises applications relative a given project. A project can specify relevant applications using <code>~weak</code> references in its <code>requires = []</code>.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;myproject&quot;</span>
 <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
 <span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
 <span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;~maya-2018&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;~nuke-11&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;~zbrush-2019&quot;</span><span style="color: #f8f8f2">]</span>
 </pre></div>
 
-<p>This will result in <code>maya</code>, <code>nuke</code> and <code>zbrush</code> being visualised in Allspark, at these particular versions. Because they are <code>~weak</code>, Rez can resolve an environment with or without either one, which enables you to specify requirements that conflict across different applications; such as <code>ilmbase-1.1</code> for Maya and <code>ilmbase-3.6</code> for Nuke.</p>
+<p>This will result in <code>maya</code>, <code>nuke</code> and <code>zbrush</code> being visualised in Allzpark, at these particular versions. Because they are <code>~weak</code>, Rez can resolve an environment with or without either one, which enables you to specify requirements that conflict across different applications; such as <code>ilmbase-1.1</code> for Maya and <code>ilmbase-3.6</code> for Nuke.</p>
 <p><br></p>
-<h2 id="allsparkconfigpy">allsparkconfig.py</h2>
-<p>Configure allspark using the <code>allsparkconfig.py</code>.</p>
+<h2 id="allzparkconfigpy">allzparkconfig.py</h2>
+<p>Configure allzpark using the <code>allzparkconfig.py</code>.</p>
 <ul>
-<li><a href="https://github.com/mottosso/allspark/blob/master/allspark/allsparkconfig.py">allspark/allsparkconfig.py</a></li>
-<li><code>touch ~/allsparkconfig.py</code> Store in your <code>$HOME</code> directory</li>
-<li><code>allspark --config-file path/to/allsparkconfig.py</code> Or pass directly</li>
+<li><a href="https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py">allzpark/allzparkconfig.py</a></li>
+<li><code>touch ~/allzparkconfig.py</code> Store in your <code>$HOME</code> directory</li>
+<li><code>allzpark --config-file path/to/allzparkconfig.py</code> Or pass directly</li>
 </ul>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #e6db74">&quot;&quot;&quot;The Allspark configuration file</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #e6db74">&quot;&quot;&quot;The Allzpark configuration file</span>
 
 <span style="color: #e6db74">Copy this onto your local drive and make modifications.</span>
 <span style="color: #e6db74">Anything not specified in your copy is inherited from here.</span>
 
-<span style="color: #e6db74">ALLSPARK_CONFIG_FILE=/path/to/allsparkconfig.py</span>
+<span style="color: #e6db74">ALLZPARK_CONFIG_FILE=/path/to/allzparkconfig.py</span>
 
 <span style="color: #e6db74">&quot;&quot;&quot;</span>
 
 
 <span style="color: #75715e"># Absolute path to where project packages reside</span>
-<span style="color: #75715e"># Allspark uses this to establish a listing or available projects</span>
+<span style="color: #75715e"># Allzpark uses this to establish a listing or available projects</span>
 <span style="color: #f8f8f2">projects_dir</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;~/projects&quot;</span>
 
 <span style="color: #75715e"># Absolute path to where applicaion packages reside</span>
-<span style="color: #75715e"># Allspark optionally uses this to enable the &quot;Show all apps&quot; button</span>
+<span style="color: #75715e"># Allzpark optionally uses this to enable the &quot;Show all apps&quot; button</span>
 <span style="color: #f8f8f2">applications_dir</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">None</span>  <span style="color: #75715e"># (optional)</span>
 
 <span style="color: #75715e"># Load this project on startup.</span>

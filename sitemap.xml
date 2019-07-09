@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-     <loc>https://allspark.sh/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/guides/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/guides/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/reference/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/reference/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/rez/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/rez/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/examples/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/examples/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/shells/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/shells/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/windows/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/windows/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
-     <loc>https://allspark.sh/about/</loc>
-     <lastmod>2019-07-08</lastmod>
+     <loc>https://allzpark.sh/about/</loc>
+     <lastmod>2019-07-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

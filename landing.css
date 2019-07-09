@@ -85,6 +85,13 @@
   display: none;
 }
 
+#title {
+  font-family: "Peinture Fraiche";
+  font-size: 6.0em;
+  color: #222;
+  margin-bottom: 0;
+}
+
 #landing {
   align-items: center;
 }
