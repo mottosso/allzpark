@@ -61,8 +61,8 @@ class Window(QtWidgets.QMainWindow):
 
             "projectBtn": QtWidgets.QToolButton(),
             "projectMenu": QtWidgets.QMenu(),
-            "projectName": QtWidgets.QLabel("None"),
-            "projectVersions": QtWidgets.QComboBox(),
+            "projectName": LineEditWithCompleter(),
+            "projectVersion": LineEditWithCompleter(),
 
             "apps": dock.SlimTableView(),
 
@@ -168,7 +168,7 @@ class Window(QtWidgets.QMainWindow):
 
         addColumn([widgets["projectBtn"]], 2, 1)
         addColumn([widgets["projectName"],
-                   widgets["projectVersions"]])
+                   widgets["projectVersion"]])
 
         addColumn([QtWidgets.QWidget()], stretch=True)  # Spacing
         addColumn([widgets["dockToggles"]], 2, 1)
@@ -231,12 +231,19 @@ class Window(QtWidgets.QMainWindow):
         # Setup
         widgets["logo"].setPixmap(res.pixmap("Logo_64"))
         widgets["logo"].setScaledContents(True)
-        widgets["projectBtn"].setMenu(widgets["projectMenu"])
-        widgets["projectBtn"].setPopupMode(widgets["projectBtn"].InstantPopup)
+        widgets["projectBtn"].setToolTip("Click to change project")
+        widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
         widgets["projectBtn"].setIcon(res.icon("Default_Project"))
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
 
-        widgets["projectVersions"].setModel(ctrl.models["projectVersions"])
+        widgets["projectBtn"].setCursor(QtCore.Qt.PointingHandCursor)
+        widgets["projectName"].setCursor(QtCore.Qt.PointingHandCursor)
+        widgets["projectVersion"].setCursor(QtCore.Qt.PointingHandCursor)
+
+        widgets["projectName"].setToolTip("Click to change project")
+        widgets["projectName"].setModel(ctrl.models["projectNames"])
+        widgets["projectVersion"].setToolTip("Click to change project version")
+        widgets["projectVersion"].setModel(ctrl.models["projectVersions"])
 
         docks["packages"].set_model(ctrl.models["packages"])
         docks["context"].set_model(ctrl.models["context"])
@@ -246,23 +253,31 @@ class Window(QtWidgets.QMainWindow):
         proxy_model = model.ProxyModel(ctrl.models["apps"])
         widgets["apps"].setModel(proxy_model)
 
-        widgets["projectMenu"].aboutToShow.connect(self.on_show_project_menu)
+        # widgets["projectMenu"].aboutToShow.connect(self.on_show_project_menu)
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
         # Signals
+        widgets["projectName"].editingFinished.connect(
+            self.on_projectname_suggested)
+        completer = widgets["projectName"].completer()
+        completer.activated.connect(self.on_projectname_completed)
+
         widgets["reset"].clicked.connect(self.on_reset_clicked)
         widgets["continue"].clicked.connect(self.on_continue_clicked)
         widgets["apps"].activated.connect(self.on_app_clicked)
-        widgets["projectName"].setText(ctrl.current_project)
 
-        widgets["apps"].customContextMenuRequested.connect(self.on_app_right_click)
+        widgets["apps"].customContextMenuRequested.connect(
+            self.on_app_right_click)
 
         selection_model = widgets["apps"].selectionModel()
         selection_model.selectionChanged.connect(self.on_app_changed)
 
         ctrl.models["apps"].modelReset.connect(self.on_apps_reset)
+        ctrl.models["projectNames"].modelReset.connect(
+            self.on_projectname_reset)
         ctrl.models["projectVersions"].modelReset.connect(
-            self.on_project_versions_reset)
+            self.on_projectversion_reset)
+        ctrl.resetted.connect(self.on_reset)
         ctrl.state_changed.connect(self.on_state_changed)
         ctrl.logged.connect(self.on_logged)
         ctrl.project_changed.connect(self.on_project_changed)
@@ -293,7 +308,7 @@ class Window(QtWidgets.QMainWindow):
 
                 self.statusBar().showMessage(tooltip, 2000)
             except (AttributeError, IndexError):
-                pass
+                self.statusBar().clearMessage()
 
         # Forward the event to subsequent listeners
         return False
@@ -303,7 +318,7 @@ class Window(QtWidgets.QMainWindow):
 
     def update_advanced_controls(self):
         shown = bool(self._ctrl.state.retrieve("showAdvancedControls"))
-        self._widgets["projectVersions"].setVisible(shown)
+        self._widgets["projectVersion"].setVisible(shown)
 
         # Update dock toggles
         toggles = self._widgets["dockToggles"].layout()
@@ -340,6 +355,9 @@ class Window(QtWidgets.QMainWindow):
 
     def reset(self):
         self._ctrl.reset()
+
+    def on_reset(self):
+        pass
 
     def on_command_copied(self, cmd):
         self.tell("Copied command '%s'" % cmd)
@@ -465,34 +483,32 @@ class Window(QtWidgets.QMainWindow):
 
         bar.setCurrentIndex(index)
 
-    def on_show_project_menu(self):
-        self.tell("Changing project..")
+    def on_projectname_suggested(self):
+        widget = self._widgets["projectName"]
+        widget.parent().setFocus()  # Double-tab Tab to return
 
-        all_projects = self._ctrl.list_projects()
-        current_project = self._ctrl.current_project
+    def on_projectname_clicked(self):
+        pass
 
-        def on_accept(project):
-            project = project.text()
-            assert isinstance(project, six.string_types)
+    def on_projectname_completed(self, project):
+        if self._ctrl.current_project == project:
+            return
 
-            self._ctrl.select_project(project)
-            self._ctrl.state.store("startupProject", project)
+        self._ctrl.select_project(project)
+        self._ctrl.state.store("startupProject", project)
 
-        menu = self._widgets["projectMenu"]
-        menu.clear()
+        self.setFocus()
 
-        group = QtWidgets.QActionGroup(menu)
-        group.triggered.connect(on_accept)
+    def on_projectversion_changed(self, index):
+        pass
 
-        for project in all_projects:
-            action = QtWidgets.QAction(project, menu)
-            action.setCheckable(True)
+    def on_projectbtn_pressed(self):
+        widget = self._widgets["projectName"]
+        widget.setFocus()
+        widget.selectAll()
 
-            if project == current_project:
-                action.setChecked(True)
-
-            group.addAction(action)
-            menu.addAction(action)
+        completer = widget.completer()
+        completer.complete()
 
     def on_project_changed(self, before, after):
         # Happens when editing requirements
@@ -504,6 +520,16 @@ class Window(QtWidgets.QMainWindow):
         self.tell("%s %s -> %s" % (action, before, after))
         self.setWindowTitle("%s - %s" % (self.title, after))
         self._widgets["projectName"].setText(after)
+
+        versions = self._ctrl.models["projectVersions"].stringList()
+
+        try:
+            version = versions[-1]
+        except IndexError:
+            # Package may not exist, thus have no versions
+            version = ""
+
+        self._widgets["projectVersion"].setText(version)
 
     def on_show_error(self):
         self._docks["console"].append(self._ctrl.current_error)
@@ -532,7 +558,7 @@ class Window(QtWidgets.QMainWindow):
         if page_name == "home":
             self._widgets["apps"].setEnabled(state == "ready")
             self._widgets["projectBtn"].setEnabled(state == "ready")
-            self._widgets["projectVersions"].setEnabled(state == "ready")
+            self._widgets["projectVersion"].setEnabled(state == "ready")
 
         elif page_name == "noapps":
             self._widgets["projectBtn"].setEnabled(True)
@@ -578,8 +604,11 @@ class Window(QtWidgets.QMainWindow):
     def on_launch_clicked(self):
         self._ctrl.launch()
 
-    def on_project_versions_reset(self):
-        self._widgets["projectVersions"].setCurrentIndex(0)
+    def on_projectname_reset(self):
+        print("Projects changed")
+
+    def on_projectversion_reset(self):
+        print("Versions changed")
 
     def on_apps_reset(self):
         app = self._ctrl.state.retrieve("startupApplication")
@@ -637,3 +666,31 @@ class Window(QtWidgets.QMainWindow):
         self._ctrl.state.store("windowState", self.saveState())
 
         super(Window, self).closeEvent(event)
+
+
+class LineEditWithCompleter(QtWidgets.QLineEdit):
+    def __init__(self, parent=None):
+        super(LineEditWithCompleter, self).__init__(parent)
+
+        proxy = QtCore.QSortFilterProxyModel(self)
+        proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        completer = QtWidgets.QCompleter(proxy, self)
+        completer.setCompletionMode(
+            QtWidgets.QCompleter.UnfilteredPopupCompletion
+        )
+
+        self.setCompleter(completer)
+
+        self._completer = completer
+        self._proxy = proxy
+
+    def setModel(self, model):
+        self._proxy.setSourceModel(model)
+        self._completer.setModel(self._proxy)
+
+    def mousePressEvent(self, event):
+        super(LineEditWithCompleter, self).mousePressEvent(event)
+
+        self._completer.complete()
+        self.selectAll()

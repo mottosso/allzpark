@@ -21,6 +21,7 @@ import rez.exceptions
 import rez.package_filter
 
 log = logging.getLogger(__name__)
+Latest = None  # Enum
 
 
 class State(dict):
@@ -142,6 +143,7 @@ class Controller(QtCore.QObject):
     state_changed = QtCore.Signal(_State)
     logged = QtCore.Signal(str, int)  # message, level
     project_changed = QtCore.Signal(str, str)  # before, after
+    resetted = QtCore.Signal()
 
     states = [
         _State("booting", help="ALLZPARK is booting, hold on"),
@@ -163,6 +165,7 @@ class Controller(QtCore.QObject):
 
         models = {
             "projectVersions": QtCore.QStringListModel(),
+            "projectNames": QtCore.QStringListModel(),
             "apps": model.ApplicationModel(),
 
             # Docks
@@ -315,6 +318,40 @@ class Controller(QtCore.QObject):
         assert root, "Tried resetting without a root, this is a bug"
 
         def do():
+            projects = dict()
+            default_project = None
+
+            for name in self.list_projects(root):
+
+                # Find project package
+                package = None
+                for package in sorted(iter_packages(name),
+                                      key=lambda p: p.version):
+
+                    if name not in projects:
+                        projects[name] = dict()
+
+                    projects[name][str(package.version)] = package
+                    projects[name][Latest] = package
+
+                if package is None:
+                    projects[name] = {
+                        Latest: type("MockPackage", (object,), {
+                            "name": lambda: name,
+                            "requires": [],
+                            "version": type("MockVersion", (object,), {
+                                "__str__": lambda: "0.0",
+                            })(),
+                        })()
+                    }
+
+                # Default to latest of last
+                default_project = name
+
+            self._state["rezProjects"].update(projects)
+            self._models["projectNames"].setStringList(list(projects))
+            self._models["projectNames"].layoutChanged.emit()
+
             # On resetting after startup, there will be a
             # currently selected project that may differ from
             # the startup project.
@@ -327,26 +364,28 @@ class Controller(QtCore.QObject):
             # The user has never opened the GUI before,
             # or user preferences has been wiped.
             if not current_project:
-                try:
-                    projects = self.list_projects(root)
-                    current_project = projects[-1]
+                current_project = default_project
 
-                except (IndexError, OSError):
-                    raise ValueError(
-                        "Couldn't find any projects @ '%s'" % root
-                    )
+            # Fallback
+            if not current_project:
+                current_project = "No project"
 
             self._state["projectName"] = current_project
             self._state["root"] = root
 
             self._state.to_ready()
+            self.resetted.emit()
 
         def _on_success():
             self.select_project(self._state["projectName"])
             on_success()
 
-        def _on_failure(error):
-            self.error(error)
+        def _on_failure(error, trace):
+            self.error("There was a problem")
+            self.error(trace)
+
+        self._state["rezContexts"].clear()
+        self._state["rezApps"].clear()
 
         self._state.to_booting()
         util.defer(
@@ -450,9 +489,9 @@ class Controller(QtCore.QObject):
         return projects
 
     @util.async_
-    def select_project(self, project_name, version=None):
-        # Wipe existing data
+    def select_project(self, project_name, version=Latest):
 
+        # Wipe existing data
         self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
@@ -469,54 +508,26 @@ class Controller(QtCore.QObject):
 
         def on_apps_not_found(error, trace):
             self._state.to_noapps()
-            print(trace)
+            self.error(trace)
 
-        def on_project_found(project):
-            if not project:
-                return self._state.to_noproject()
+        try:
+            project_versions = self._state["rezProjects"][project_name]
+            active_project = project_versions[version]
 
-            # Continue the pipeline
+            # Update versions model
+            versions = list(filter(None, project_versions))  # Exclude "Latest"
+            self._models["projectVersions"].setStringList(versions)
+
+            self._state.to_loading()
             util.defer(
                 self._list_apps,
-                args=[project],
+                args=[active_project],
                 on_success=on_apps_found,
                 on_failure=on_apps_not_found,
             )
 
-        def on_project_not_found(error, trace):
-            if isinstance(error, rez.exceptions.PackageNotFoundError):
-                self._state["error"] = error.value
-                self.error(error.value)
-                self._state.to_pkgnotfound()
-
-            elif isinstance(error, rez.exceptions.ResolveError):
-                self._state["error"] = error.value
-                self.error(error.value)
-                self._state.to_notresolved()
-
-            elif isinstance(error, rez.vendor.version.util.VersionError):
-                self._state["error"] = str(error)
-                self.error(str(error))
-                self._state.to_notresolved()
-
-            elif isinstance(error, AssertionError):
-                self._state["error"] = str(error)
-                self.error(str(error))
-                self._state.to_noapps()
-
-            else:
-                self._state["error"] = str(error)
-                self.error(str(error))
-                self._state.to_notresolved()
-
-        self._state.to_loading()
-
-        util.defer(
-            self._find_project,
-            args=[project_name, version],
-            on_success=on_project_found,
-            on_failure=on_project_not_found,
-        )
+        except KeyError:
+            self._state.to_notresolved()
 
     def select_application(self, app_name):
         self._state["appName"] = app_name
@@ -540,28 +551,6 @@ class Controller(QtCore.QObject):
     def select_tool(self, tool_name):
         self.debug("%s selected" % tool_name)
         self._state["tool"] = tool_name
-
-    def _find_project(self, project_name, version):
-        try:
-            versions = self._state["rezProjects"][project_name]
-
-        except KeyError:
-            it = iter_packages(project_name)
-            versions = sorted(it, key=lambda x: x.version, reverse=True)
-
-            # Store for next time
-            self._state["rezProjects"][project_name] = versions
-
-        try:
-            latest = versions[0]
-        except IndexError:
-            return None
-
-        self._models["projectVersions"].setStringList([
-            str(pkg.version) for pkg in versions
-        ])
-
-        return latest
 
     def _list_apps(self, project):
         # Each app has a unique context relative the current project

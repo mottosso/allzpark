@@ -79,9 +79,18 @@ Window #header #projectBtn {
     padding: 0;
 }
 
-Window #header #projectName {
+LineEditWithCompleter {
     background: none;
     border: none;
+
+    /* Leave room for hover */
+    padding-bottom: 2px;
+}
+
+/* Underline on hover */
+LineEditWithCompleter:hover {
+    border-bottom: 2px solid steelblue;
+    padding: 0px;
 }
 
 Window #header QPushButton[type=toggle] {
