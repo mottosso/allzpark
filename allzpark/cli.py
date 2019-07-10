@@ -20,13 +20,21 @@ def _load_userconfig(fname=None):
         os.path.expanduser("~/allzparkconfig.py")
     )
 
-    mod = {}
+    mod = {
+        "__file__": fname,
+    }
+
     with open(fname) as f:
         exec(compile(f.read(), f.name, 'exec'), mod)
 
     tell("- Loading custom allzparkconfig..")
-    for key, value in mod.items():
+    for key in dir(allzparkconfig):
         if key.startswith("__"):
+            continue
+
+        try:
+            value = mod[key]
+        except KeyError:
             continue
 
         tell("  - %s=%r" % (key, value))
