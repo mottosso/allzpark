@@ -8,9 +8,10 @@ from functools import partial
 from collections import OrderedDict as odict
 
 from .vendor.Qt import QtWidgets, QtCore, QtGui
-from .vendor import six, qargparse
+from .vendor import qargparse
 from .version import version
 from . import resources as res, dock, model
+from . import allzparkconfig
 
 px = res.px
 
@@ -163,23 +164,19 @@ class Window(QtWidgets.QMainWindow):
                 layout.addWidget(widget, row, addColumn.row, *args)
 
             if kwargs.get("stretch"):
-                layout.setColumnStretch(addColumn.row, 1)
+                layout.setColumnStretch(addColumn.row, kwargs["stretch"])
 
         addColumn([widgets["projectBtn"]], 2, 1)
         addColumn([widgets["projectName"],
                    widgets["projectVersion"]])
 
-        addColumn([QtWidgets.QWidget()], stretch=True)  # Spacing
+        addColumn([QtWidgets.QWidget()], stretch=1)
         addColumn([widgets["dockToggles"]], 2, 1)
+        addColumn([QtWidgets.QWidget()], stretch=2)
 
-        addColumn([QtWidgets.QWidget()], stretch=True)  # Spacing
-
-        def Space(width=1, height=1):
-            widget = QtWidgets.QWidget()
-            widget.setFixedSize(width, height)
-            return widget
-
-        addColumn([Space(px(70))])  # spans 2 rows
+        addColumn([QtWidgets.QLabel("allzpark"),
+                   widgets["appVersion"]])
+        addColumn([widgets["logo"]], 2, 1)
 
         layout = QtWidgets.QHBoxLayout(widgets["dockToggles"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -235,7 +232,9 @@ class Window(QtWidgets.QMainWindow):
         widgets["logo"].setScaledContents(True)
         widgets["projectBtn"].setToolTip("Click to change project")
         widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
-        widgets["projectBtn"].setIcon(res.icon("Default_Project"))
+
+        css = "QWidget { border-image: url(%s); }"
+        widgets["projectBtn"].setStyleSheet(css % res.find("Default_Project"))
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
 
         widgets["projectBtn"].setCursor(QtCore.Qt.PointingHandCursor)
@@ -510,8 +509,48 @@ class Window(QtWidgets.QMainWindow):
 
         self.tell("%s %s-%s" % (action, project, version))
         self.setWindowTitle("%s | %s" % (project, self.title))
-        self._widgets["projectName"].setText(project)
+
+        package = self._ctrl.state["rezProjects"][project][version]
+        data = allzparkconfig.metadata_from_package(package)
+
+        self._widgets["projectName"].setText(data["label"])
         self._widgets["projectVersion"].setText(version)
+
+        icon = res.find("Default_Project")
+
+        # Facilitate overriding of icon via package metadata
+        if data.get("icon"):
+            try:
+                values = {
+                    "root": os.path.dirname(package.uri),
+                    "width": px(32),
+                    "height": px(32),
+                }
+
+                icon = data["icon"].format(**values).replace("\\", "/")
+
+            except KeyError:
+                self.tell("Misformatted %s.icon" % package.name)
+
+            except TypeError:
+                self.tell("Unsupported package repository "
+                          "for icon of %s" % package.uri)
+
+            except Exception:
+                self.tell("Unexpected error coming from icon of %s"
+                          % package.uri)
+
+        css = "QWidget { border-image: url(%s); }"
+        button = self._widgets["projectBtn"]
+        button.setStyleSheet(css % icon)
+
+        # Determine aspect ratio
+        height = px(32)
+        pixmap = res.pixmap(icon).scaledToHeight(height)
+        width = pixmap.width()
+
+        button.setIconSize(QtCore.QSize(width, height))
+        button.setAutoFillBackground(True)
 
     def on_show_error(self):
         self._docks["console"].append(self._ctrl.current_error)
@@ -595,20 +634,20 @@ class Window(QtWidgets.QMainWindow):
     def on_apps_reset(self):
         app = self._ctrl.state.retrieve("startupApplication")
 
-        index = 0
+        row = 0
         model = self._ctrl.models["apps"]
 
         if app:
-            for row in range(model.rowCount()):
-                index = model.index(row, 0, QtCore.QModelIndex())
-                name = model.data(index, "name")
+            for row_ in range(model.rowCount()):
+                index = model.index(row_, 0, QtCore.QModelIndex())
+                name = model.data(index, QtCore.Qt.DisplayRole)
 
                 if app == name:
-                    index = row
+                    row = row_
                     self.tell("Using startup application %s" % name)
                     break
 
-        self._widgets["apps"].selectRow(index)
+        self._widgets["apps"].selectRow(row)
 
     def on_app_clicked(self, index):
         """An app was double-clicked or Return was hit"""
@@ -626,7 +665,12 @@ class Window(QtWidgets.QMainWindow):
 
         """
 
-        index = selected.indexes()[0]
+        try:
+            index = selected.indexes()[0]
+        except IndexError:
+            # No app was selected
+            return
+
         model = index.model()
         app_name = model.data(index, "name")
         self._ctrl.select_application(app_name)
