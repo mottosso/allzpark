@@ -115,6 +115,8 @@
   display: block;
   border-radius: 3px;
   margin: 5px;
+  margin-left: 0;
+  margin-right: 10px;
   padding: 15px;
   text-align: center;
   text-decoration: none;
@@ -131,6 +133,20 @@
 .button:active {
   position: relative;
   top: 6px;
+}
+
+.green {
+  background: #5aa926;
+  box-shadow: 0px 6px #418624;
+}
+
+.green:active {
+  background: #79c15c;
+  box-shadow: 0px 0px #79c15c;
+}
+
+.green:hover {
+  background: #79c15c;
 }
 
 .blue {
