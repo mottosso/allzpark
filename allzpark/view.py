@@ -16,7 +16,7 @@ px = res.px
 
 
 class Window(QtWidgets.QMainWindow):
-    title = "Allzpark"
+    title = "Allzpark %s" % version
 
     def __init__(self, ctrl, parent=None):
         super(Window, self).__init__(parent)
@@ -56,11 +56,10 @@ class Window(QtWidgets.QMainWindow):
             ),
 
             # Header
-            "logo": QtWidgets.QLabel(),
-            "appVersion": QtWidgets.QLabel(version),
+            "logo": QtWidgets.QLabel(),  # unused
+            "appVersion": QtWidgets.QLabel(version),  # unused
 
             "projectBtn": QtWidgets.QToolButton(),
-            "projectMenu": QtWidgets.QMenu(),
             "projectName": LineEditWithCompleter(),
             "projectVersion": LineEditWithCompleter(),
 
@@ -175,9 +174,12 @@ class Window(QtWidgets.QMainWindow):
 
         addColumn([QtWidgets.QWidget()], stretch=True)  # Spacing
 
-        addColumn([QtWidgets.QLabel("allzpark"),
-                   widgets["appVersion"]])
-        addColumn([widgets["logo"]], 2, 1)  # spans 2 rows
+        def Space(width=1, height=1):
+            widget = QtWidgets.QWidget()
+            widget.setFixedSize(width, height)
+            return widget
+
+        addColumn([Space(px(128))])  # spans 2 rows
 
         layout = QtWidgets.QHBoxLayout(widgets["dockToggles"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -253,14 +255,12 @@ class Window(QtWidgets.QMainWindow):
         proxy_model = model.ProxyModel(ctrl.models["apps"])
         widgets["apps"].setModel(proxy_model)
 
-        # widgets["projectMenu"].aboutToShow.connect(self.on_show_project_menu)
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
         # Signals
-        widgets["projectName"].editingFinished.connect(
-            self.on_projectname_suggested)
-        completer = widgets["projectName"].completer()
-        completer.activated.connect(self.on_projectname_completed)
+        widgets["projectName"].changed.connect(self.on_projectname_changed)
+        widgets["projectVersion"].changed.connect(
+            self.on_projectversion_changed)
 
         widgets["reset"].clicked.connect(self.on_reset_clicked)
         widgets["continue"].clicked.connect(self.on_continue_clicked)
@@ -483,31 +483,18 @@ class Window(QtWidgets.QMainWindow):
 
         bar.setCurrentIndex(index)
 
-    def on_projectname_suggested(self):
-        """User likely hit enter in the search box, without an exact match"""
-        widget = self._widgets["projectName"]
-
-        completer = widget.completer()
-        suggested = completer.currentCompletion()
-        if not suggested or suggested == self._ctrl.current_project:
-            widget.setText(self._ctrl.current_project)
-
-        widget.parent().setFocus()  # Double-tab Tab to return
-
     def on_projectname_clicked(self):
         pass
 
-    def on_projectname_completed(self, project):
-        if self._ctrl.current_project == project:
-            return
-
+    def on_projectname_changed(self, project):
         self._ctrl.select_project(project)
         self._ctrl.state.store("startupProject", project)
-
         self.setFocus()
 
-    def on_projectversion_changed(self, index):
-        pass
+    def on_projectversion_changed(self, version):
+        project = self._ctrl.current_project
+        self._ctrl.select_project(project, version)
+        self.setFocus()
 
     def on_projectbtn_pressed(self):
         widget = self._widgets["projectName"]
@@ -517,25 +504,13 @@ class Window(QtWidgets.QMainWindow):
         completer = widget.completer()
         completer.complete()
 
-    def on_project_changed(self, before, after):
+    def on_project_changed(self, project, version, refreshed=False):
         # Happens when editing requirements
-        if before != after:
-            action = "Changing"
-        else:
-            action = "Refreshing"
+        action = "Refreshing" if refreshed else "Changing"
 
-        self.tell("%s %s -> %s" % (action, before, after))
-        self.setWindowTitle("%s - %s" % (self.title, after))
-        self._widgets["projectName"].setText(after)
-
-        versions = self._ctrl.models["projectVersions"].stringList()
-
-        try:
-            version = versions[-1]
-        except IndexError:
-            # Package may not exist, thus have no versions
-            version = ""
-
+        self.tell("%s %s-%s" % (action, project, version))
+        self.setWindowTitle("%s | %s" % (project, self.title))
+        self._widgets["projectName"].setText(project)
         self._widgets["projectVersion"].setText(version)
 
     def on_show_error(self):
@@ -676,6 +651,8 @@ class Window(QtWidgets.QMainWindow):
 
 
 class LineEditWithCompleter(QtWidgets.QLineEdit):
+    changed = QtCore.Signal(str)
+
     def __init__(self, parent=None):
         super(LineEditWithCompleter, self).__init__(parent)
 
@@ -685,18 +662,50 @@ class LineEditWithCompleter(QtWidgets.QLineEdit):
         completer = QtWidgets.QCompleter(proxy, self)
         completer.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
         completer.setCompletionMode(completer.UnfilteredPopupCompletion)
+        completer.setMaxVisibleItems(15)
 
         self.setCompleter(completer)
+        self.editingFinished.connect(self.onEditingFinished)
 
         self._completer = completer
+        self._focused = False
         self._proxy = proxy
+        self._current = None
 
     def setModel(self, model):
         self._proxy.setSourceModel(model)
         self._completer.setModel(self._proxy)
 
+    def setText(self, text):
+
+        # Keep track of a "default" such that we can revert back to
+        # it following a bad completion.
+        self._current = text
+
+        return super(LineEditWithCompleter, self).setText(text)
+
+    def resetText(self):
+        self.setText(self._current)
+
     def mousePressEvent(self, event):
         super(LineEditWithCompleter, self).mousePressEvent(event)
 
+        # Automatically show dropdown on select
         self._completer.complete()
         self.selectAll()
+
+    def onEditingFinished(self):
+        # For whatever reason, the completion prefix isn't updated
+        # when coming from the user selecting an item from the
+        # completion listview. (Windows 10, PySide2, Python 3.7)
+        self._completer.setCompletionPrefix(self.text())
+
+        suggested = self._completer.currentCompletion()
+
+        if not suggested or suggested == self._current:
+            self.resetText()
+            self.parent().setFocus()
+        else:
+            self.setText(suggested)
+            self.changed.emit(suggested)
+            self._current = suggested

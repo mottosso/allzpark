@@ -142,7 +142,7 @@ class _State(transitions.State):
 class Controller(QtCore.QObject):
     state_changed = QtCore.Signal(_State)
     logged = QtCore.Signal(str, int)  # message, level
-    project_changed = QtCore.Signal(str, str)  # before, after
+    project_changed = QtCore.Signal(str, str, bool)  # project, version, refreshed
     resetted = QtCore.Signal()
 
     states = [
@@ -489,7 +489,7 @@ class Controller(QtCore.QObject):
         return projects
 
     @util.async_
-    def select_project(self, project_name, version=Latest):
+    def select_project(self, project_name, version_name=Latest):
 
         # Wipe existing data
         self._models["apps"].reset()
@@ -499,10 +499,14 @@ class Controller(QtCore.QObject):
 
         def on_apps_found(apps):
             self._models["apps"].reset(apps)
-
-            before = self._state["projectName"] or ""
             self._state["projectName"] = project_name
-            self.project_changed.emit(before, project_name)
+
+            refreshed = self._state["projectName"] == project_name
+            self.project_changed.emit(
+                str(active_project.name),
+                str(active_project.version),
+                refreshed
+            )
 
             self._state.to_ready()
 
@@ -512,7 +516,7 @@ class Controller(QtCore.QObject):
 
         try:
             project_versions = self._state["rezProjects"][project_name]
-            active_project = project_versions[version]
+            active_project = project_versions[version_name]
 
             # Update versions model
             versions = list(filter(None, project_versions))  # Exclude "Latest"
