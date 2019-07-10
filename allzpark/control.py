@@ -336,13 +336,8 @@ class Controller(QtCore.QObject):
 
                 if package is None:
                     projects[name] = {
-                        Latest: type("MockPackage", (object,), {
-                            "name": lambda: name,
-                            "requires": [],
-                            "version": type("MockVersion", (object,), {
-                                "__str__": lambda: "0.0",
-                            })(),
-                        })()
+                        "0.0": model.BrokenPackage(name),
+                        Latest: model.BrokenPackage(name),
                     }
 
                 # Default to latest of last
@@ -602,18 +597,21 @@ class Controller(QtCore.QObject):
                 package_filter = PackageFilterList.singleton.copy()
                 package_filter.add_exclusion(rule)
 
+                error = None
+
                 try:
                     context = ResolvedContext(request,
                                               package_filter=package_filter)
                 except rez.exceptions.RezError as e:
-                    self.error(str(e))
-                    continue
+                    error = e
+                    self.error(traceback.format_exc())
 
                 if not context.success:
                     description = context.failure_description
                     self.error(description)
-                    continue
-                    # raise rez.exceptions.ResolveError(description)
+
+                if not context.success or error:
+                    context = model.BrokenContext(app_name, request)
 
                 contexts[app_name] = context
 
@@ -639,22 +637,20 @@ class Controller(QtCore.QObject):
                     "Could not find package for app %s" % app_name
                 )
 
-            hidden = getattr(package, "_data", {}).get("hidden", False)
+            data = allzparkconfig.metadata_from_package(package)
+            hidden = data.get("hidden", False)
+
             if hidden and not show_hidden:
+                package.hidden = True
                 continue
+
+            if isinstance(context, model.BrokenContext):
+                package.broken = True
 
             app_packages += [package]
 
         self._state["rezContexts"] = contexts
         return app_packages
-
-
-class BrokenPackage(object):
-    def __str__(self):
-        return self.name
-
-    def __init__(self, name):
-        self.name = name
 
 
 class Command(QtCore.QObject):

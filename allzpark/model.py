@@ -190,6 +190,7 @@ class ApplicationModel(AbstractTableModel):
                 "context": None,
                 "active": True,
                 "hidden": data["hidden"],
+                "broken": isinstance(app, BrokenPackage),
 
                 # Whether or not to open a separate console for this app
                 "detached": False,
@@ -205,6 +206,14 @@ class ApplicationModel(AbstractTableModel):
 
         self.endResetModel()
 
+    def flags(self, index):
+        model = index.model()
+
+        if model.data(index, "broken"):
+            return QtCore.Qt.ItemIsEnabled
+
+        return super(ApplicationModel, self).flags(index)
+
     def data(self, index, role):
         row = index.row()
 
@@ -218,6 +227,37 @@ class ApplicationModel(AbstractTableModel):
                 return QtGui.QColor("gray")
 
         return super(ApplicationModel, self).data(index, role)
+
+
+class BrokenContext(object):
+    def __init__(self, app_name, request):
+        self.resolved_packages = [BrokenPackage(app_name)]
+        self.success = True
+
+        self._request = request
+
+    def requested_packages(self):
+        return self._request
+
+    def to_dict(self):
+        return {}
+
+    def get_environ(self):
+        return {}
+
+
+class BrokenPackage(object):
+    def __str__(self):
+        return self.name
+
+    def __init__(self, name):
+        self.name = name
+        self.uri = ""
+        self.requires = []
+        self.version = "0.0"
+        self.resource = type(
+            "BrokenResource", (object,), {"repository_type": None}
+        )()
 
 
 def is_local(pkg):
