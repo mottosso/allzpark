@@ -179,7 +179,7 @@ class Window(QtWidgets.QMainWindow):
             widget.setFixedSize(width, height)
             return widget
 
-        addColumn([Space(px(128))])  # spans 2 rows
+        addColumn([Space(px(70))])  # spans 2 rows
 
         layout = QtWidgets.QHBoxLayout(widgets["dockToggles"])
         layout.setContentsMargins(0, 0, 0, 0)
