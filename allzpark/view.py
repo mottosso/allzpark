@@ -484,7 +484,14 @@ class Window(QtWidgets.QMainWindow):
         bar.setCurrentIndex(index)
 
     def on_projectname_suggested(self):
+        """User likely hit enter in the search box, without an exact match"""
         widget = self._widgets["projectName"]
+
+        completer = widget.completer()
+        suggested = completer.currentCompletion()
+        if not suggested or suggested == self._ctrl.current_project:
+            widget.setText(self._ctrl.current_project)
+
         widget.parent().setFocus()  # Double-tab Tab to return
 
     def on_projectname_clicked(self):
@@ -676,9 +683,8 @@ class LineEditWithCompleter(QtWidgets.QLineEdit):
         proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
 
         completer = QtWidgets.QCompleter(proxy, self)
-        completer.setCompletionMode(
-            QtWidgets.QCompleter.UnfilteredPopupCompletion
-        )
+        completer.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        completer.setCompletionMode(completer.UnfilteredPopupCompletion)
 
         self.setCompleter(completer)
 
