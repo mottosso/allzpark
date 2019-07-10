@@ -178,7 +178,7 @@ class ApplicationModel(AbstractTableModel):
         for app in applications:
             root = os.path.dirname(app.uri)
 
-            data = allzparkconfig.read_package_data(app)
+            data = allzparkconfig.metadata_from_package(app)
             tools = getattr(app, "tools", None) or [app.name]
 
             item = {
@@ -269,7 +269,7 @@ class PackagesModel(AbstractTableModel):
 
         for pkg in packages:
             root = os.path.dirname(pkg.uri)
-            data = allzparkconfig.read_package_data(pkg)
+            data = allzparkconfig.metadata_from_package(pkg)
             local = "(local)" if is_local(pkg) else ""
 
             item = {
@@ -395,7 +395,7 @@ class CommandsModel(AbstractTableModel):
         index = len(self.items)
         app = command.app
         root = os.path.dirname(app.uri)
-        data = allzparkconfig.read_package_data(app)
+        data = allzparkconfig.metadata_from_package(app)
 
         self.beginInsertRows(QtCore.QModelIndex(), index, index + 1)
         self.items.append({

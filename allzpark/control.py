@@ -585,20 +585,12 @@ class Controller(QtCore.QObject):
                     self.info("Could not show all apps, "
                               "missing `allzparkconfig.applications`")
 
-        # Fetch applications from project weak references
         if not apps:
-            apps = []
-            for req in project.requires:
-                if not req.weak:
-                    continue
-
-                apps += [req.name]
+            apps[:] = allzparkconfig.applications_from_package(project)
 
         # Clear existing
         self._state["rezContexts"] = {}
 
-        # TODO: Separate this, it may take a while if not memcached,
-        #   and the user needs to know what's going on.
         contexts = odict()
         with util.timing() as t:
             for app_name in apps:
