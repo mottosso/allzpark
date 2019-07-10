@@ -43,8 +43,20 @@ startup_application = None  # (optional)
 startup_project = None  # (optional)
 
 
-def read_package_data(variant):
-    """Return data relative `variant`
+def applications_from_package(variant):
+    """Return applications relative `variant`"""
+
+    apps = []
+    for req in variant.requires:
+        if not req.weak:
+            continue
+
+        apps += [req.name]
+    return apps
+
+
+def metadata_from_package(variant):
+    """Return metadata relative `variant`
 
     Blocking call, during change of project.
 
@@ -68,7 +80,7 @@ def read_package_data(variant):
         # Guaranteed keys, with default values
         "label": data.get("label", variant.name),
         "background": data.get("background"),
-        "icon": data.get("icon", None),
+        "icon": data.get("icon", ""),
         "hidden": data.get("hidden", False),
     })
 
