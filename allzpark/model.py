@@ -44,6 +44,7 @@ from rez.config import config
 
 from .vendor.Qt import QtCore, QtGui, QtCompat
 from .vendor import qjsonmodel, six
+from . import allzparkconfig
 
 log = logging.getLogger(__name__)
 _basestring = six.string_types[0]  # For Python 2/3
@@ -136,6 +137,22 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
         return True
 
 
+def parse_icon(root, template):
+    try:
+        fname = template.format(
+            root=root,
+            width=32,
+            height=32,
+            w=32,
+            h=32
+        )
+
+    except KeyError:
+        fname = ""
+
+    return QtGui.QIcon(fname)
+
+
 class ApplicationModel(AbstractTableModel):
     ColumnToKey = {
         0: {
@@ -161,23 +178,18 @@ class ApplicationModel(AbstractTableModel):
         for app in applications:
             root = os.path.dirname(app.uri)
 
-            data = getattr(app, "_data", {})
-            icons = data.get("icons")
-            icons = icons or getattr(app, "_icons", {})  # backwards comp
-            label = data.get("label", app.name)
+            data = allzparkconfig.read_package_data(app)
             tools = getattr(app, "tools", None) or [app.name]
 
             item = {
                 "name": app.name,
-                "label": label,
+                "label": data["label"],
                 "version": str(app.version),
-                "icon": QtGui.QIcon(
-                    icons.get("32x32", "").format(root=root)
-                ),
+                "icon": parse_icon(root, template=data["icon"]),
                 "package": app,
                 "context": None,
                 "active": True,
-                "hidden": data.get("hidden", False),
+                "hidden": data["hidden"],
 
                 # Whether or not to open a separate console for this app
                 "detached": False,
@@ -257,20 +269,15 @@ class PackagesModel(AbstractTableModel):
 
         for pkg in packages:
             root = os.path.dirname(pkg.uri)
-            data = getattr(pkg, "_data", {})
-            icons = data.get("icons")
-            icons = icons or getattr(pkg, "_icons", {})  # backwards comp
+            data = allzparkconfig.read_package_data(pkg)
             local = "(local)" if is_local(pkg) else ""
-            label = data.get("label", pkg.name)
 
             item = {
                 "name": pkg.name,
-                "label": label,
+                "label": data["label"],
                 "version": str(pkg.version),
                 "default": str(pkg.version),
-                "icon": QtGui.QIcon(
-                    icons.get("32x32", "").format(root=root)
-                ),
+                "icon": parse_icon(root, template=data["icon"]),
                 "package": pkg,
                 "override": self._overrides.get(pkg.name),
                 "disabled": self._disabled.get(pkg.name, False),
@@ -388,7 +395,7 @@ class CommandsModel(AbstractTableModel):
         index = len(self.items)
         app = command.app
         root = os.path.dirname(app.uri)
-        icons = getattr(app, "_icons", {})
+        data = allzparkconfig.read_package_data(app)
 
         self.beginInsertRows(QtCore.QModelIndex(), index, index + 1)
         self.items.append({
@@ -396,9 +403,7 @@ class CommandsModel(AbstractTableModel):
             "niceCmd": command.nicecmd,
             "pid": None,
             "running": "waiting..",
-            "icon": QtGui.QIcon(
-                icons.get("32x32", "").format(root=root)
-            ),
+            "icon": parse_icon(root, template=data["icon"]),
             "object": command,
             "appName": app.name,
         })

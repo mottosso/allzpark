@@ -7,7 +7,8 @@ ALLZPARK_CONFIG_FILE=/path/to/allzparkconfig.py
 
 """
 
-import os
+import os as __os
+import sys as __sys
 
 
 def projects():
@@ -19,7 +20,7 @@ def projects():
 
     """
 
-    return os.listdir("~/projects")
+    return __os.listdir("~/projects")
 
 
 def applications():
@@ -40,3 +41,43 @@ startup_application = None  # (optional)
 # Pre-select this application in the list of applications,
 # if it exists in the startup project.
 startup_project = None  # (optional)
+
+
+def read_package_data(variant):
+    """Return data relative `variant`
+
+    Blocking call, during change of project.
+
+    IMPORTANT: this function must return at least the
+        members part of the original function, else the program
+        will not function. Very few safeguards are put in place
+        in favour of performance.
+
+    Arguments:
+        variant (rez.packages_.Variant): Package from which to retrieve data
+
+    Returns:
+        dict: See function for values and types
+
+    """
+
+    data = getattr(variant, "_data", {})
+
+    return dict(data, **{
+
+        # Guaranteed keys, with default values
+        "label": data.get("label", variant.name),
+        "background": data.get("background"),
+        "icon": data.get("icon", None),
+        "hidden": data.get("hidden", False),
+    })
+
+
+# Backup-copies of originals, with `_` prefix
+# Useful for augmenting an existing value with your own config
+__self__ = __sys.modules[__name__]
+for member in dir(__self__):
+    if member.startswith("__"):
+        continue
+
+    setattr(__self__, "_%s" % member, getattr(__self__, member))
