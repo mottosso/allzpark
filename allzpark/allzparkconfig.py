@@ -46,13 +46,11 @@ startup_project = None  # (optional)
 def applications_from_package(variant):
     """Return applications relative `variant`"""
 
-    apps = []
-    for req in variant.requires:
-        if not req.weak:
-            continue
-
-        apps += [req.name]
-    return apps
+    return list(
+        req.name
+        for req in variant.requires
+        if req.weak
+    )
 
 
 def metadata_from_package(variant):
