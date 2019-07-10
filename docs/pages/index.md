@@ -17,6 +17,7 @@ template: landing.html
         <div class="hboxlayout justify-left">
             <a href="guides/#install" class="button blue">Learn more</a>
             <a href="guides/#install" class="button red">Download</a>
+            <a href="https://github.com/mottosso/allzpark/issues/1" class="button green">Blog</a>
         </div>
         <br>
         <br>
