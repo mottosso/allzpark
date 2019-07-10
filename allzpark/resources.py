@@ -6,11 +6,13 @@ _cache = {}
 
 
 def px(value, scale=1.0):
-    return value * scale
+    return int(value * scale)
 
 
 def find(*paths):
-    return os.path.join(dirname, "resources", *paths)
+    fname = os.path.join(dirname, "resources", *paths)
+    fname = os.path.normpath(fname)  # Conform slashes and backslashes
+    return fname.replace("\\", "/")  # Cross-platform compatibility
 
 
 def pixmap(*paths):
