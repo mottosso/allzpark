@@ -280,6 +280,7 @@ class Window(QtWidgets.QMainWindow):
         ctrl.state_changed.connect(self.on_state_changed)
         ctrl.logged.connect(self.on_logged)
         ctrl.project_changed.connect(self.on_project_changed)
+        ctrl.repository_changed.connect(self.on_repository_changed)
 
         self._pages = pages
         self._widgets = widgets
@@ -551,6 +552,9 @@ class Window(QtWidgets.QMainWindow):
 
         button.setIconSize(QtCore.QSize(width, height))
         button.setAutoFillBackground(True)
+
+    def on_repository_changed(self):
+        self.reset()
 
     def on_show_error(self):
         self._docks["console"].append(self._ctrl.current_error)

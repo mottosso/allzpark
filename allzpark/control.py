@@ -3,7 +3,9 @@
 import os
 import time
 import errno
+import shutil
 import logging
+import tempfile
 import threading
 import traceback
 import subprocess
@@ -19,6 +21,12 @@ from rez.packages_ import iter_packages
 from rez.resolved_context import ResolvedContext
 import rez.exceptions
 import rez.package_filter
+
+# Optional third-party dependencies
+try:
+    from localz import lib as localz
+except ImportError:
+    localz = None
 
 log = logging.getLogger(__name__)
 Latest = None  # Enum
@@ -142,8 +150,13 @@ class _State(transitions.State):
 class Controller(QtCore.QObject):
     state_changed = QtCore.Signal(_State)
     logged = QtCore.Signal(str, int)  # message, level
-    project_changed = QtCore.Signal(str, str, bool)  # project, version, refreshed
     resetted = QtCore.Signal()
+
+    # One or more packages have changed on disk
+    repository_changed = QtCore.Signal()
+
+    project_changed = QtCore.Signal(
+        str, str, bool)  # project, version, refreshed
 
     states = [
         _State("booting", help="ALLZPARK is booting, hold on"),
@@ -434,12 +447,67 @@ class Controller(QtCore.QObject):
             self._state["commands"].append(cmd)
             self._models["commands"].append(cmd)
 
-            self._state.store("startupApplication", app_name)
             self._state.store("app/%s/lastUsed" % app_name, time.time())
             self._state.to_launching()
 
         self._state.to_loading()
         util.delay(do)
+
+    def localize(self, name):
+        tempdir = tempfile.mkdtemp()
+
+        def do():
+            self.info("Resolving %s.." % name)
+            variant = localz.resolve(name)[0]  # Guaranteed to be one
+
+            try:
+                self.info("Preparing %s.." % name)
+                copied = localz.prepare(variant, tempdir, verbose=2)[0]
+
+                self.info("Computing size..")
+                size = localz.dirsize(tempdir) / (10.0 ** 6)  # mb
+
+                self.info("Localising %.2f mb.." % size)
+                result = localz.localize(copied,
+                                         localz.localized_packages_path(),
+                                         verbose=2)
+
+                self.info("Localised %s" % result)
+
+            finally:
+                self.info("Cleaning up..")
+                shutil.rmtree(tempdir)
+
+        def on_success(result):
+            self.repository_changed.emit()
+
+        def on_failure(error, trace):
+            self.error(trace)
+
+        util.defer(do,
+                   on_success=on_success,
+                   on_failure=on_failure)
+
+    def delocalize(self, name):
+        def do():
+            item = self._models["packages"].find(name)
+            package = item["package"]
+            self.info("Delocalizing %s" % package.root)
+            localz.delocalize(package)
+
+        def on_success(result):
+            self.repository_changed.emit()
+
+        def on_failure(error, trace):
+            self.error(trace)
+
+        util.defer(do,
+                   on_success=on_success,
+                   on_failure=on_failure)
+
+    def _localize_status(self, package):
+        """Return status of localisation"""
+        return None
 
     def debug(self, message):
         log.debug(message)
@@ -546,6 +614,9 @@ class Controller(QtCore.QObject):
         self._models["packages"].reset(packages)
         self._models["context"].load(context)
         self._models["environment"].load(environ)
+
+        # Use this application on next launch or change of project
+        self._state.store("startupApplication", app_name)
 
     def select_tool(self, tool_name):
         self.debug("%s selected" % tool_name)

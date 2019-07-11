@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-from . import cli
 
 # Debugging, measure start-up time
 # NOTE: Handle this prior to importing anything
@@ -19,4 +18,5 @@ if os.getenv("ALLZPARK_STARTTIME"):
     duration = t1 - t0
     print("shell to python: %.2f s" % duration)
 
+from . import cli
 sys.exit(cli.main())

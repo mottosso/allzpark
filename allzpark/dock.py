@@ -315,8 +315,8 @@ class Packages(AbstractDockWidget):
             # Clicked outside any item
             return
 
-        model = index.model()
-        menu = QtWidgets.QMenu(self)
+        model_ = index.model()
+        menu = MenuWithTooltip(self)
         edit = QtWidgets.QAction("Edit", menu)
         disable = QtWidgets.QAction("Disable", menu)
         default = QtWidgets.QAction("Set to default", menu)
@@ -324,9 +324,13 @@ class Packages(AbstractDockWidget):
         latest = QtWidgets.QAction("Set to latest", menu)
         openfile = QtWidgets.QAction("Open file location", menu)
         copyfile = QtWidgets.QAction("Copy file location", menu)
+        localize = QtWidgets.QAction("Localise selected...", menu)
+        localize_related = QtWidgets.QAction("Localise related...", menu)
+        localize_all = QtWidgets.QAction("Localise all...", menu)
+        delocalize = QtWidgets.QAction("Delocalise selected...", menu)
 
         disable.setCheckable(True)
-        disable.setChecked(model.data(index, "disabled"))
+        disable.setChecked(model_.data(index, "disabled"))
 
         menu.addAction(edit)
         menu.addAction(disable)
@@ -337,6 +341,42 @@ class Packages(AbstractDockWidget):
         menu.addSeparator()
         menu.addAction(openfile)
         menu.addAction(copyfile)
+
+        if self._ctrl.state.retrieve("localisationEnabled"):
+            enabled = True
+            tooltip = None
+
+            if index.data(model.LocalizingRole):
+                enabled = False
+                tooltip = "Localisation in progress..."
+
+            elif model_.data(index, "state") in ("(dev)", "(localised)"):
+                tooltip = "Package already local"
+                enabled = False
+
+            elif not model_.data(index, "relocatable"):
+                tooltip = "Package does not support localisation"
+                enabled = False
+
+            menu.addSeparator()
+            for action in (localize,
+                           localize_related,
+                           localize_all,
+                           ):
+                menu.addAction(action)
+                action.setToolTip(tooltip or "")
+                action.setEnabled(enabled)
+
+            menu.addSeparator()
+            menu.addAction(delocalize)
+            delocalize.setEnabled(
+                model_.data(index, "state") == "(localised)"
+            )
+
+            # Not yet implemented
+            localize_all.setEnabled(False)
+            localize_related.setEnabled(False)
+
         menu.move(QtGui.QCursor.pos())
 
         picked = menu.exec_()
@@ -348,39 +388,51 @@ class Packages(AbstractDockWidget):
             self._widgets["view"].edit(index)
 
         if picked == default:
-            model.setData(index, None, "override")
-            model.setData(index, False, "disabled")
+            model_.setData(index, None, "override")
+            model_.setData(index, False, "disabled")
             self.message.emit("Package set to default")
 
         if picked == earliest:
-            versions = model.data(index, "versions")
-            model.setData(index, versions[0], "override")
-            model.setData(index, False, "disabled")
+            versions = model_.data(index, "versions")
+            model_.setData(index, versions[0], "override")
+            model_.setData(index, False, "disabled")
             self.message.emit("Package set to earliest")
 
         if picked == latest:
-            versions = model.data(index, "versions")
-            model.setData(index, versions[-1], "override")
-            model.setData(index, False, "disabled")
+            versions = model_.data(index, "versions")
+            model_.setData(index, versions[-1], "override")
+            model_.setData(index, False, "disabled")
             self.message.emit("Package set to latest version")
 
         if picked == openfile:
-            package = model.data(index, "package")
+            package = model_.data(index, "package")
             fname = os.path.join(package.root, "package.py")
             util.open_file_location(fname)
             self.message.emit("Opened %s" % fname)
 
         if picked == copyfile:
-            package = model.data(index, "package")
+            package = model_.data(index, "package")
             fname = os.path.join(package.root, "package.py")
             clipboard = QtWidgets.QApplication.instance().clipboard()
             clipboard.setText(fname)
             self.message.emit("Copied %s" % fname)
 
         if picked == disable:
-            model.setData(index, None, "override")
-            model.setData(index, disable.isChecked(), "disabled")
+            model_.setData(index, None, "override")
+            model_.setData(index, disable.isChecked(), "disabled")
             self.message.emit("Package disabled")
+
+        if picked in (localize, localize_all, localize_related):
+            name = model_.data(index, "name")
+            self._ctrl.localize(name)
+            model_.setData(index, "(localising..)", "state")
+            model_.setData(index, True, model.LocalizingRole)
+
+        if picked == delocalize:
+            name = model_.data(index, "name")
+            self._ctrl.delocalize(name)
+            model_.setData(index, "(delocalising..)", "state")
+            model_.setData(index, True, model.LocalizingRole)
 
 
 class Context(AbstractDockWidget):
@@ -726,3 +778,18 @@ class SlimTableView(QtWidgets.QTableView):
         finally:
             if event.button() == QtCore.Qt.RightButton:
                 self.customContextMenuRequested.emit(event.pos())
+
+
+class MenuWithTooltip(QtWidgets.QMenu):
+    """QMenu typically doesn't draw tooltips"""
+
+    def event(self, event):
+        if event.type() == QtCore.QEvent.ToolTip and self.activeAction() != 0:
+            QtWidgets.QToolTip.showText(
+                event.globalPos(),
+                self.activeAction().toolTip()
+            )
+        else:
+            QtWidgets.QToolTip.hideText()
+
+        return super(MenuWithTooltip, self).event(event)

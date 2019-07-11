@@ -46,6 +46,12 @@ from .vendor.Qt import QtCore, QtGui, QtCompat
 from .vendor import qjsonmodel, six
 from . import allzparkconfig
 
+# Optional third-party dependencies
+try:
+    from localz import lib as localz
+except ImportError:
+    localz = None
+
 log = logging.getLogger(__name__)
 _basestring = six.string_types[0]  # For Python 2/3
 _usercount = itertools.count(1)
@@ -53,6 +59,7 @@ Finish = None
 
 DisplayRole = QtCore.Qt.DisplayRole
 IconRole = QtCore.Qt.DecorationRole
+LocalizingRole = QtCore.Qt.UserRole + 1
 
 
 class AbstractTableModel(QtCore.QAbstractTableModel):
@@ -280,19 +287,20 @@ class PackagesModel(AbstractTableModel):
         0: {
             QtCore.Qt.DisplayRole: "label",
             QtCore.Qt.DecorationRole: "icon",
+            LocalizingRole: "localizing",
         },
         1: {
             QtCore.Qt.DisplayRole: "version",
         },
         2: {
-            QtCore.Qt.DisplayRole: "local",
+            QtCore.Qt.DisplayRole: "state",
         }
     }
 
     Headers = [
         "package",
         "version",
-        "local",
+        "state",
     ]
 
     def __init__(self, parent=None):
@@ -310,7 +318,15 @@ class PackagesModel(AbstractTableModel):
         for pkg in packages:
             root = os.path.dirname(pkg.uri)
             data = allzparkconfig.metadata_from_package(pkg)
-            local = "(local)" if is_local(pkg) else ""
+            state = (
+                "(dev)" if is_local(pkg) else
+                "(localised)" if localz.exists(pkg) else
+                ""
+            )
+            relocatable = False
+
+            if localz:
+                relocatable = localz.is_relocatable(pkg)
 
             item = {
                 "name": pkg.name,
@@ -324,7 +340,9 @@ class PackagesModel(AbstractTableModel):
                 "context": None,
                 "active": True,
                 "versions": None,
-                "local": local,
+                "state": state,
+                "relocatable": relocatable,
+                "localizing": False,  # in progress
             }
 
             self.items.append(item)
@@ -352,7 +370,7 @@ class PackagesModel(AbstractTableModel):
             if role == QtCore.Qt.ForegroundRole:
                 return QtGui.QColor("darkorange")
 
-        if data["disabled"]:
+        if data["disabled"] or data["localizing"]:
             if role == QtCore.Qt.FontRole:
                 font = QtGui.QFont()
                 font.setBold(True)
