@@ -27,12 +27,27 @@ input {
     margin-bottom: 5px;
 }
 
-.md-typeset {
+/* Faded items in the table of contents, as the user scrolls */
+.md-nav__link[data-md-state=blur] {
+    color: rgba(0,0,0,.34);
+}
+
+.md-typeset, .md-sidebar {
+  font-family: Segoe UI,
+               Roboto,
+               Oxygen,
+               Ubuntu,
+               Cantarell,
+               Fira Sans,
+               Droid Sans,
+               Helvetica Neue,
+               sans-serif;
   text-size-adjust: 100%;
-  font-size: 1.5em;
+  font-size: 16px;
   line-height: 1.4;
   color: #424242;
-  font-weight: 100;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
 }
 
 .md-typeset code {
