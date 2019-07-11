@@ -323,7 +323,7 @@ class Packages(AbstractDockWidget):
         earliest = QtWidgets.QAction("Set to earliest", menu)
         latest = QtWidgets.QAction("Set to latest", menu)
         openfile = QtWidgets.QAction("Open file location", menu)
-        copyfile = QtWidgets.QAction("Cope file location", menu)
+        copyfile = QtWidgets.QAction("Copy file location", menu)
 
         disable.setCheckable(True)
         disable.setChecked(model.data(index, "disabled"))
