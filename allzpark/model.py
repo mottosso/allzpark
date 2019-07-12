@@ -282,6 +282,13 @@ def is_local(pkg):
     return pkg_path.startswith(local_path)
 
 
+def is_localised(pkg):
+    if localz:
+        return localz.exists(pkg)
+    else:
+        return False
+
+
 class PackagesModel(AbstractTableModel):
     ColumnToKey = {
         0: {
@@ -320,7 +327,7 @@ class PackagesModel(AbstractTableModel):
             data = allzparkconfig.metadata_from_package(pkg)
             state = (
                 "(dev)" if is_local(pkg) else
-                "(localised)" if localz.exists(pkg) else
+                "(localised)" if is_localised(pkg) else
                 ""
             )
             relocatable = False
