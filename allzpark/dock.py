@@ -7,6 +7,12 @@ from .vendor.Qt import QtWidgets, QtCore, QtGui, QtCompat
 from .vendor import qargparse
 
 from . import resources as res, model, delegates, util
+from . import allzparkconfig
+
+try:
+    from localz import lib as localz
+except ImportError:
+    localz = None
 
 px = res.px
 
@@ -261,7 +267,27 @@ class Packages(AbstractDockWidget):
             "central": QtWidgets.QWidget()
         }
 
+        args = [
+            qargparse.Boolean(
+                "useDevelopmentPackages",
+                default=ctrl._state.retrieve("useDevelopmentPackages"),
+                help="Include development packages in the resolve"),
+            qargparse.String(
+                "exclusionFilter",
+                default=allzparkconfig.exclude_filter,
+                help="Exclude versions that match this expression"),
+        ]
+
+        if localz:
+            args.insert(0, qargparse.Boolean(
+                "useLocalizedPackages",
+                default=ctrl._state.retrieve("useLocalizedPackages", True),
+                help="Include localised packages in the resolve"),
+            )
+
         widgets = {
+            "args": qargparse.QArgumentParser(args),
+
             "view": SlimTableView(),
             "status": QtWidgets.QStatusBar(),
         }
@@ -271,7 +297,8 @@ class Packages(AbstractDockWidget):
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(widgets["view"])
+        layout.addWidget(widgets["args"])
+        layout.addWidget(widgets["view"], 1)
         layout.addWidget(widgets["status"])
 
         widgets["view"].setStretch(2)
@@ -282,8 +309,23 @@ class Packages(AbstractDockWidget):
 
         widgets["status"].setSizeGripEnabled(False)
 
+        widgets["args"].changed.connect(self.on_argument_changed)
+
         self._ctrl = ctrl
         self._widgets = widgets
+
+    def on_argument_changed(self, arg):
+        if arg["name"] == "useDevelopmentPackages":
+            self._ctrl._state.store("useDevelopmentPackages", arg.read())
+            self._ctrl.reset()
+
+        if arg["name"] == "useLocalizedPackages":
+            self._ctrl._state.store("useLocalizedPackages", arg.read())
+            self._ctrl.reset()
+
+        if arg["name"] == "exclusionFilter":
+            allzparkconfig.exclude_filter = arg.read()
+            self._ctrl.reset()
 
     def set_model(self, model_):
         proxy_model = model.ProxyModel(model_)

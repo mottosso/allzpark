@@ -44,7 +44,7 @@ from rez.config import config
 
 from .vendor.Qt import QtCore, QtGui, QtCompat
 from .vendor import qjsonmodel, six
-from . import allzparkconfig
+from . import allzparkconfig, util
 
 # Optional third-party dependencies
 try:
@@ -284,7 +284,9 @@ def is_local(pkg):
 
 def is_localised(pkg):
     if localz:
-        return localz.exists(pkg)
+        root = util.normpath(pkg.root)
+        path = util.normpath(localz.localized_packages_path())
+        return root.startswith(path)
     else:
         return False
 

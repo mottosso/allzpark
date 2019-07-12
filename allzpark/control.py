@@ -17,10 +17,7 @@ from .vendor import transitions
 from . import model, util, allzparkconfig
 
 # Third-party dependencies
-from rez.packages_ import iter_packages
-from rez.resolved_context import ResolvedContext
-import rez.exceptions
-import rez.package_filter
+from . import _rezapi as rez
 
 # Optional third-party dependencies
 try:
@@ -80,9 +77,10 @@ class State(dict):
 
         """
 
+        log.debug("Storing %s=%s" % (key, value))
         self._storage.setValue(key, value)
 
-    def retrieve(self, key):
+    def retrieve(self, key, default=None):
         """Read from persistent storage
 
         Arguments:
@@ -91,6 +89,9 @@ class State(dict):
         """
 
         value = self._storage.value(key)
+
+        if value is None:
+            value = default
 
         # Account for poor serialisation format
         # TODO: Implement a better format
@@ -255,7 +256,7 @@ class Controller(QtCore.QObject):
 
     def find(self, package_name, callback=lambda result: None):
         return util.defer(
-            iter_packages, args=[package_name],
+            rez.find, args=[package_name],
             on_success=callback
         )
 
@@ -292,17 +293,15 @@ class Controller(QtCore.QObject):
 
         """
 
-        RexUndefinedVariableError = rez.exceptions.RexUndefinedVariableError
-
-        if rez.exceptions.RexError is type:
+        if rez.RexError is type:
             # These are re-raised as a more specific
             # exception, e.g. RexUndefinedVariableError
             pass
 
-        if RexUndefinedVariableError is type:
+        if rez.RexUndefinedVariableError is type:
             pass
 
-        if rez.exceptions.PackageCommandError is type:
+        if rez.PackageCommandError is type:
             pass
 
         self.error("".join(traceback.format_tb(tb)))
@@ -338,7 +337,7 @@ class Controller(QtCore.QObject):
 
                 # Find project package
                 package = None
-                for package in sorted(iter_packages(name),
+                for package in sorted(rez.find(name),
                                       key=lambda p: p.version):
 
                     if name not in projects:
@@ -654,26 +653,48 @@ class Controller(QtCore.QObject):
         if not apps:
             apps[:] = allzparkconfig.applications_from_package(project)
 
-        # Clear existing
-        self._state["rezContexts"] = {}
-
         contexts = odict()
         with util.timing() as t:
             for app_name in apps:
                 request = [project.name, app_name]
                 self.info("Resolving request: %s" % " ".join(request))
 
-                rule = rez.package_filter.Rule.parse_rule("*.beta")
-                PackageFilterList = rez.package_filter.PackageFilterList
+                PackageFilterList = rez.PackageFilterList
                 package_filter = PackageFilterList.singleton.copy()
-                package_filter.add_exclusion(rule)
+
+                exclude = allzparkconfig.exclude_filter
+                if exclude:
+                    rule = rez.Rule.parse_rule(exclude)
+                    package_filter.add_exclusion(rule)
+                    print("  - rule: %s" % rule)
+
+                paths = util.normpaths(*rez.config.packages_path)
+                if not self._state.retrieve("useDevelopmentPackages"):
+                    paths = util.normpaths(*rez.config.nonlocal_packages_path)
+
+                if not self._state.retrieve("useLocalizedPackages"):
+                    try:
+                        paths.remove(util.normpath(
+                            localz.localized_packages_path())
+                        )
+
+                    except ValueError:
+                        # It may not be part of the path
+                        self.warning(
+                            "%s was not found on your "
+                            "package path." % localz.localized_packages_path()
+                        )
 
                 error = None
 
                 try:
-                    context = ResolvedContext(request,
-                                              package_filter=package_filter)
-                except rez.exceptions.RezError as e:
+                    context = rez.env(
+                        request,
+                        package_paths=paths,
+                        package_filter=package_filter,
+                    )
+
+                except rez.RezError as e:
                     error = e
                     self.error(traceback.format_exc())
 
@@ -791,7 +812,7 @@ class Command(QtCore.QObject):
 
         if self.overrides or self.disabled:
             # Apply overrides to a new context, to preserve the original
-            context = ResolvedContext(context.requested_packages())
+            context = rez.env(context.requested_packages())
             packages = context.resolved_packages[:]
 
             name_to_package_lut = {
@@ -808,7 +829,7 @@ class Command(QtCore.QObject):
 
                 # Find a replacement, taking implciit variants into account
                 request = "%s-%s" % (name, version)
-                replacement = ResolvedContext([request])
+                replacement = rez.env([request])
                 replacement = {
                     package.name: package
                     for package in replacement.resolved_packages

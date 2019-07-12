@@ -11,6 +11,9 @@ import os as __os
 import sys as __sys
 
 
+exclude_filter = "*.beta"
+
+
 def projects():
     """Return list of projects
 
