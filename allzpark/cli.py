@@ -73,7 +73,7 @@ def main():
         "pass --help for details"
     ))
 
-    parser.add_argument("--verbose", action="store_true", help=(
+    parser.add_argument("-v", "--verbose", action="count", help=(
         "Print additional information about Allzpark during operation"))
     parser.add_argument("--version", action="store_true", help=(
         "Print version and exit"))
@@ -138,8 +138,10 @@ def main():
     ))
     logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
     logging.getLogger("allzpark").setLevel(logging.DEBUG
-                                           if opts.verbose
-                                           else logging.INFO)
+                                           if opts.verbose == 2
+                                           else logging.INFO
+                                           if opts.verbose == 1
+                                           else logging.WARNING)
 
     # Allow the application to die on CTRL+C
     signal.signal(signal.SIGINT, signal.SIG_DFL)
