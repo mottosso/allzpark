@@ -276,6 +276,10 @@ class Packages(AbstractDockWidget):
                 "exclusionFilter",
                 default=allzparkconfig.exclude_filter,
                 help="Exclude versions that match this expression"),
+            qargparse.String(
+                "patch",
+                default=ctrl._state.retrieve("patch"),
+                help="Add packages to context"),
         ]
 
         if localz:
@@ -287,7 +291,6 @@ class Packages(AbstractDockWidget):
 
         widgets = {
             "args": qargparse.QArgumentParser(args),
-
             "view": SlimTableView(),
             "status": QtWidgets.QStatusBar(),
         }
@@ -325,6 +328,10 @@ class Packages(AbstractDockWidget):
 
         if arg["name"] == "exclusionFilter":
             allzparkconfig.exclude_filter = arg.read()
+            self._ctrl.reset()
+
+        if arg["name"] == "patch":
+            self._ctrl._state.store("patch", arg.read())
             self._ctrl.reset()
 
     def set_model(self, model_):

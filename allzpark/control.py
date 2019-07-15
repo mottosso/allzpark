@@ -557,6 +557,7 @@ class Controller(QtCore.QObject):
         self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
+        self._models["packages"].reset()
         self._models["projectVersions"].setStringList([])
 
         def on_apps_found(apps):
@@ -666,7 +667,6 @@ class Controller(QtCore.QObject):
                 if exclude:
                     rule = rez.Rule.parse_rule(exclude)
                     package_filter.add_exclusion(rule)
-                    print("  - rule: %s" % rule)
 
                 paths = util.normpaths(*rez.config.packages_path)
                 if not self._state.retrieve("useDevelopmentPackages"):
@@ -685,8 +685,6 @@ class Controller(QtCore.QObject):
                             "package path." % localz.localized_packages_path()
                         )
 
-                error = None
-
                 try:
                     context = rez.env(
                         request,
@@ -695,22 +693,43 @@ class Controller(QtCore.QObject):
                     )
 
                 except rez.RezError as e:
-                    error = e
+                    context = model.BrokenContext(app_name, request)
+                    context.success = False
+                    context.failure_description = traceback.format_exc()
                     self.error(traceback.format_exc())
 
-                if not context.success:
+                else:
+                    # TODO: Unsure of under what circumstances this occurs
                     description = context.failure_description
                     self.error(description)
 
-                if not context.success or error:
-                    context = model.BrokenContext(app_name, request)
+                patch = self._state.retrieve("patch", "").split()
+
+                if patch:
+                    self.info("Patching request: %s" % " ".join(request))
+                    request = context.get_patched_request(patch)
+                    context = rez.env(
+                        request,
+                        package_paths=paths,
+                        package_filter=package_filter,
+                    )
 
                 contexts[app_name] = context
 
         # Associate a Rez package with an app
         for app_name, rez_context in contexts.items():
-            rez_pkg = next(pkg for pkg in rez_context.resolved_packages
-                           if pkg.name == app_name)
+            try:
+                rez_pkg = next(
+                    pkg
+                    for pkg in rez_context.resolved_packages
+                    if pkg.name == app_name
+                )
+
+            except StopIteration:
+                # Can happen with a patched context, where the application
+                # itself is patched away. E.g. "^maya". This is a user error.
+                rez_pkg = model.BrokenPackage(app_name)
+
             self._state["rezApps"][app_name] = rez_pkg
 
         self.debug("Resolved all contexts in %.2f seconds" % t.duration)
@@ -724,7 +743,6 @@ class Controller(QtCore.QObject):
                 if package.name in apps:
                     break
             else:
-                # This cannot happen and would be a bug
                 raise ValueError(
                     "Could not find package for app %s" % app_name
                 )
