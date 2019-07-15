@@ -315,6 +315,7 @@ class String(QArgument):
     def create(self):
         widget = QtWidgets.QLineEdit()
         widget.editingFinished.connect(self.onEditingFinished)
+        widget.returnPressed.connect(widget.editingFinished.emit)
         self._read = lambda: widget.text()
         self._write = lambda value: widget.setText(value)
 
