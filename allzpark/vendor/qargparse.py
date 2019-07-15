@@ -308,9 +308,13 @@ class Range(Number):
 
 
 class String(QArgument):
+    def __init__(self, *args, **kwargs):
+        super(String, self).__init__(*args, **kwargs)
+        self._previous = None
+
     def create(self):
         widget = QtWidgets.QLineEdit()
-        widget.editingFinished.connect(self.changed.emit)
+        widget.editingFinished.connect(self.onEditingFinished)
         self._read = lambda: widget.text()
         self._write = lambda value: widget.setText(value)
 
@@ -319,8 +323,16 @@ class String(QArgument):
 
         if self["default"] is not None:
             self._write(self["default"])
+            self._previous = self["default"]
 
         return widget
+
+    def onEditingFinished(self):
+        current = self._read()
+
+        if current != self._previous:
+            self.changed.emit()
+            self._previous = current
 
 
 class Info(String):
