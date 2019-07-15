@@ -428,10 +428,9 @@ class Window(QtWidgets.QMainWindow):
         if key == "showAdvancedControls":
             self.update_advanced_controls()
 
-        if key == "showAllApps":
-            self._ctrl.reset()
-
-        if key == "showHiddenApps":
+        if key in ("showAllApps",
+                   "showHiddenApps",
+                   "patchWithFilter"):
             self._ctrl.reset()
 
     def on_dock_toggled(self, dock, visible):

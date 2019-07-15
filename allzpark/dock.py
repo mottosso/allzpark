@@ -702,11 +702,18 @@ class Preferences(AbstractDockWidget):
             "Show developer-centric controls"
         )),
         qargparse.Boolean("showAllApps", help=(
-            "List everything from ALLZPARK_APPS\n"
+            "List everything from allzparkconfig:applications\n"
             "not just the ones specified for a given project."
         )),
         qargparse.Boolean("showHiddenApps", help=(
-            "Show apps with _data['hidden'] = True"
+            "Show apps with metadata['hidden'] = True"
+        )),
+
+        qargparse.Boolean("patchWithFilter", help=(
+            "Use the current exclusion filter when patching\n"
+            "This enable patching of packages outside of a filter, \n"
+            "such as *.beta packages, with every other package still \n"
+            "qualifying for that filter."
         )),
 
         qargparse.Separator("System"),

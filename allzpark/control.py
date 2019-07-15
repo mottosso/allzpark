@@ -711,7 +711,11 @@ class Controller(QtCore.QObject):
                     context = rez.env(
                         request,
                         package_paths=paths,
-                        package_filter=package_filter,
+                        package_filter=(
+                            package_filter
+                            if self._state.retrieve("patchWithFilter", True)
+                            else None
+                        )
                     )
 
                 contexts[app_name] = context
