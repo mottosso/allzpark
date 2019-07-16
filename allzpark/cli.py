@@ -171,9 +171,6 @@ def main():
             "rezLocalPath": config.local_packages_path.split(os.pathsep),
             "rezReleasePath": config.release_packages_path.split(os.pathsep),
             "settingsPath": storage.fileName(),
-
-            # Optional extras
-            "localisationEnabled": True if localz else False,
         }
 
         for key, value in defaults.items():

@@ -672,7 +672,7 @@ class Controller(QtCore.QObject):
                 if not self._state.retrieve("useDevelopmentPackages"):
                     paths = util.normpaths(*rez.config.nonlocal_packages_path)
 
-                if not self._state.retrieve("useLocalizedPackages"):
+                if localz and not self._state.retrieve("useLocalizedPackages"):
                     try:
                         paths.remove(util.normpath(
                             localz.localized_packages_path())
