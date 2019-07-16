@@ -1,6 +1,8 @@
 import os
+import re
 import time
 import logging
+import collections
 from itertools import chain
 
 from .vendor.Qt import QtWidgets, QtCore, QtGui, QtCompat
@@ -525,33 +527,63 @@ class Environment(AbstractDockWidget):
     icon = "App_Heidi_32"
     advanced = True
 
-    def __init__(self, parent=None):
+    def __init__(self, ctrl, parent=None):
         super(Environment, self).__init__("Environment", parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("Environment")
 
         panels = {
-            "central": QtWidgets.QWidget()
+            "central": QtWidgets.QTabWidget(),
+        }
+
+        pages = {
+            "environment": QtWidgets.QTreeView(),
+            "editor": EnvironmentEditor(),
         }
 
         widgets = {
-            "view": QtWidgets.QTreeView()
         }
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(widgets["view"])
+        layout.addWidget(pages["environment"])
 
-        self._panels = panels
-        self._widgets = widgets
-
-        widgets["view"].setSortingEnabled(True)
+        pages["environment"].setSortingEnabled(True)
         self.setWidget(panels["central"])
+
+        pages["editor"].applied.connect(self.on_env_applied)
+
+        panels["central"].addTab(pages["environment"], "Context")
+        panels["central"].addTab(pages["editor"], "User")
+
+        user_env = ctrl.state.retrieve("userEnv", {})
+        pages["editor"].from_environment(user_env)
+        pages["editor"].warning.connect(self.on_env_warning)
+
+        self._ctrl = ctrl
+        self._panels = panels
+        self._pages = pages
+        self._widgets = widgets
 
     def set_model(self, model_):
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(model_)
-        self._widgets["view"].setModel(proxy_model)
+        self._pages["environment"].setModel(proxy_model)
+
+    def on_env_applied(self, env):
+        self._ctrl.state.store("userEnv", env)
+        self._ctrl.info("User environment successfully saved")
+
+    def on_env_warning(self, message):
+        self._ctrl.warning(message)
+
+
+class TextEditWithFocus(QtWidgets.QTextEdit):
+    focusLost = QtCore.Signal()
+
+    def focusOutEvent(self, event):
+        super(TextEditWithFocus, self).focusOutEvent(event)
+        self.focusLost.emit()
 
 
 class Commands(AbstractDockWidget):
@@ -664,6 +696,94 @@ class Commands(AbstractDockWidget):
             self.message.emit("Copying %s" % cmd)
 
 
+class EnvironmentEditor(QtWidgets.QWidget):
+    applied = QtCore.Signal(dict)  # environment
+    warning = QtCore.Signal(str)  # message
+
+    def __init__(self, parent=None):
+        super(EnvironmentEditor, self).__init__(parent)
+
+        widgets = {
+            "textEdit": TextEditWithFocus(),
+        }
+
+        font = self.font()
+        font.setFamily("Courier")
+        font.setFixedPitch(True)
+        font.setPointSize(10)
+
+        widgets["textEdit"].setFont(font)
+
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(px(2))
+        layout.addWidget(widgets["textEdit"])
+
+        self._widgets = widgets
+        self._edited = False
+
+        widgets["textEdit"].focusLost.connect(self.on_focus_lost)
+        widgets["textEdit"].textChanged.connect(self.on_text_changed)
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        shortcut.activated.connect(self.on_apply_clicked)
+
+    def on_apply_clicked(self):
+        if not self._edited:
+            self.warning.emit("Already saved")
+            return
+
+        self.on_focus_lost()
+
+    def from_environment(self, environ):
+        text = "\n".join([
+            "%s=%s" % (key, value)
+            for key, value in environ.items()
+        ])
+
+        self._widgets["textEdit"].setPlainText(text)
+
+    def to_environment(self):
+        """Serialise text to dictionary"""
+
+        # Maintain order as written
+        env = collections.OrderedDict()
+
+        textedit = self._widgets["textEdit"]
+        for line in textedit.toPlainText().splitlines():
+            if line.startswith("#"):
+                continue
+
+            try:
+                key, value = line.split("=")
+            except Exception:
+                continue
+
+            key = key.rstrip(" ")  # Tailing space
+            value = value.strip(" ")  # Leading space
+
+            # Validate key
+            validator = re.compile(r'^[A-Za-z0-9\._]+$')
+            if not validator.match(key):
+                self.warning.emit("Invalid key: %s" % key)
+                continue
+
+            env[key] = value
+        return env
+
+    def on_focus_lost(self):
+        if not self._edited:
+            return
+
+        env = self.to_environment()
+        self.applied.emit(env)
+        self._edited = False
+
+    def on_text_changed(self):
+        # Prevent focus from triggering serialisation,
+        # if it had already been serialised with Ctrl+S
+        self._edited = True
+
+
 class CssEditor(QtWidgets.QWidget):
     applied = QtCore.Signal(str)  # css
 
@@ -675,6 +795,8 @@ class CssEditor(QtWidgets.QWidget):
             "apply": QtWidgets.QPushButton("Apply"),
         }
 
+        # Cannot set via CSS, as we need to query the
+        # size of it in order to get the tab width below..
         font = self.font()
         font.setFamily("Courier")
         font.setFixedPitch(True)

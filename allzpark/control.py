@@ -420,10 +420,14 @@ class Controller(QtCore.QObject):
             is_detached = kwargs.get(
                 "detached", app_model.data(app_index, "detached"))
 
-            assert tool_name
+            assert tool_name, (
+                "There should have been at least one tool name. "
+                "This is a bug"
+            )
 
             overrides = self._models["packages"]._overrides
             disabled = self._models["packages"]._disabled
+            environ = self._state.retrieve("userEnv", {})
 
             self.info(
                 "Launching %s%s.." % (
@@ -437,6 +441,7 @@ class Controller(QtCore.QObject):
                 overrides=overrides,
                 disabled=disabled,
                 detached=is_detached,
+                environ=environ,
                 parent=self
             )
 
@@ -783,11 +788,13 @@ class Command(QtCore.QObject):
                  overrides=None,
                  disabled=None,
                  detached=True,
+                 environ=None,
                  parent=None):
         super(Command, self).__init__(parent)
 
         self.overrides = overrides or {}
         self.disabled = disabled or {}
+        self.environ = environ or {}
 
         self.context = context
         self.app = package
@@ -826,6 +833,7 @@ class Command(QtCore.QObject):
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
             "detached": self.detached,
+            "parent_environ": None,
         }
 
         context = self.context
@@ -878,6 +886,15 @@ class Command(QtCore.QObject):
                 log.info("Disabling %s" % package_name)
 
             context.resolved_packages[:] = packages
+
+        if self.environ:
+            # Inject user environment
+            #
+            # NOTE: Rez takes precendence on environment, so a user
+            # cannot edit the environment in such a way that packages break.
+            # However it also means it cannot edit variables also edited
+            # by a package. Win some lose some
+            kwargs["parent_environ"] = dict(os.environ, **self.environ)
 
         self.popen = context.execute_shell(**kwargs)
 

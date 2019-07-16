@@ -80,7 +80,7 @@ class Window(QtWidgets.QMainWindow):
             ("app", dock.App(ctrl)),
             ("packages", dock.Packages(ctrl)),
             ("context", dock.Context()),
-            ("environment", dock.Environment()),
+            ("environment", dock.Environment(ctrl)),
             ("console", dock.Console()),
             ("commands", dock.Commands()),
             ("preferences", dock.Preferences(self, ctrl)),
