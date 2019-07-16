@@ -239,7 +239,7 @@ class ApplicationModel(AbstractTableModel):
 class BrokenContext(object):
     def __init__(self, app_name, request):
         self.resolved_packages = [BrokenPackage(app_name)]
-        self.success = True
+        self.success = False
 
         self._request = request
 
