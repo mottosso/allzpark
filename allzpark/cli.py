@@ -199,8 +199,16 @@ def main():
     sys.excepthook = excepthook
 
     window = view.Window(ctrl)
+    user_css = storage.value("userCss") or ""
+
     with open(resources.find("style.css")) as f:
-        window.setStyleSheet(f.read())
+        css = f.read()
+
+        # Store for CSS Editor
+        window._originalcss = css
+
+        window.setStyleSheet("\n".join([css, user_css]))
+
     window.show()
 
     def measure():

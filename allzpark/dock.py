@@ -664,6 +664,50 @@ class Commands(AbstractDockWidget):
             self.message.emit("Copying %s" % cmd)
 
 
+class CssEditor(QtWidgets.QWidget):
+    applied = QtCore.Signal(str)  # css
+
+    def __init__(self, parent=None):
+        super(CssEditor, self).__init__(parent)
+
+        widgets = {
+            "textEdit": QtWidgets.QTextEdit(),
+            "apply": QtWidgets.QPushButton("Apply"),
+        }
+
+        font = self.font()
+        font.setFamily("Courier")
+        font.setFixedPitch(True)
+        font.setPointSize(10)
+
+        widgets["textEdit"].setFont(font)
+
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(px(2))
+        layout.addWidget(widgets["textEdit"])
+        layout.addWidget(widgets["apply"])
+
+        widgets["apply"].clicked.connect(self.on_apply_clicked)
+
+        try:
+            width = 2 * widgets["textEdit"].fontMetrics().width(" ")
+            widgets["textEdit"].setTabStopWidth(width)
+        except AttributeError:
+            # Qt 5+ only
+            pass
+
+        self._widgets = widgets
+        self._highlighter = CssHighlighter(widgets["textEdit"].document())
+
+        shortcut = QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+S"), self)
+        shortcut.activated.connect(self.on_apply_clicked)
+
+    def on_apply_clicked(self):
+        textedit = self._widgets["textEdit"]
+        self.applied.emit(textedit.toPlainText())
+
+
 class Preferences(AbstractDockWidget):
     """Preferred settings relative the current user"""
 
@@ -740,8 +784,12 @@ class Preferences(AbstractDockWidget):
         self.setObjectName("Preferences")
 
         panels = {
-            "scrollarea": QtWidgets.QScrollArea(),
-            "central": QtWidgets.QWidget(),
+            "central": QtWidgets.QTabWidget(),
+        }
+
+        pages = {
+            "settings": QtWidgets.QWidget(),
+            "cssEditor": CssEditor(),
         }
 
         widgets = {
@@ -749,24 +797,39 @@ class Preferences(AbstractDockWidget):
                 self.options, storage=ctrl._storage)
         }
 
-        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout = QtWidgets.QVBoxLayout(pages["settings"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["options"])
 
-        panels["scrollarea"].setWidget(panels["central"])
-        panels["scrollarea"].setWidgetResizable(True)
+        scroll = QtWidgets.QScrollArea()
+        scroll.setWidget(pages["settings"])
+        scroll.setWidgetResizable(True)
 
         widgets["options"].changed.connect(self.handler)
+        pages["cssEditor"].applied.connect(self.on_css_applied)
+
+        panels["central"].addTab(scroll, "Settings")
+        panels["central"].addTab(pages["cssEditor"], "CSS")
 
         self._panels = panels
+        self._pages = pages
         self._widgets = widgets
         self._ctrl = ctrl
         self._window = window
 
-        self.setWidget(panels["scrollarea"])
+        user_css = ctrl.state.retrieve("userCss", "")
+        pages["cssEditor"]._widgets["textEdit"].setPlainText(user_css)
+
+        self.setWidget(panels["central"])
 
     def handler(self, argument):
         self._window.on_setting_changed(argument)
+
+    def on_css_applied(self, css):
+        self._ctrl.state.store("userCss", css)
+        self._window.setStyleSheet("\n".join([
+            self._window._originalcss, css]))
+        self._window.tell("Applying css..")
 
 
 class SlimTableView(QtWidgets.QTableView):
@@ -849,3 +912,108 @@ class MenuWithTooltip(QtWidgets.QMenu):
             QtWidgets.QToolTip.hideText()
 
         return super(MenuWithTooltip, self).event(event)
+
+
+class CssHighlighter(QtGui.QSyntaxHighlighter):
+    def __init__(self, parent=None):
+        super(CssHighlighter, self).__init__(parent)
+
+        keyword_format = QtGui.QTextCharFormat()
+        keyword_format.setForeground(QtCore.Qt.darkBlue)
+        keyword_format.setFontWeight(QtGui.QFont.Bold)
+
+        keywordPatterns = [
+            "\\bchar\\b", "\\bclass\\b", "\\bconst\\b",
+            "\\bdouble\\b", "\\benum\\b", "\\bexplicit\\b", "\\bfriend\\b",
+            "\\binline\\b", "\\bint\\b", "\\blong\\b", "\\bnamespace\\b",
+            "\\boperator\\b", "\\bprivate\\b", "\\bprotected\\b",
+            "\\bpublic\\b", "\\bshort\\b", "\\bsignals\\b", "\\bsigned\\b",
+            "\\bslots\\b", "\\bstatic\\b", "\\bstruct\\b",
+            "\\btemplate\\b", "\\btypedef\\b", "\\btypename\\b",
+            "\\bunion\\b", "\\bunsigned\\b", "\\bvirtual\\b", "\\bvoid\\b",
+            "\\bvolatile\\b"
+        ]
+
+        self.rules = [
+            (QtCore.QRegExp(pattern), keyword_format)
+            for pattern in keywordPatterns
+        ]
+
+        class_format = QtGui.QTextCharFormat()
+        class_format.setFontWeight(QtGui.QFont.Bold)
+        class_format.setForeground(QtCore.Qt.darkMagenta)
+        self.rules.append((
+            QtCore.QRegExp("\\bQ[A-Za-z]+\\b"),
+            class_format
+        ))
+
+        id_format = QtGui.QTextCharFormat()
+        id_format.setFontWeight(QtGui.QFont.Bold)
+        id_format.setForeground(QtCore.Qt.darkBlue)
+        self.rules.append((
+            QtCore.QRegExp(r"#\w{1,}\b"),
+            id_format
+        ))
+
+        comment_format = QtGui.QTextCharFormat()
+        comment_format.setForeground(QtCore.Qt.red)
+        self.rules.append((
+            QtCore.QRegExp("//[^\n]*"),
+            comment_format
+        ))
+
+        self.multicomment_format = QtGui.QTextCharFormat()
+        self.multicomment_format.setForeground(QtCore.Qt.gray)
+
+        quote_format = QtGui.QTextCharFormat()
+        quote_format.setForeground(QtCore.Qt.darkGreen)
+        self.rules.append(
+            (QtCore.QRegExp("\".*\""), quote_format)
+        )
+
+        function_format = QtGui.QTextCharFormat()
+        function_format.setFontItalic(True)
+        function_format.setForeground(QtCore.Qt.blue)
+        self.rules.append((
+            QtCore.QRegExp("\\b[A-Za-z0-9_]+(?=\\()"),
+            function_format
+        ))
+
+        self.comment_start_exp = QtCore.QRegExp("/\\*")
+        self.comment_end_exp = QtCore.QRegExp("\\*/")
+
+    def highlightBlock(self, text):
+        for pattern, format in self.rules:
+            expression = QtCore.QRegExp(pattern)
+            index = expression.indexIn(text)
+            while index >= 0:
+                length = expression.matchedLength()
+                self.setFormat(index, length, format)
+                index = expression.indexIn(text, index + length)
+
+        self.setCurrentBlockState(0)
+
+        startIndex = 0
+        if self.previousBlockState() != 1:
+            startIndex = self.comment_start_exp.indexIn(text)
+
+        while startIndex >= 0:
+            endIndex = self.comment_end_exp.indexIn(text, startIndex)
+
+            if endIndex == -1:
+                self.setCurrentBlockState(1)
+                commentLength = len(text) - startIndex
+            else:
+                commentLength = (
+                    endIndex -
+                    startIndex +
+                    self.comment_end_exp.matchedLength()
+                )
+
+            self.setFormat(
+                startIndex,
+                commentLength,
+                self.multicomment_format
+            )
+            startIndex = self.comment_start_exp.indexIn(
+                text, startIndex + commentLength)
