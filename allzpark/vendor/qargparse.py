@@ -409,22 +409,32 @@ class Choice(QArgument):
 
     def create(self):
         def on_changed(selected, deselected):
-            selected = selected.indexes()[0]
+            try:
+                selected = selected.indexes()[0]
+            except IndexError:
+                # At least one item must be selected at all times
+                selected = deselected.indexes()[0]
+
             value = selected.data(QtCore.Qt.DisplayRole)
-            self["current"] = value
+            set_current(value)
             self.changed.emit()
 
         def set_current(current):
             options = model.stringList()
-            for index, member in enumerate(options):
-                if member == current:
-                    break
+
+            if current == "Empty":
+                index = 0
             else:
-                raise ValueError("%s not a member of %s" % (current, options))
+                for index, member in enumerate(options):
+                    if member == current:
+                        break
+                else:
+                    raise ValueError(
+                        "%s not a member of %s" % (current, options)
+                    )
 
             qindex = model.index(index, 0, QtCore.QModelIndex())
-            smodel = widget.selectionModel()
-            smodel.setCurrentIndex(qindex, smodel.Select)
+            smodel.setCurrentIndex(qindex, smodel.ClearAndSelect)
             self["current"] = options[index]
 
         def reset(items, default=None):
@@ -436,6 +446,7 @@ class Choice(QArgument):
         widget = QtWidgets.QListView()
         widget.setModel(model)
         widget.setEditTriggers(widget.NoEditTriggers)
+        widget.setSelectionMode(widget.SingleSelection)
         smodel = widget.selectionModel()
         smodel.selectionChanged.connect(on_changed)
 
