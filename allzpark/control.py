@@ -692,20 +692,21 @@ class Controller(QtCore.QObject):
                         package_filter=package_filter,
                     )
 
-                except rez.RezError as e:
+                except rez.RezError:
                     context = model.BrokenContext(app_name, request)
-                    context.success = False
                     context.failure_description = traceback.format_exc()
                     self.error(traceback.format_exc())
 
-                else:
-                    # TODO: Unsure of under what circumstances this occurs
+                if not context.success:
+                    # Happens on failed resolve, e.g. version conflict
                     description = context.failure_description
+                    context = model.BrokenContext(app_name, request)
+                    context.failure_description = description
                     self.error(description)
 
                 patch = self._state.retrieve("patch", "").split()
 
-                if patch:
+                if patch and not isinstance(context, model.BrokenContext):
                     self.info("Patching request: %s" % " ".join(request))
                     request = context.get_patched_request(patch)
                     context = rez.env(
