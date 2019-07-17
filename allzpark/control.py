@@ -662,7 +662,20 @@ class Controller(QtCore.QObject):
         contexts = odict()
         with util.timing() as t:
             for app_name in apps:
-                request = [project.name, app_name]
+                variants = list(project.iter_variants())
+                variant = variants[0]
+
+                if len(variants) > 1:
+                    # Unsure of whether this is desirable. It would enable
+                    # a project per platform, or potentially other kinds
+                    # of special-purpose situations. If you see this,
+                    # and want this, submit an issue with your use case!
+                    self.warning(
+                        "Projects with multiple variants are unsupported. "
+                        "Using first found: %s" % variant
+                    )
+
+                request = [variant.qualified_package_name, app_name]
                 self.info("Resolving request: %s" % " ".join(request))
 
                 PackageFilterList = rez.PackageFilterList
