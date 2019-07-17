@@ -335,6 +335,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multiple-application-versions" title="Multiple Application Versions" class="md-nav__link">
+    Multiple Application Versions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uniform" title="Uniform" class="md-nav__link">
+    Uniform
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parallel" title="Parallel" class="md-nav__link">
+    Parallel
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packages-and-version-control" title="Packages and Version Control" class="md-nav__link">
+    Packages and Version Control
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#release-with-gitlab" title="Release with GitLab" class="md-nav__link">
     Release with GitLab
   </a>
@@ -387,6 +421,33 @@
           <li class="md-nav__item">
   <a href="#resolved_packages" title="resolved_packages" class="md-nav__link">
     resolved_packages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-packages" title="Testing Packages" class="md-nav__link">
+    Testing Packages
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-build-and-run" title="Local Build and Run" class="md-nav__link">
+    Local Build and Run
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-on-release" title="Test on Release" class="md-nav__link">
+    Test on Release
   </a>
   
 </li>
@@ -541,6 +602,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#multiple-application-versions" title="Multiple Application Versions" class="md-nav__link">
+    Multiple Application Versions
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#uniform" title="Uniform" class="md-nav__link">
+    Uniform
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parallel" title="Parallel" class="md-nav__link">
+    Parallel
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packages-and-version-control" title="Packages and Version Control" class="md-nav__link">
+    Packages and Version Control
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#release-with-gitlab" title="Release with GitLab" class="md-nav__link">
     Release with GitLab
   </a>
@@ -593,6 +688,33 @@
           <li class="md-nav__item">
   <a href="#resolved_packages" title="resolved_packages" class="md-nav__link">
     resolved_packages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-packages" title="Testing Packages" class="md-nav__link">
+    Testing Packages
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-build-and-run" title="Local Build and Run" class="md-nav__link">
+    Local Build and Run
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-on-release" title="Test on Release" class="md-nav__link">
+    Test on Release
   </a>
   
 </li>
@@ -745,6 +867,74 @@ The following package conflicts occurred: <span style="color: #f92672">(</span>p
 - ~os<span style="color: #f92672">==</span>windows-10
 </pre></div>
 
+<p><br></p>
+<h3 id="multiple-application-versions">Multiple Application Versions</h3>
+<p>Applications such as Python, Autodesk Maya and Adobe Photoshop can get packaged in one of two ways.</p>
+<ol>
+<li><code>maya-2018.1.0</code> i.e. "Serial"</li>
+<li><code>maya2018-1.0</code> i.e. "Parallel"</li>
+</ol>
+<p>Let's refer to these as "serial" and "parallel" respectively. Which should you use, and why?</p>
+<p><br></p>
+<h4 id="uniform">Uniform</h4>
+<p>In this example, there is only one package "family" for the Autodesk Maya software, whereby every revision of Maya is released as a new Rez package version; including "service packs" and "hotfixes" etc.</p>
+<p>The advantage is that a package can then create a requirement on a range of <code>maya</code> versions.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;mgear&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.0&quot;</span>
+<span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;maya&gt;=2015,&lt;2020&quot;</span><span style="color: #f8f8f2">]</span>
+</pre></div>
+
+<p>The disadvantage however is that you cannot resolve an environment with both <code>maya-2018</code> and <code>maya-2019</code>, as one would conflict with the other. Furthermore, if you did <em>force</em> this resolve, what should you expect to have happen in a situation like this?</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ rez env python-2 python-3
+&gt; $ python --version
+Python ?.?.?
+</pre></div>
+
+<p><br></p>
+<h4 id="parallel">Parallel</h4>
+<p>Conversely, you can perform a "parallel" version.</p>
+<p><strong>maya2018/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya2018&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+</pre></div>
+
+<p><strong>maya2019/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya2019&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+</pre></div>
+
+<p>In which case you are able to resolve an environment like this.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ rez env maya2018 maya2019-1.0
+&gt; $
+</pre></div>
+
+<p>To work around the aforementioned issue of knowing which <code>python</code> - or in this case <code>maya</code> - is actually called, you can use an <code>alias()</code>.</p>
+<p><strong>maya2019/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya2019&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">alias</span>
+    <span style="color: #f8f8f2">alias(</span><span style="color: #e6db74">&quot;maya2019&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;{root}/bin/maya.exe&quot;</span><span style="color: #f8f8f2">)</span>
+</pre></div>
+
+<p>At which point you can call..</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ rez env maya2018 maya2019
+&gt; $ maya2018
+<span style="color: #75715e"># Launching Maya 2018..</span>
+</pre></div>
+
+<p>However it isn't clear how you can make a requirement on a range of Maya versions with a parallel package. Consider the <code>mgear</code> package.</p>
+<p><strong>mgear/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;mgear&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+<span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;maya2018-1.0&quot;</span><span style="color: #f8f8f2">]</span>  <span style="color: #75715e"># What about Maya 2019? :(</span>
+</pre></div>
+
+<p>Rez <a href="https://github.com/mottosso/bleeding-rez/issues/37">currently does not support</a> optional or "any"-style packages and so this approach would not be well suited for these types of requirements.</p>
+<p><br></p>
+<h3 id="packages-and-version-control">Packages and Version Control</h3>
+<p>Any collaborative software project </p>
 <p><br></p>
 <h3 id="release-with-gitlab">Release with GitLab</h3>
 <p>Once you've created a package, it's often a good idea to version control it.</p>
@@ -901,12 +1091,13 @@ rez env packageA-1.0.0.beta  <span style="color: #75715e"># packageA-1.0.0.beta<
 </ol>
 <p><strong>used_resolve.py</strong></p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">from</span> <span style="color: #f8f8f2">rez.status</span> <span style="color: #f92672">import</span> <span style="color: #f8f8f2">status</span>
-<span style="color: #f8f8f2">context</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">status</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">context</span>
-<span style="color: #f8f8f2">resolve</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot; &quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join([</span>
+
+<span style="color: #75715e"># Use `status` to fetch an instance of ResolvedContext</span>
+<span style="color: #75715e"># from within our current environment.</span>
+<span style="color: #66d9ef">print</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&quot; &quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join([</span>
     <span style="color: #e6db74">&quot;%s==%s&quot;</span> <span style="color: #f92672">%</span> <span style="color: #f8f8f2">(pkg</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name,</span> <span style="color: #f8f8f2">pkg</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version)</span>
-    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">pkg</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">ctx</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">resolved_packages</span>
-<span style="color: #f8f8f2">])</span>
-<span style="color: #66d9ef">print</span><span style="color: #f8f8f2">(resolve)</span>
+    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">pkg</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">status</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">context</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">resolved_packages</span>
+<span style="color: #f8f8f2">]))</span>
 </pre></div>
 
 <p>Resulting in..</p>
@@ -915,6 +1106,35 @@ rez env packageA-1.0.0.beta  <span style="color: #75715e"># packageA-1.0.0.beta<
 </pre></div>
 
 <p>And presto, an accurate depiction of a given context, suitable for use again on the same machine, on a local render farm or remote cloud rendering environment.</p>
+<p><br></p>
+<h3 id="testing-packages">Testing Packages</h3>
+<p>Like any software projects, you need good tests. Software packaged with Rez is no exception, and doesn't <em>necessarily</em> change how you normally approach test.</p>
+<p>There are a few ways to exercise your package.</p>
+<p><br></p>
+<h4 id="local-build-and-run">Local Build and Run</h4>
+<p>The most useful and common approach is to build and run your package locally.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> my_package
+rez build --install
+</pre></div>
+
+<p>This will install the package into your local <code>~/packages</code> directory, overridden by  <code>REZ_LOCAL_PACKAGES_PATH</code>. From there, you can test a package <em>as though</em> it was deployed globally, until it's ready for an audience.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez build --install --release
+</pre></div>
+
+<p>This command on the other hand installs a package into <code>~/.rez</code>, overridden by <code>REZ_RELEASE_PACKAGES_PATH</code>.</p>
+<p><br></p>
+<h4 id="test-on-release">Test on Release</h4>
+<p>The above is a good start, but it's still possible for bugs to make their way into a deployed package unless you have a solid test suite.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> my_package
+nosetests2
+<span style="color: #75715e"># Testing..</span>
+</pre></div>
+
+<p>For a Python project, tests can be written as though Rez was not involved, using any relevant test framework. But having tests means nothing unless they are actually exercised, and that's when setting up a "release hook" can help maintain consistency.</p>
+<blockquote>
+<p>Work in progress</p>
+</blockquote>
+<p>If you got this far, and know more or want more, feel free to submit <a href="https://github.com/mottosso/allzpark/issues">an issue</a>.</p>
                 
                   
                 
