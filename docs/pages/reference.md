@@ -148,6 +148,105 @@ rez config implicit_packages
 
 <br>
 
+### Multiple Application Versions
+
+Applications such as Python, Autodesk Maya and Adobe Photoshop can get packaged in one of two ways.
+
+1. `maya-2018.1.0` i.e. "Serial"
+2. `maya2018-1.0` i.e. "Parallel"
+
+Let's refer to these as "serial" and "parallel" respectively. Which should you use, and why?
+
+<br>
+
+#### Uniform
+
+In this example, there is only one package "family" for the Autodesk Maya software, whereby every revision of Maya is released as a new Rez package version; including "service packs" and "hotfixes" etc.
+
+The advantage is that a package can then create a requirement on a range of `maya` versions.
+
+```python
+name = "mgear"
+version = "1.0.0"
+requires = ["maya>=2015,<2020"]
+```
+
+The disadvantage however is that you cannot resolve an environment with both `maya-2018` and `maya-2019`, as one would conflict with the other. Furthermore, if you did *force* this resolve, what should you expect to have happen in a situation like this?
+
+```bash
+$ rez env python-2 python-3
+> $ python --version
+Python ?.?.?
+```
+
+<br>
+
+#### Parallel
+
+Conversely, you can perform a "parallel" version.
+
+**maya2018/package.py**
+
+```python
+name = "maya2018"
+version = "1.0"
+```
+
+**maya2019/package.py**
+
+```python
+name = "maya2019"
+version = "1.0"
+```
+
+In which case you are able to resolve an environment like this.
+
+```bash
+$ rez env maya2018 maya2019-1.0
+> $
+```
+
+To work around the aforementioned issue of knowing which `python` - or in this case `maya` - is actually called, you can use an `alias()`.
+
+**maya2019/package.py**
+
+```python
+name = "maya2019"
+version = "1.0"
+
+def commands():
+    global alias
+    alias("maya2019", "{root}/bin/maya.exe")
+```
+
+At which point you can call..
+
+```bash
+$ rez env maya2018 maya2019
+> $ maya2018
+# Launching Maya 2018..
+```
+
+However it isn't clear how you can make a requirement on a range of Maya versions with a parallel package. Consider the `mgear` package.
+
+**mgear/package.py**
+
+```python
+name = "mgear"
+version = "1.0"
+requires = ["maya2018-1.0"]  # What about Maya 2019? :(
+```
+
+Rez [currently does not support](https://github.com/mottosso/bleeding-rez/issues/37) optional or "any"-style packages and so this approach would not be well suited for these types of requirements.
+
+<br>
+
+### Packages and Version Control
+
+Any collaborative software project 
+
+<br>
+
 ### Release with GitLab
 
 Once you've created a package, it's often a good idea to version control it.
@@ -357,12 +456,13 @@ So what is the solution? In a nutshell..
 
 ```python
 from rez.status import status
-context = status.context
-resolve = " ".join([
+
+# Use `status` to fetch an instance of ResolvedContext
+# from within our current environment.
+print(" ".join([
     "%s==%s" % (pkg.name, pkg.version)
-    for pkg in ctx.resolved_packages
-])
-print(resolve)
+    for pkg in status.context.resolved_packages
+]))
 ```
 
 Resulting in..
@@ -373,3 +473,48 @@ rez env python packageA packageB --exclude *.beta -- python used_resolve.py
 ```
 
 And presto, an accurate depiction of a given context, suitable for use again on the same machine, on a local render farm or remote cloud rendering environment.
+
+<br>
+
+### Testing Packages
+
+Like any software projects, you need good tests. Software packaged with Rez is no exception, and doesn't *necessarily* change how you normally approach test.
+
+There are a few ways to exercise your package.
+
+<br>
+
+#### Local Build and Run
+
+The most useful and common approach is to build and run your package locally.
+
+```bash
+cd my_package
+rez build --install
+```
+
+This will install the package into your local `~/packages` directory, overridden by  `REZ_LOCAL_PACKAGES_PATH`. From there, you can test a package *as though* it was deployed globally, until it's ready for an audience.
+
+```bash
+rez build --install --release
+```
+
+This command on the other hand installs a package into `~/.rez`, overridden by `REZ_RELEASE_PACKAGES_PATH`.
+
+<br>
+
+#### Test on Release
+
+The above is a good start, but it's still possible for bugs to make their way into a deployed package unless you have a solid test suite.
+
+```bash
+cd my_package
+nosetests2
+# Testing..
+```
+
+For a Python project, tests can be written as though Rez was not involved, using any relevant test framework. But having tests means nothing unless they are actually exercised, and that's when setting up a "release hook" can help maintain consistency.
+
+> Work in progress
+
+If you got this far, and know more or want more, feel free to submit [an issue](https://github.com/mottosso/allzpark/issues).
