@@ -128,7 +128,7 @@ def main():
 
     try:
         _load_userconfig(opts.config_file)
-    except OSError:
+    except (IOError, OSError):
         # That's OK
         pass
 
