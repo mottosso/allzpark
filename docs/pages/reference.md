@@ -2,97 +2,134 @@ Short bite-sized snippets of information. This builds on information provided in
 
 <br>
 
-## Assumptions
-
-In order to leverage Allzpark, these are the assumptions it makes about your setup.
-
-![image](https://user-images.githubusercontent.com/2152766/60737073-4dec2600-9f51-11e9-88a6-958ab4e20db1.png)
-
-1. Project Packages MUST be of type `FileSystemRepository`
-1. Allzpark MUST distinguish between a Project package and other packages
-1. Allzpark MAY distinguish between an Application package and other packages
-
-Project packages should reside in a single directory; the contents of this folder is what your artists are able to see from Allzpark.
-
-<br>
-
-## Project
-
-Allzpark associates software and applications with a project via a Rez package.
-
-```powershell
-mkdir myproject
-cd myproject
-"name = `"myproject`"" | Add-Content package.py
-"version = `"1.0`"" | Add-Content package.py
-"build_command = False" | Add-Content package.py
-```
-
-With a project created, point allzpark to it.
-
-```powershell
-cd ..
-rez env allzpark --root $(pwd)
-```
-
-With this in mind, it is recommended you separate your Project Packages from other packages.
-
-```
-PS> tree $(rez config release_packages_path)
-├───proj
-│   └───myproject
-└───other
-```
-
-<br>
-
-## Application
-
-Allzpark visualises applications relative a given project. A project can specify relevant applications using `~weak` references in its `requires = []`.
-
-```python
-name = "myproject"
-version = "1.0"
-build_command = False
-requires = ["~maya-2018", "~nuke-11", "~zbrush-2019"]
-```
-
-This will result in `maya`, `nuke` and `zbrush` being visualised in Allzpark, at these particular versions. Because they are `~weak`, Rez can resolve an environment with or without either one, which enables you to specify requirements that conflict across different applications; such as `ilmbase-1.1` for Maya and `ilmbase-3.6` for Nuke.
-
-<br>
-
 ## allzparkconfig.py
 
 Configure allzpark using the `allzparkconfig.py`.
 
-- [allzpark/allzparkconfig.py](https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py)
 - `touch ~/allzparkconfig.py` Store in your `$HOME` directory
 - `allzpark --config-file path/to/allzparkconfig.py` Or pass directly
+- `ALLZPARK_CONFIG_FILE` Or pass via environment variable
+
+All available keys and their default values can be found here.
+
+- [allzparkconfig.py](https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py)
+
+<br>
+
+### Naming Convention
+
+Requests are split between `name<operator><version>`
+
+- Where `<operator>` is e.g. `-` or `==` or `>=`
+- And `<version>` is an alphanumeric string, e.g. `1.0` or `latest` or `2.b2`
+
+**Example**
+
+```bash
+rez env my_package-1  # package `my_package`, version `1` or above
+rez env my-package-1  # package `my`, version `package-1` or above
+rez env my_package_1  # package `my_package_1`, latest version
+rez env my_package==1  # package `my_package_1`, version `1` exactly
+```
+
+- See [wiki](https://github.com/mottosso/bleeding-rez/wiki/Basic-Concepts#package-requests) for details.
+
+<br>
+
+### Automatic Environment Variables
+
+Every package part of a resolve is given a series of environment variables.
+
+- `REZ_(PKG)_BASE`
+- `REZ_(PKG)_ROOT`
+- `REZ_(PKG)_VERSION`
+- `REZ_(PKG)_MAJOR_VERSION`
+- `REZ_(PKG)_MINOR_VERSION`
+- `REZ_(PKG)_PATCH_VERSION`
+
+You can reference these from other packages, using the `{env.NAME}` notation, where `env` refers to the system environment, prior to packages having an effect.
+
+**Example**
 
 ```python
-"""The Allzpark configuration file
+# package.py
+name = "my_package"
+version = "1.0"
+requires = ["my_package-1.0"]
 
-Copy this onto your local drive and make modifications.
-Anything not specified in your copy is inherited from here.
+def commands():
+    global env
+    env["MY_VARIABLE"] = r"c:\path\{env.REZ_MY_PACKAGE_VERSION}\scripts"
+```
 
-ALLZPARK_CONFIG_FILE=/path/to/allzparkconfig.py
+- See [wiki](https://github.com/mottosso/bleeding-rez/wiki/Environment-Variables#context-environment-variables) for details.
 
-"""
+<br>
 
+### Platform Specific Packages
 
-# Absolute path to where project packages reside
-# Allzpark uses this to establish a listing or available projects
-projects_dir = "~/projects"
+A package can target a given platform using "variants".
 
-# Absolute path to where applicaion packages reside
-# Allzpark optionally uses this to enable the "Show all apps" button
-applications_dir = None  # (optional)
+**my_package/package.py**
 
-# Load this project on startup.
-# Defaults to the first available from `projects_dir`
-startup_application = None  # (optional)
+```python
+name = "my_package"
+version = "1.0"
+build_command = False
+variants = [
+    ["platform-windows"],
+    ["platform-linux"],
+]
+```
 
-# Pre-select this application in the list of applications,
-# if it exists in the startup project.
-startup_project = None  # (optional)
+- **Requesting** this package on `windows` would result in a version specific to Windows, and likewise for Linux.
+- **Building** of this package happens *twice*; once per "variant".
+
+<br>
+
+#### Building Per Platform
+
+```bash
+$ cd my_package
+$ rez build
+Building variant 0 (1/2)...
+Invoking custom build system...
+Building variant 0 (2/2)...
+The following package conflicts occurred: (platform-linux <--!--> ~platform==windows)
+```
+
+Since you cannot build a Linux package from Windows, nor vice versa, you can specify which variant to build using the `--variants` argument.
+
+```bash
+$ rez build --variants 0
+```
+
+Where `0` indicates the 0th index in the `package.py:variants = []` list.
+
+- See [wiki](https://github.com/mottosso/bleeding-rez/wiki/Variants) for details
+- See `rez build --help` for details
+
+<br>
+
+#### Options
+
+You can reference any package and version as a variant, but generally you'll only need the platform specific ones, which come defined in `rezconfig.py` per default.
+
+**rezconfig.py**
+
+```python
+implicit_packages = [
+    "~platform=={system.platform}",
+    "~arch=={system.arch}",
+    "~os=={system.os}",
+]
+```
+
+- See `rez config implicit_packages` for available options along with their values.
+
+```bash
+rez config implicit_packages
+- ~platform==windows
+- ~arch==AMD64
+- ~os==windows-10
 ```
