@@ -51,7 +51,6 @@ class Version(object):
         item = index.internalPointer()
         current = index.data(model_.DisplayRole)
         default = index.data(model_.DefaultRole)
-        print("default: %s" % default)
 
         for child in item.children():
             option = child[model_.DisplayRole][0]
@@ -67,13 +66,6 @@ class Version(object):
                 font.setBold(version != default)
 
                 model.setData(index, font, QtCore.Qt.FontRole)
-
-# class SubVersion(Version):
-#     def createEditor(self, parent, option, index):
-#         model = index.model()
-#         model.findChild("packages")
-#         item = index.internalPointer()
-#         item.
 
 
 class DelegateProxy(QtWidgets.QStyledItemDelegate):
@@ -121,11 +113,9 @@ class DelegateProxy(QtWidgets.QStyledItemDelegate):
 
 
 class Package(QtWidgets.QStyledItemDelegate):
-    def __init__(self, view, model, parent=None):
+    def __init__(self, ctrl, parent=None):
         super(Package, self).__init__(parent)
-
-        self._view = view
-        self._model = model
+        self._ctrl = ctrl
 
     def createEditor(self, parent, option, index):
         if index.column() != 1:
@@ -145,12 +135,13 @@ class Package(QtWidgets.QStyledItemDelegate):
 
     def setModelData(self, editor, model, index):
         model = index.model()
+        package = model.data(index, "name")
         options = model.data(index, "versions")
         default = model.data(index, "default")
-        selected = options[editor.currentIndex()]
+        version = options[editor.currentIndex()]
 
-        if selected == default:
+        if version == default:
             # Reset to default
-            selected = None
+            version = None
 
-        model.setData(index, selected, "override")
+        model.setData(index, version, "override")

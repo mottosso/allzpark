@@ -876,8 +876,8 @@ class Preferences(AbstractDockWidget):
         )),
 
         qargparse.Boolean("patchWithFilter", help=(
-            "Use the current exclusion filter when patching\n"
-            "This enable patching of packages outside of a filter, \n"
+            "Use the current exclusion filter when patching.\n"
+            "This enables patching of packages outside of a filter, \n"
             "such as *.beta packages, with every other package still \n"
             "qualifying for that filter."
         )),

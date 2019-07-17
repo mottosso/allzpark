@@ -314,7 +314,7 @@ class Window(QtWidgets.QMainWindow):
         return False
 
     def createPopupMenu(self):
-        """Null; defaults to checkboxes for docks and toolbars"""
+        """Disables default popup for QDockWidget and QToolBar"""
 
     def update_advanced_controls(self):
         shown = bool(self._ctrl.state.retrieve("showAdvancedControls"))
