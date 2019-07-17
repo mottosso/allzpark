@@ -243,7 +243,9 @@ Rez [currently does not support](https://github.com/mottosso/bleeding-rez/issues
 
 ### Packages and Version Control
 
-Any collaborative software project 
+> Work in progress
+
+If you got this far, and know more or want more, feel free to submit [an issue](https://github.com/mottosso/allzpark/issues).
 
 <br>
 
