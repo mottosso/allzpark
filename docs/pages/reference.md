@@ -478,6 +478,56 @@ And presto, an accurate depiction of a given context, suitable for use again on 
 
 <br>
 
+#### requested_packages
+
+What that last method _doesn't_ do however is guarantee that one resolve to work across platforms.
+
+Take this package for example.
+
+```python
+name = "processmanager"
+variants = [
+    ["platform-windows", "win32all"],
+    ["platform-linux", "unix-process-tool"],
+]
+```
+
+On Windows, this would result in a list of resolved packages including `win32all` which isn't available on Linux, thus making the resulting request invalid.
+
+In this case, you could instead use the `resolved_packages` variable.
+
+**used_request.py**
+
+```python
+from rez.status import status
+
+# Use `status` to fetch an instance of ResolvedContext
+# from within our current environment.
+print(" ".join([
+    "%s==%s" % (pkg.name, pkg.version)
+    for pkg in status.context.requested_packages()
+]))
+```
+
+*However* this has a number of gotchas as well. For example, if the request was `alita==1.1 maya==2018` you would expect the resulting resolve to be identical, no matter where or when it's called. It would even accommodate for the problem is Linux versus Windows variants. What it *wouldn't* do however is protect against later versions of indirectly required packages from getting picked up.
+
+For example.
+
+1. Artist launches Maya session with `rez env alita==1.1 maya==2018`,  resulting in `["packageA-1.1"]`
+2. Shortly thereafter, Developer releases `package-1.2`
+3. From the same Maya session, artist submits job to a remote computer
+4. The remote computer re-runs `rez env alita==1.1 maya==2018` but this time gets `["package-1.2"]` instead, resulting in a different environment than what was provided for the artist.
+
+One solution to this problem is including a time stamp. Alongside every resolve is a `REZ_USED_TIMESTAMP` environment variable which keeps track of when a request was resolved. If you include this in your re-resolve, you'll be more likely to get what was requested at that point in time elsewhere.
+
+```bash
+rez env alita==1.1 maya==2018 --time $env:REZ_USED_TIMESTAMP
+```
+
+And presto, a cross-platform reproducible request!
+
+<br>
+
 ### Testing Packages
 
 Like any software projects, you need good tests. Software packaged with Rez is no exception, and doesn't *necessarily* change how you normally approach test.
@@ -520,3 +570,35 @@ For a Python project, tests can be written as though Rez was not involved, using
 > Work in progress
 
 If you got this far, and know more or want more, feel free to submit [an issue](https://github.com/mottosso/allzpark/issues).
+
+<br>
+
+### Hidden Applications
+
+Allzpark serves two audiences - artists and developers. Developers want more customisation and control than the average artists, such as having additional debug or testing applications made available.
+
+To address both of these audiences, there is a toggle called "Show Hidden Apps" which enables the package author to expose application packages with `hidden=True`.
+
+**maya_dev/package.py**
+
+```python
+name = "maya_dev"
+version = "2018.0"
+build_command = False
+
+# This is it
+_data = {
+    "hidden": True,
+}
+```
+
+Now when this application is associated with a project, it is hidden per default, unless..
+
+![image](https://user-images.githubusercontent.com/2152766/61438446-638d2280-a937-11e9-8c77-7ddf18af455d.png)
+
+<br>
+
+### All Applications
+
+Each project specifies what applications to make available to the artist and developer. But sometimes, you don't care about that and just want to run Application X in a particular project environment.
+
