@@ -29,7 +29,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
 
     def __init__(self, title, parent=None):
         super(AbstractDockWidget, self).__init__(title, parent)
-        self.layout().setContentsMargins(15, 15, 15, 15)
+        self.layout().setContentsMargins(px(15), px(15), px(15), px(15))
 
         panels = {
             "help": QtWidgets.QLabel(),
@@ -37,7 +37,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
         }
 
         for name, widget in panels.items():
-            widget.setObjectName(name)
+            widget.setObjectName("dock%s" % name.title())
 
         central = QtWidgets.QWidget()
 
@@ -148,7 +148,6 @@ class App(AbstractDockWidget):
         widgets["environment"].setIcon(res.icon(Environment.icon))
         widgets["packages"].setIcon(res.icon(Packages.icon))
         widgets["terminal"].setIcon(res.icon(Console.icon))
-        widgets["tool"].setText("maya")
 
         widgets["args"].changed.connect(self.on_arg_changed)
 
@@ -174,10 +173,13 @@ class App(AbstractDockWidget):
 
         ctrl = self._ctrl
         model = ctrl.models["apps"]
-        app_name = ctrl.state["appName"]
+        app_name = ctrl.state["appRequest"]
         app_index = model.findIndex(app_name)
         value = arg.read()
         model.setData(app_index, value, arg["name"])
+
+        if arg["name"] == "tool":
+            ctrl.select_tool(value)
 
     def refresh(self, index):
         name = index.data(QtCore.Qt.DisplayRole)
@@ -204,7 +206,7 @@ class App(AbstractDockWidget):
         arg.reset(tools[:], default_tool)
 
         self._proxy.setup(include=[
-            ("appName", name),
+            ("appRequest", name),
             ("running", "running"),
         ])
 

@@ -65,6 +65,7 @@ class Window(QtWidgets.QMainWindow):
             "projectVersion": LineEditWithCompleter(),
 
             "apps": dock.SlimTableView(),
+            "fullCommand": FullCommand(ctrl),
 
             # Error page
             "continue": QtWidgets.QPushButton("Continue"),
@@ -221,8 +222,10 @@ class Window(QtWidgets.QMainWindow):
             layout.addWidget(toggle)
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
+        layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["apps"])
+        layout.addWidget(widgets["fullCommand"])
 
         status_bar = self.statusBar()
         status_bar.addPermanentWidget(widgets["stateIndicator"])
@@ -281,6 +284,7 @@ class Window(QtWidgets.QMainWindow):
         ctrl.logged.connect(self.on_logged)
         ctrl.project_changed.connect(self.on_project_changed)
         ctrl.repository_changed.connect(self.on_repository_changed)
+        ctrl.command_changed.connect(self.on_command_changed)
 
         self._pages = pages
         self._widgets = widgets
@@ -358,6 +362,9 @@ class Window(QtWidgets.QMainWindow):
 
     def on_reset(self):
         pass
+
+    def on_command_changed(self, command):
+        self._widgets["fullCommand"].setText(command)
 
     def on_command_copied(self, cmd):
         self.tell("Copied command '%s'" % cmd)
@@ -645,7 +652,7 @@ class Window(QtWidgets.QMainWindow):
         if app:
             for row_ in range(model.rowCount()):
                 index = model.index(row_, 0, QtCore.QModelIndex())
-                name = model.data(index, QtCore.Qt.DisplayRole)
+                name = model.data(index, "name")
 
                 if app == name:
                     row = row_
@@ -758,3 +765,61 @@ class LineEditWithCompleter(QtWidgets.QLineEdit):
             self.setText(suggested)
             self.changed.emit(suggested)
             self._current = suggested
+
+
+class FullCommand(QtWidgets.QWidget):
+    def __init__(self, ctrl, parent=None):
+        super(FullCommand, self).__init__(parent)
+
+        widgets = {
+            "options": QtWidgets.QComboBox(),
+            "text": QtWidgets.QLineEdit(),
+        }
+
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["options"])
+        layout.addWidget(widgets["text"])
+
+        up_icon = res.icon("Action_GoUp_3_Large_32.png")
+        down_icon = res.icon("Action_GoDown_3_32.png")
+
+        widgets["text"].setReadOnly(True)
+        widgets["options"].addItem(up_icon, "Used Request")
+        widgets["options"].addItem(down_icon, "Used Resolve")
+
+        widgets["options"].currentIndexChanged.connect(self.on_option_changed)
+
+        self._widgets = widgets
+        self._ctrl = ctrl
+
+        index = (
+            0
+            if ctrl.state.retrieve("serialisationMode") == "used_request"
+            else 1
+        )
+
+        widgets["options"].setCurrentIndex(index)
+
+    def setText(self, text):
+        self._widgets["text"].setText(text)
+
+    def on_option_changed(self, option):
+        if option == 0:
+            mode = "used_request"
+            self._widgets["options"].setToolTip(
+                "Used Request\n"
+                "Use the final request made to Rez,\n"
+                "excluding any indirect requirements."
+            )
+        else:
+            mode = "used_resolve"
+            self._widgets["options"].setToolTip(
+                "Used Resolve\n"
+                "Use the fully resolved list of packages,\n"
+                "including packages that may not be suitable\n"
+                "for another platform."
+            )
+
+        self._ctrl.update_command(mode)

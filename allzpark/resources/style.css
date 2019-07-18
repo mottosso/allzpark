@@ -81,6 +81,28 @@ Window #header #projectBtn {
     padding: 0;
 }
 
+Window #body {
+    background: white;
+}
+
+FullCommand QLineEdit {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+FullCommand QLineEdit:hover {
+  color: #333;
+}
+
+FullCommand QComboBox {
+    background: transparent;
+}
+
+Window #body QLineEdit {
+    border: 1px solid #ddd;
+    padding: 3px;
+  margin: 3px;
+}
+
 LineEditWithCompleter {
     background: none;
     border: none;

@@ -44,9 +44,7 @@ class State(dict):
     def __init__(self, ctrl, storage):
         super(State, self).__init__({
             "projectName": storage.value("startupProject"),
-            "projectVersion": None,
-            "appName": storage.value("startupApplication"),
-            "appVersion": None,
+            "appRequest": storage.value("startupApplication"),
 
             # String or callable, returning list of project names
             "root": None,
@@ -63,6 +61,10 @@ class State(dict):
             # Currently loaded Rez contexts
             "rezContexts": {},
             "rezApps": odict(),
+            "fullCommand": "rez env",
+            "serialisationMode": (
+                storage.value("serialisationMode") or "used_request"
+            ),
         })
 
         self._ctrl = ctrl
@@ -158,6 +160,9 @@ class Controller(QtCore.QObject):
     project_changed = QtCore.Signal(
         str, str, bool)  # project, version, refreshed
 
+    # The current command to launch an application has changed
+    command_changed = QtCore.Signal(str)  # command
+
     states = [
         _State("booting", help="ALLZPARK is booting, hold on"),
         _State("resolving", help="Rez is busy resolving a context"),
@@ -238,7 +243,7 @@ class Controller(QtCore.QObject):
 
     @property
     def current_application(self):
-        return self._state["appName"]
+        return self._state["appRequest"]
 
     @property
     def current_tool(self):
@@ -310,6 +315,42 @@ class Controller(QtCore.QObject):
     # ----------------
     # Methods
     # ----------------
+
+    def update_command(self, mode=None):
+        if mode:
+            self._state["serialisationMode"] = mode
+            self._state.store("serialisationMode", mode)
+
+        mode = self._state["serialisationMode"]
+        app = self._state["appRequest"]
+        context = self._state["rezContexts"][app]
+        tool = self._state["tool"]
+        exclude = allzparkconfig.exclude_filter
+
+        if mode == "used_resolve":
+            packages = [
+                "%s==%s" % (pkg.name, pkg.version)
+                for pkg in context.resolved_packages
+            ]
+
+        else:
+            packages = [str(pkg) for pkg in context.requested_packages()]
+
+        command = ["rez", "env"]
+        command += packages
+
+        if exclude:
+            command += ["--exclude", exclude]
+
+        # Ensure consistency during re-resolve
+        # Important for submitting contexts across
+        # machines at different times
+        command += ["--time", str(context.timestamp)]
+
+        command += ["--", tool]
+
+        self._state["fullCommand"] = " ".join(command)
+        self.command_changed.emit(self._state["fullCommand"])
 
     @util.async_
     def reset(self, root=None, on_success=lambda: None):
@@ -403,7 +444,7 @@ class Controller(QtCore.QObject):
     @util.async_
     def launch(self, **kwargs):
         def do():
-            app_request = self._state["appName"]
+            app_request = self._state["appRequest"]
             rez_context = self._state["rezContexts"][app_request]
             rez_app = self._state["rezApps"][app_request]
 
@@ -601,7 +642,7 @@ class Controller(QtCore.QObject):
             self._state.to_notresolved()
 
     def select_application(self, app_request):
-        self._state["appName"] = app_request
+        self._state["appRequest"] = app_request
         self.info("%s selected" % app_request)
 
         try:
@@ -619,12 +660,41 @@ class Controller(QtCore.QObject):
         self._models["context"].load(context)
         self._models["environment"].load(environ)
 
+        tools = self._models["apps"].find(app_request)["tools"]
+        self._state["tool"] = tools[0]
+
         # Use this application on next launch or change of project
+        self.update_command()
         self._state.store("startupApplication", app_request)
 
     def select_tool(self, tool_name):
         self.debug("%s selected" % tool_name)
         self._state["tool"] = tool_name
+        self.update_command()
+
+    def _package_paths(self):
+        """Return all package paths, relative the current state of the world"""
+
+        paths = util.normpaths(*rez.config.packages_path)
+
+        # Optional development packages
+        if not self._state.retrieve("useDevelopmentPackages"):
+            paths = util.normpaths(*rez.config.nonlocal_packages_path)
+
+        # Optional package localisation
+        if localz and not self._state.retrieve("useLocalizedPackages"):
+            path = localz.localized_packages_path()
+
+            try:
+                paths.remove(util.normpath(path))
+            except ValueError:
+                # It may not be part of the path
+                self.warning(
+                    "%s was not found on your "
+                    "package path." % path
+                )
+
+        return paths
 
     def _list_apps(self, project):
         # Each app has a unique context relative the current project
@@ -633,9 +703,7 @@ class Controller(QtCore.QObject):
         apps = []
         _apps = allzparkconfig.applications
 
-        paths = util.normpaths(*rez.config.packages_path)
-        if not self._state.retrieve("useDevelopmentPackages"):
-            paths = util.normpaths(*rez.config.nonlocal_packages_path)
+        paths = self._package_paths()
 
         if self._state.retrieve("showAllApps") and not _apps:
             self.info("Requires allzparkconfig.applications")
@@ -685,20 +753,6 @@ class Controller(QtCore.QObject):
         if allzparkconfig.exclude_filter:
             rule = rez.Rule.parse_rule(allzparkconfig.exclude_filter)
             package_filter.add_exclusion(rule)
-
-        # Optional package localisation
-        if localz and not self._state.retrieve("useLocalizedPackages"):
-            try:
-                paths.remove(util.normpath(
-                    localz.localized_packages_path())
-                )
-
-            except ValueError:
-                # It may not be part of the path
-                self.warning(
-                    "%s was not found on your "
-                    "package path." % localz.localized_packages_path()
-                )
 
         contexts = odict()
         with util.timing() as t:
