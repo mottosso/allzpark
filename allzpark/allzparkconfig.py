@@ -23,7 +23,10 @@ def projects():
 
     """
 
-    return __os.listdir("~/projects")
+    try:
+        return __os.listdir(__os.path.expanduser("~/projects"))
+    except IOError:
+        return ["No project"]
 
 
 def applications():
