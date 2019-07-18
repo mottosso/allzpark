@@ -323,6 +323,7 @@ class Window(QtWidgets.QMainWindow):
     def update_advanced_controls(self):
         shown = bool(self._ctrl.state.retrieve("showAdvancedControls"))
         self._widgets["projectVersion"].setVisible(shown)
+        self._widgets["fullCommand"].setVisible(shown)
 
         # Update dock toggles
         toggles = self._widgets["dockToggles"].layout()
