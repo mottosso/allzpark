@@ -385,8 +385,14 @@ class Window(QtWidgets.QMainWindow):
         separator.setDefaultWidget(QtWidgets.QLabel("Quick Launch"))
         menu.addAction(separator)
 
+        def handle(action):
+            tool = action.text()
+            self._ctrl.launch(command=tool)
+
         for tool in tools:
-            menu.addAction(QtWidgets.QAction(tool, menu))
+            action = QtWidgets.QAction(tool, menu)
+            action.triggered.connect(lambda _=False, a=action: handle(a))
+            menu.addAction(action)
 
         menu.addSeparator()
 
@@ -397,16 +403,12 @@ class Window(QtWidgets.QMainWindow):
         )
 
         for tool in extras:
-            menu.addAction(QtWidgets.QAction(tool, menu))
+            action = QtWidgets.QAction(tool, menu)
+            action.triggered.connect(lambda _=False, a=action: handle(a))
+            menu.addAction(action)
 
         menu.move(QtGui.QCursor.pos())
-
-        picked = menu.exec_()
-
-        if picked is None:
-            return  # Cancelled
-
-        self._ctrl.launch(command=picked.text())
+        menu.show()
 
     def on_setting_changed(self, argument):
         if isinstance(argument, qargparse.Button):

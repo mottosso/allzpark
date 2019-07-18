@@ -662,17 +662,7 @@ class Commands(AbstractDockWidget):
         copy_command = QtWidgets.QAction("Copy command", menu)
         copy_pid = QtWidgets.QAction("Copy pid", menu)
 
-        menu.addAction(kill) if os.name != "nt" else None
-        menu.addAction(copy_command)
-        menu.addAction(copy_pid)
-        menu.move(QtGui.QCursor.pos())
-
-        picked = menu.exec_()
-
-        if picked is None:
-            return  # Cancelled
-
-        if picked == kill:
+        def on_kill():
             name = model.data(index, "cmd")
             if not model.data(index, "running"):
                 self.message.emit("%s isn't running" % name)
@@ -682,18 +672,29 @@ class Commands(AbstractDockWidget):
             command = model.data(index, "object")
             command.kill()
 
-        if picked == copy_pid:
+        def on_copy_pid():
             clipboard = QtWidgets.QApplication.instance().clipboard()
             command = model.data(index, "object")
             pid = str(command.pid)
             clipboard.setText(pid)
             self.message.emit("Copying %s" % pid)
 
-        if picked == copy_command:
+        def on_copy_command():
             clipboard = QtWidgets.QApplication.instance().clipboard()
             cmd = model.data(index, "niceCmd")
             clipboard.setText(cmd)
             self.message.emit("Copying %s" % cmd)
+
+        kill.triggered.connect(on_kill)
+        kill.triggered.connect(on_copy_command)
+        kill.triggered.connect(on_copy_pid)
+
+        menu.addAction(kill) if os.name != "nt" else None
+        menu.addAction(copy_command)
+        menu.addAction(copy_pid)
+        menu.move(QtGui.QCursor.pos())
+
+        menu.show()
 
 
 class EnvironmentEditor(QtWidgets.QWidget):
