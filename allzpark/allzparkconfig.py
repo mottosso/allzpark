@@ -50,7 +50,7 @@ def applications_from_package(variant):
     """Return applications relative `variant`"""
 
     return list(
-        req.name
+        str(req)
         for req in variant.requires
         if req.weak
     )

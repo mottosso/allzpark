@@ -675,8 +675,8 @@ class Window(QtWidgets.QMainWindow):
             return
 
         model = index.model()
-        app_name = model.data(index, "name")
-        self._ctrl.select_application(app_name)
+        app_request = model.data(index, "name")
+        self._ctrl.select_application(app_request)
         self._docks["app"].refresh(index)
 
     def showEvent(self, event):

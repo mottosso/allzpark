@@ -77,7 +77,6 @@ class State(dict):
 
         """
 
-        log.debug("Storing %s=%s" % (key, value))
         self._storage.setValue(key, value)
 
     def retrieve(self, key, default=None):
@@ -245,14 +244,14 @@ class Controller(QtCore.QObject):
     def current_tool(self):
         return self._state["tool"]
 
-    def context(self, app_name):
-        return self._state["rezContexts"][app_name].to_dict()
+    def context(self, app_request):
+        return self._state["rezContexts"][app_request].to_dict()
 
-    def environ(self, app_name):
-        return self._state["rezContexts"][app_name].get_environ()
+    def environ(self, app_request):
+        return self._state["rezContexts"][app_request].get_environ()
 
-    def resolved_packages(self, app_name):
-        return self._state["rezContexts"][app_name].resolved_packages
+    def resolved_packages(self, app_request):
+        return self._state["rezContexts"][app_request].resolved_packages
 
     def find(self, package_name, callback=lambda result: None):
         return util.defer(
@@ -404,16 +403,16 @@ class Controller(QtCore.QObject):
     @util.async_
     def launch(self, **kwargs):
         def do():
-            app_name = self._state["appName"]
-            rez_context = self._state["rezContexts"][app_name]
-            rez_app = self._state["rezApps"][app_name]
+            app_request = self._state["appName"]
+            rez_context = self._state["rezContexts"][app_request]
+            rez_app = self._state["rezApps"][app_request]
 
             self.info("Found app: %s=%s" % (
                 rez_app.name, rez_app.version
             ))
 
             app_model = self._models["apps"]
-            app_index = app_model.findIndex(app_name)
+            app_index = app_model.findIndex(app_request)
 
             tool_name = kwargs.get(
                 "command", app_model.data(app_index, "tool"))
@@ -451,7 +450,7 @@ class Controller(QtCore.QObject):
             self._state["commands"].append(cmd)
             self._models["commands"].append(cmd)
 
-            self._state.store("app/%s/lastUsed" % app_name, time.time())
+            self._state.store("app/%s/lastUsed" % app_request, time.time())
             self._state.to_launching()
 
         self._state.to_loading()
@@ -601,14 +600,14 @@ class Controller(QtCore.QObject):
         except KeyError:
             self._state.to_notresolved()
 
-    def select_application(self, app_name):
-        self._state["appName"] = app_name
-        self.info("%s selected" % app_name)
+    def select_application(self, app_request):
+        self._state["appName"] = app_request
+        self.info("%s selected" % app_request)
 
         try:
-            context = self.context(app_name)
-            environ = self.environ(app_name)
-            packages = self.resolved_packages(app_name)
+            context = self.context(app_request)
+            environ = self.environ(app_request)
+            packages = self.resolved_packages(app_request)
 
         except Exception:
             self._models["packages"].reset()
@@ -621,7 +620,7 @@ class Controller(QtCore.QObject):
         self._models["environment"].load(environ)
 
         # Use this application on next launch or change of project
-        self._state.store("startupApplication", app_name)
+        self._state.store("startupApplication", app_request)
 
     def select_tool(self, tool_name):
         self.debug("%s selected" % tool_name)
@@ -633,6 +632,10 @@ class Controller(QtCore.QObject):
 
         apps = []
         _apps = allzparkconfig.applications
+
+        paths = util.normpaths(*rez.config.packages_path)
+        if not self._state.retrieve("useDevelopmentPackages"):
+            paths = util.normpaths(*rez.config.nonlocal_packages_path)
 
         if self._state.retrieve("showAllApps") and not _apps:
             self.info("Requires allzparkconfig.applications")
@@ -659,9 +662,47 @@ class Controller(QtCore.QObject):
         if not apps:
             apps[:] = allzparkconfig.applications_from_package(project)
 
+        # Strip the "weak" property of the request, else iter_packages
+        # isn't able to find the requested versions.
+        apps = [rez.PackageRequest(req.strip("~")) for req in apps]
+
+        # Expand versions into their full range
+        # E.g. maya-2018|2019 == ["maya-2018", "maya-2019"]
+        all_apps = list()
+        for request in apps:
+            all_apps += rez.find(
+                request.name,
+                range_=request.range,
+                paths=paths
+            )
+
+        # Optional patch
+        patch = self._state.retrieve("patch", "").split()
+
+        # Optional filtering
+        PackageFilterList = rez.PackageFilterList
+        package_filter = PackageFilterList.singleton.copy()
+        if allzparkconfig.exclude_filter:
+            rule = rez.Rule.parse_rule(allzparkconfig.exclude_filter)
+            package_filter.add_exclusion(rule)
+
+        # Optional package localisation
+        if localz and not self._state.retrieve("useLocalizedPackages"):
+            try:
+                paths.remove(util.normpath(
+                    localz.localized_packages_path())
+                )
+
+            except ValueError:
+                # It may not be part of the path
+                self.warning(
+                    "%s was not found on your "
+                    "package path." % localz.localized_packages_path()
+                )
+
         contexts = odict()
         with util.timing() as t:
-            for app_name in apps:
+            for app_package in all_apps:
                 variants = list(project.iter_variants())
                 variant = variants[0]
 
@@ -675,33 +716,11 @@ class Controller(QtCore.QObject):
                         "Using first found: %s" % variant
                     )
 
-                request = [variant.qualified_package_name, app_name]
+                app_request = "%s==%s" % (app_package.name,
+                                          app_package.version)
+
+                request = [variant.qualified_package_name, app_request]
                 self.info("Resolving request: %s" % " ".join(request))
-
-                PackageFilterList = rez.PackageFilterList
-                package_filter = PackageFilterList.singleton.copy()
-
-                exclude = allzparkconfig.exclude_filter
-                if exclude:
-                    rule = rez.Rule.parse_rule(exclude)
-                    package_filter.add_exclusion(rule)
-
-                paths = util.normpaths(*rez.config.packages_path)
-                if not self._state.retrieve("useDevelopmentPackages"):
-                    paths = util.normpaths(*rez.config.nonlocal_packages_path)
-
-                if localz and not self._state.retrieve("useLocalizedPackages"):
-                    try:
-                        paths.remove(util.normpath(
-                            localz.localized_packages_path())
-                        )
-
-                    except ValueError:
-                        # It may not be part of the path
-                        self.warning(
-                            "%s was not found on your "
-                            "package path." % localz.localized_packages_path()
-                        )
 
                 try:
                     context = rez.env(
@@ -711,18 +730,16 @@ class Controller(QtCore.QObject):
                     )
 
                 except rez.RezError:
-                    context = model.BrokenContext(app_name, request)
+                    context = model.BrokenContext(app_request, request)
                     context.failure_description = traceback.format_exc()
                     self.error(traceback.format_exc())
 
                 if not context.success:
                     # Happens on failed resolve, e.g. version conflict
                     description = context.failure_description
-                    context = model.BrokenContext(app_name, request)
+                    context = model.BrokenContext(app_request, request)
                     context.failure_description = description
                     self.error(description)
-
-                patch = self._state.retrieve("patch", "").split()
 
                 if patch and not isinstance(context, model.BrokenContext):
                     self.info("Patching request: %s" % " ".join(request))
@@ -737,23 +754,23 @@ class Controller(QtCore.QObject):
                         )
                     )
 
-                contexts[app_name] = context
+                contexts[app_request] = context
 
         # Associate a Rez package with an app
-        for app_name, rez_context in contexts.items():
+        for app_request, rez_context in contexts.items():
             try:
                 rez_pkg = next(
                     pkg
                     for pkg in rez_context.resolved_packages
-                    if pkg.name == app_name
+                    if "%s==%s" % (pkg.name, pkg.version) == app_request
                 )
 
             except StopIteration:
                 # Can happen with a patched context, where the application
                 # itself is patched away. E.g. "^maya". This is a user error.
-                rez_pkg = model.BrokenPackage(app_name)
+                rez_pkg = model.BrokenPackage(app_request)
 
-            self._state["rezApps"][app_name] = rez_pkg
+            self._state["rezApps"][app_request] = rez_pkg
 
         self.debug("Resolved all contexts in %.2f seconds" % t.duration)
 
@@ -761,13 +778,13 @@ class Controller(QtCore.QObject):
         # E.g. maya -> maya-2018.0.1
         app_packages = []
         show_hidden = self._state.retrieve("showHiddenApps")
-        for app_name, context in contexts.items():
+        for app_request, context in contexts.items():
             for package in context.resolved_packages:
-                if package.name in apps:
+                if package.name in [a.name for a in all_apps]:
                     break
             else:
                 raise ValueError(
-                    "Could not find package for app %s" % app_name
+                    "Could not find package for app %s" % app_request
                 )
 
             data = allzparkconfig.metadata_from_package(package)
@@ -838,7 +855,8 @@ class Command(QtCore.QObject):
 
     @property
     def pid(self):
-        return self.popen.pid
+        if self.popen.poll is None:
+            return self.popen.pid
 
     def execute(self):
         kwargs = {

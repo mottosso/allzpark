@@ -187,9 +187,10 @@ class ApplicationModel(AbstractTableModel):
 
             data = allzparkconfig.metadata_from_package(app)
             tools = getattr(app, "tools", None) or [app.name]
+            app_request = "%s==%s" % (app.name, app.version)
 
             item = {
-                "name": app.name,
+                "name": app_request,
                 "label": data["label"],
                 "version": str(app.version),
                 "icon": parse_icon(root, template=data["icon"]),

@@ -275,9 +275,9 @@ release:
   environment:
     - REZ_CONFIG_FILE=/packages/rezconfig.py
   script:
-  - rez build --release
+    - rez build --release
   only:
-  - tags
+    - tags
 ```
 
 > Work in progress
