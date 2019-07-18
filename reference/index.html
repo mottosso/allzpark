@@ -792,15 +792,19 @@
                 <p>Short bite-sized snippets of information. This builds on information provided in the <a href="../guides">guides</a> chapter.</p>
 <p><br></p>
 <h3 id="allzparkconfigpy">allzparkconfig.py</h3>
-<p>Configure allzpark using the <code>allzparkconfig.py</code>.</p>
+<p>Configure allzpark using the <code>allzparkconfig.py</code>, which it will look for in these three locations, first one found wins.</p>
 <ul>
-<li><code>touch ~/allzparkconfig.py</code> Store in your <code>$HOME</code> directory</li>
-<li><code>allzpark --config-file path/to/allzparkconfig.py</code> Or pass directly</li>
-<li><code>ALLZPARK_CONFIG_FILE</code> Or pass via environment variable</li>
+<li>Your home directory, e.g. <code>~/allzparkonfig.py</code></li>
+<li>Passed via command-line, e.g. <code>allzpark --config-file path/to/allzparkconfig.py</code></li>
+<li>Or the environment, <code>ALLZPARK_CONFIG_FILE=/full/path/to/allzparkconfig.py</code></li>
 </ul>
 <p>All available keys and their default values can be found here.</p>
 <ul>
 <li><a href="https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py"><code>allzparkconfig.py</code></a></li>
+</ul>
+<p>And an example can be found here:</p>
+<ul>
+<li><a href="https://github.com/mottosso/rez-for-projects/blob/master/allzparkconfig.py">rez-for-projects</a></li>
 </ul>
 <p><br></p>
 <h3 id="styling">Styling</h3>
