@@ -425,6 +425,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#requested_packages" title="requested_packages" class="md-nav__link">
+    requested_packages
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -454,6 +461,20 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hidden-applications" title="Hidden Applications" class="md-nav__link">
+    Hidden Applications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#all-applications" title="All Applications" class="md-nav__link">
+    All Applications
+  </a>
   
 </li>
       
@@ -692,6 +713,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#requested_packages" title="requested_packages" class="md-nav__link">
+    requested_packages
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -724,6 +752,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#hidden-applications" title="Hidden Applications" class="md-nav__link">
+    Hidden Applications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#all-applications" title="All Applications" class="md-nav__link">
+    All Applications
+  </a>
+  
+</li>
+      
       
       
       
@@ -739,7 +781,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-17</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-18</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/reference.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -959,9 +1001,9 @@ Python ?.?.?
   environment:
     - REZ_CONFIG_FILE=/packages/rezconfig.py
   script:
-  - rez build --release
+    - rez build --release
   only:
-  - tags
+    - tags
 </pre></div>
 
 <blockquote>
@@ -1110,6 +1152,43 @@ rez env packageA-1.0.0.beta  <span style="color: #75715e"># packageA-1.0.0.beta<
 
 <p>And presto, an accurate depiction of a given context, suitable for use again on the same machine, on a local render farm or remote cloud rendering environment.</p>
 <p><br></p>
+<h4 id="requested_packages">requested_packages</h4>
+<p>What that last method <em>doesn't</em> do however is guarantee that one resolve to work across platforms.</p>
+<p>Take this package for example.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;processmanager&quot;</span>
+<span style="color: #f8f8f2">variants</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;platform-windows&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;win32all&quot;</span><span style="color: #f8f8f2">],</span>
+    <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;platform-linux&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;unix-process-tool&quot;</span><span style="color: #f8f8f2">],</span>
+<span style="color: #f8f8f2">]</span>
+</pre></div>
+
+<p>On Windows, this would result in a list of resolved packages including <code>win32all</code> which isn't available on Linux, thus making the resulting request invalid.</p>
+<p>In this case, you could instead use the <code>resolved_packages</code> variable.</p>
+<p><strong>used_request.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">from</span> <span style="color: #f8f8f2">rez.status</span> <span style="color: #f92672">import</span> <span style="color: #f8f8f2">status</span>
+
+<span style="color: #75715e"># Use `status` to fetch an instance of ResolvedContext</span>
+<span style="color: #75715e"># from within our current environment.</span>
+<span style="color: #66d9ef">print</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&quot; &quot;</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join([</span>
+    <span style="color: #e6db74">&quot;%s==%s&quot;</span> <span style="color: #f92672">%</span> <span style="color: #f8f8f2">(pkg</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name,</span> <span style="color: #f8f8f2">pkg</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version)</span>
+    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">pkg</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">status</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">context</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">requested_packages()</span>
+<span style="color: #f8f8f2">]))</span>
+</pre></div>
+
+<p><em>However</em> this has a number of gotchas as well. For example, if the request was <code>alita==1.1 maya==2018</code> you would expect the resulting resolve to be identical, no matter where or when it's called. It would even accommodate for the problem is Linux versus Windows variants. What it <em>wouldn't</em> do however is protect against later versions of indirectly required packages from getting picked up.</p>
+<p>For example.</p>
+<ol>
+<li>Artist launches Maya session with <code>rez env alita==1.1 maya==2018</code>,  resulting in <code>["packageA-1.1"]</code></li>
+<li>Shortly thereafter, Developer releases <code>package-1.2</code></li>
+<li>From the same Maya session, artist submits job to a remote computer</li>
+<li>The remote computer re-runs <code>rez env alita==1.1 maya==2018</code> but this time gets <code>["package-1.2"]</code> instead, resulting in a different environment than what was provided for the artist.</li>
+</ol>
+<p>One solution to this problem is including a time stamp. Alongside every resolve is a <code>REZ_USED_TIMESTAMP</code> environment variable which keeps track of when a request was resolved. If you include this in your re-resolve, you'll be more likely to get what was requested at that point in time elsewhere.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env <span style="color: #f8f8f2">alita</span><span style="color: #f92672">==</span><span style="color: #ae81ff">1</span>.1 <span style="color: #f8f8f2">maya</span><span style="color: #f92672">==</span><span style="color: #ae81ff">2018</span> --time <span style="color: #f8f8f2">$env</span>:REZ_USED_TIMESTAMP
+</pre></div>
+
+<p>And presto, a cross-platform reproducible request!</p>
+<p><br></p>
 <h3 id="testing-packages">Testing Packages</h3>
 <p>Like any software projects, you need good tests. Software packaged with Rez is no exception, and doesn't <em>necessarily</em> change how you normally approach test.</p>
 <p>There are a few ways to exercise your package.</p>
@@ -1138,6 +1217,26 @@ nosetests2
 <p>Work in progress</p>
 </blockquote>
 <p>If you got this far, and know more or want more, feel free to submit <a href="https://github.com/mottosso/allzpark/issues">an issue</a>.</p>
+<p><br></p>
+<h3 id="hidden-applications">Hidden Applications</h3>
+<p>Allzpark serves two audiences - artists and developers. Developers want more customisation and control than the average artists, such as having additional debug or testing applications made available.</p>
+<p>To address both of these audiences, there is a toggle called "Show Hidden Apps" which enables the package author to expose application packages with <code>hidden=True</code>.</p>
+<p><strong>maya_dev/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya_dev&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;2018.0&quot;</span>
+<span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
+
+<span style="color: #75715e"># This is it</span>
+<span style="color: #f8f8f2">_data</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #e6db74">&quot;hidden&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">True,</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+<p>Now when this application is associated with a project, it is hidden per default, unless..</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61438446-638d2280-a937-11e9-8c77-7ddf18af455d.png" /></p>
+<p><br></p>
+<h3 id="all-applications">All Applications</h3>
+<p>Each project specifies what applications to make available to the artist and developer. But sometimes, you don't care about that and just want to run Application X in a particular project environment.</p>
                 
                   
                 
