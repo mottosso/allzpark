@@ -682,7 +682,7 @@ class Controller(QtCore.QObject):
             paths = util.normpaths(*rez.config.nonlocal_packages_path)
 
         # Optional package localisation
-        if localz and not self._state.retrieve("useLocalizedPackages"):
+        if localz and not self._state.retrieve("useLocalizedPackages", True):
             path = localz.localized_packages_path()
 
             try:
