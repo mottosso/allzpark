@@ -395,7 +395,7 @@ class Packages(AbstractDockWidget):
         menu.addAction(openfile)
         menu.addAction(copyfile)
 
-        if self._ctrl.state.retrieve("localisationEnabled"):
+        if localz:
             enabled = True
             tooltip = None
 
@@ -430,62 +430,68 @@ class Packages(AbstractDockWidget):
             localize_all.setEnabled(False)
             localize_related.setEnabled(False)
 
-        menu.move(QtGui.QCursor.pos())
-
-        picked = menu.exec_()
-
-        if picked is None:
-            return  # Cancelled
-
-        if picked == edit:
+        def on_edit():
             self._widgets["view"].edit(index)
 
-        if picked == default:
+        def on_default():
             model_.setData(index, None, "override")
             model_.setData(index, False, "disabled")
             self.message.emit("Package set to default")
 
-        if picked == earliest:
+        def on_earliest():
             versions = model_.data(index, "versions")
             model_.setData(index, versions[0], "override")
             model_.setData(index, False, "disabled")
             self.message.emit("Package set to earliest")
 
-        if picked == latest:
+        def on_latest():
             versions = model_.data(index, "versions")
             model_.setData(index, versions[-1], "override")
             model_.setData(index, False, "disabled")
             self.message.emit("Package set to latest version")
 
-        if picked == openfile:
+        def on_openfile():
             package = model_.data(index, "package")
             fname = os.path.join(package.root, "package.py")
             util.open_file_location(fname)
             self.message.emit("Opened %s" % fname)
 
-        if picked == copyfile:
+        def on_copyfile():
             package = model_.data(index, "package")
             fname = os.path.join(package.root, "package.py")
             clipboard = QtWidgets.QApplication.instance().clipboard()
             clipboard.setText(fname)
             self.message.emit("Copied %s" % fname)
 
-        if picked == disable:
+        def on_disable():
             model_.setData(index, None, "override")
             model_.setData(index, disable.isChecked(), "disabled")
             self.message.emit("Package disabled")
 
-        if picked in (localize, localize_all, localize_related):
+        def on_localize():
             name = model_.data(index, "name")
             self._ctrl.localize(name)
             model_.setData(index, "(localising..)", "state")
             model_.setData(index, True, model.LocalizingRole)
 
-        if picked == delocalize:
+        def on_delocalize():
             name = model_.data(index, "name")
             self._ctrl.delocalize(name)
             model_.setData(index, "(delocalising..)", "state")
             model_.setData(index, True, model.LocalizingRole)
+
+        edit.triggered.connect(on_edit)
+        disable.triggered.connect(on_disable)
+        default.triggered.connect(on_default)
+        earliest.triggered.connect(on_earliest)
+        latest.triggered.connect(on_latest)
+        openfile.triggered.connect(on_openfile)
+        copyfile.triggered.connect(on_copyfile)
+        localize.triggered.connect(on_localize)
+        delocalize.triggered.connect(on_delocalize)
+
+        menu.move(QtGui.QCursor.pos())
+        menu.show()
 
 
 class Context(AbstractDockWidget):
