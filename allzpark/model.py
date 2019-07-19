@@ -33,18 +33,16 @@ but not vice versa as that would implicate a view when using it standalone.
 
 """
 
+import re
 import os
 import logging
 import itertools
 
-import rez.packages_
-import rez.package_filter
-import rez.resolved_context
-from rez.config import config
+from . import allzparkconfig, util
+from . import _rezapi as rez
 
 from .vendor.Qt import QtCore, QtGui, QtCompat
 from .vendor import qjsonmodel, six
-from . import allzparkconfig, util
 
 # Optional third-party dependencies
 try:
@@ -60,6 +58,8 @@ Finish = None
 DisplayRole = QtCore.Qt.DisplayRole
 IconRole = QtCore.Qt.DecorationRole
 LocalizingRole = QtCore.Qt.UserRole + 1
+BetaRole = QtCore.Qt.UserRole + 2
+LatestRole = QtCore.Qt.UserRole + 3
 
 
 class AbstractTableModel(QtCore.QAbstractTableModel):
@@ -272,7 +272,7 @@ def is_local(pkg):
     if pkg.resource.repository_type != "filesystem":
         return False
 
-    local_path = config.local_packages_path
+    local_path = rez.config.local_packages_path
     local_path = os.path.abspath(local_path)
     local_path = os.path.normpath(local_path)
 
@@ -297,20 +297,27 @@ class PackagesModel(AbstractTableModel):
         0: {
             QtCore.Qt.DisplayRole: "label",
             QtCore.Qt.DecorationRole: "icon",
-            LocalizingRole: "localizing",
         },
         1: {
             QtCore.Qt.DisplayRole: "version",
         },
         2: {
             QtCore.Qt.DisplayRole: "state",
-        }
+        },
+        3: {
+            QtCore.Qt.DisplayRole: "latest",
+        },
+        4: {
+            QtCore.Qt.DisplayRole: "beta",
+        },
     }
 
     Headers = [
         "package",
         "version",
         "state",
+        "latest",
+        "beta",
     ]
 
     def __init__(self, parent=None):
@@ -335,21 +342,27 @@ class PackagesModel(AbstractTableModel):
             )
             relocatable = False
 
+            version = str(pkg.version)
+
+            # Fetch all versions of package
+            versions = rez.find(pkg.name)
+            versions = sorted([str(v.version) for v in versions])
+
             if localz:
                 relocatable = localz.is_relocatable(pkg)
 
             item = {
                 "name": pkg.name,
                 "label": data["label"],
-                "version": str(pkg.version),
-                "default": str(pkg.version),
+                "version": version,
+                "default": version,
                 "icon": parse_icon(root, template=data["icon"]),
                 "package": pkg,
                 "override": self._overrides.get(pkg.name),
                 "disabled": self._disabled.get(pkg.name, False),
                 "context": None,
                 "active": True,
-                "versions": None,
+                "versions": versions,
                 "state": state,
                 "relocatable": relocatable,
                 "localizing": False,  # in progress
@@ -391,10 +404,6 @@ class PackagesModel(AbstractTableModel):
                 return QtGui.QColor("darkorange")
 
         try:
-            if role == "versions" and data["versions"] is None:
-                versions = list(rez.packages_.iter_packages(data["name"]))
-                data["versions"] = sorted([str(v.version) for v in versions])
-
             return data[role]
 
         except KeyError:
@@ -402,6 +411,15 @@ class PackagesModel(AbstractTableModel):
                 key = self.ColumnToKey[col][role]
             except KeyError:
                 return None
+
+        if key == "beta":
+            version = data["override"] or data["version"]
+            return "x" if re.findall(r".beta$", version) else ""
+
+        if key == "latest":
+            version = data["override"] or data["version"]
+            latest = data["versions"][-1]
+            return "x" if version == latest else ""
 
         return data[key]
 

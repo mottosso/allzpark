@@ -308,7 +308,7 @@ class Packages(AbstractDockWidget):
         layout.addWidget(widgets["view"], 1)
         layout.addWidget(widgets["status"])
 
-        widgets["view"].setStretch(2)
+        widgets["view"].setStretch(4)
         widgets["view"].setItemDelegate(delegates.Package(ctrl, self))
         widgets["view"].setEditTriggers(widgets["view"].DoubleClicked)
         widgets["view"].verticalHeader().setDefaultSectionSize(px(20))
@@ -972,6 +972,8 @@ class SlimTableView(QtWidgets.QTableView):
         self.verticalHeader().hide()
         self.setSelectionMode(self.SingleSelection)
         self.setSelectionBehavior(self.SelectRows)
+        self.setVerticalScrollMode(self.ScrollPerPixel)
+        self.setHorizontalScrollMode(self.ScrollPerPixel)
         self._stretch = 0
         self._previous_sort = 0
 
