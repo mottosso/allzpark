@@ -4,15 +4,19 @@ Short bite-sized snippets of information. This builds on information provided in
 
 ### allzparkconfig.py
 
-Configure allzpark using the `allzparkconfig.py`.
+Configure allzpark using the `allzparkconfig.py`, which it will look for in these three locations, first one found wins.
 
-- `touch ~/allzparkconfig.py` Store in your `$HOME` directory
-- `allzpark --config-file path/to/allzparkconfig.py` Or pass directly
-- `ALLZPARK_CONFIG_FILE` Or pass via environment variable
+- Your home directory, e.g. `~/allzparkonfig.py`
+- Passed via command-line, e.g. `allzpark --config-file path/to/allzparkconfig.py`
+- Or the environment, `ALLZPARK_CONFIG_FILE=/full/path/to/allzparkconfig.py`
 
 All available keys and their default values can be found here.
 
 - [`allzparkconfig.py`](https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py)
+
+And an example can be found here:
+
+- [rez-for-projects](https://github.com/mottosso/rez-for-projects/blob/master/allzparkconfig.py)
 
 <br>
 
