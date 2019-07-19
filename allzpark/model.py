@@ -346,7 +346,10 @@ class PackagesModel(AbstractTableModel):
 
             # Fetch all versions of package
             versions = rez.find(pkg.name)
-            versions = sorted([str(v.version) for v in versions])
+            versions = sorted(
+                [str(v.version) for v in versions],
+                key=util.natural_keys
+            )
 
             if localz:
                 relocatable = localz.is_relocatable(pkg)
