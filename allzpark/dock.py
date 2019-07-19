@@ -277,10 +277,6 @@ class Packages(AbstractDockWidget):
                 default=ctrl._state.retrieve("useDevelopmentPackages"),
                 help="Include development packages in the resolve"),
             qargparse.String(
-                "exclusionFilter",
-                default=allzparkconfig.exclude_filter,
-                help="Exclude versions that match this expression"),
-            qargparse.String(
                 "patch",
                 default=ctrl._state.retrieve("patch"),
                 help="Add packages to context"),
@@ -328,10 +324,6 @@ class Packages(AbstractDockWidget):
 
         if arg["name"] == "useLocalizedPackages":
             self._ctrl._state.store("useLocalizedPackages", arg.read())
-            self._ctrl.reset()
-
-        if arg["name"] == "exclusionFilter":
-            allzparkconfig.exclude_filter = arg.read()
             self._ctrl.reset()
 
         if arg["name"] == "patch":
@@ -890,6 +882,11 @@ class Preferences(AbstractDockWidget):
             "such as *.beta packages, with every other package still \n"
             "qualifying for that filter."
         )),
+
+        qargparse.String(
+            "exclusionFilter",
+            default=allzparkconfig.exclude_filter,
+            help="Exclude versions that match this expression"),
 
         qargparse.Separator("System"),
 

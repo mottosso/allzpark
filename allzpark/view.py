@@ -443,6 +443,10 @@ class Window(QtWidgets.QMainWindow):
                    "patchWithFilter"):
             self._ctrl.reset()
 
+        if key == "exclusionFilter":
+            allzparkconfig.exclude_filter = value
+            self._ctrl.reset()
+
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
