@@ -140,8 +140,7 @@ class Package(QtWidgets.QStyledItemDelegate):
         default = model.data(index, "default")
         version = options[editor.currentIndex()]
 
-        if version == default:
-            # Reset to default
-            version = None
+        if not version or version == default:
+            return
 
-        model.setData(index, version, "override")
+        self._ctrl.patch("%s==%s" % (package, version))

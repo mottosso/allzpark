@@ -313,6 +313,7 @@ class Packages(AbstractDockWidget):
         widgets["status"].setSizeGripEnabled(False)
 
         widgets["args"].changed.connect(self.on_argument_changed)
+        ctrl.resetted.connect(self.on_resetted)
 
         self._ctrl = ctrl
         self._widgets = widgets
@@ -329,6 +330,12 @@ class Packages(AbstractDockWidget):
         if arg["name"] == "patch":
             self._ctrl._state.store("patch", arg.read())
             self._ctrl.reset()
+
+    def on_resetted(self):
+        patch = self._ctrl.state.retrieve("patch", "")
+        arg = self._widgets["args"].find("patch")
+        print("Writing %s -> %s" % (patch, arg))
+        arg._write(patch)
 
     def set_model(self, model_):
         proxy_model = model.ProxyModel(model_)
@@ -881,6 +888,17 @@ class Preferences(AbstractDockWidget):
             "This enables patching of packages outside of a filter, \n"
             "such as *.beta packages, with every other package still \n"
             "qualifying for that filter."
+        )),
+        qargparse.Integer("clearCacheTimeout", minimum=1, default=10, help=(
+            "Clear package repository cache at this interval, in seconds. \n\n"
+            "Normally, filesystem calls like `os.listdir` are cached \n"
+            "so as to avoid unnecessary calls. However, whenever a new \n"
+            "version of a package is released, it will remain invisible \n"
+            "until this cache is cleared. \n\n"
+
+            "Clearing ths cache should have a very small impact on \n"
+            "performance and is safe to do frequently. It has no effect \n"
+            "on memcached which has a much greater impact on performanc."
         )),
 
         qargparse.String(

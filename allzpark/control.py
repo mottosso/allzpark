@@ -163,6 +163,8 @@ class Controller(QtCore.QObject):
     # The current command to launch an application has changed
     command_changed = QtCore.Signal(str)  # command
 
+    patch_changed = QtCore.Signal(str)  # full patch string
+
     states = [
         _State("booting", help="ALLZPARK is booting, hold on"),
         _State("resolving", help="Rez is busy resolving a context"),
@@ -195,10 +197,15 @@ class Controller(QtCore.QObject):
 
         timers = {
             "commandsPoller": QtCore.QTimer(self),
+            "cacheCleaner": QtCore.QTimer(self),
         }
 
         timers["commandsPoller"].timeout.connect(self.on_tasks_polled)
         timers["commandsPoller"].start(500)
+
+        timeout = int(state.retrieve("clearCacheTimeout", 1))
+        timers["cacheCleaner"].timeout.connect(self.on_cache_cleared)
+        timers["cacheCleaner"].start(timeout * 1000)
 
         # Initialize the state machine
         self._machine = transitions.Machine(
@@ -270,6 +277,11 @@ class Controller(QtCore.QObject):
 
     def on_tasks_polled(self):
         self._models["commands"].poll()
+
+    def on_cache_cleared(self):
+        for path in self._package_paths():
+            repo = rez.package_repository_manager.get_repository(path)
+            repo.clear_caches()
 
     def on_state_changed(self):
         state = self._name_to_state[self._state.state]
@@ -458,6 +470,14 @@ class Controller(QtCore.QObject):
             on_success=_on_success,
             on_failure=_on_failure
         )
+
+    def patch(self, request):
+        self.debug("Patching %s.." % request)
+        current = self._state.retrieve("patch", "").split()
+        if request not in current:
+            current += [request]
+        self._state.store("patch", " ".join(current))
+        self.reset()
 
     @util.async_
     def launch(self, **kwargs):
