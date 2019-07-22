@@ -334,7 +334,6 @@ class Packages(AbstractDockWidget):
     def on_resetted(self):
         patch = self._ctrl.state.retrieve("patch", "")
         arg = self._widgets["args"].find("patch")
-        print("Writing %s -> %s" % (patch, arg))
         arg._write(patch)
 
     def set_model(self, model_):
@@ -385,7 +384,6 @@ class Packages(AbstractDockWidget):
         disable.setChecked(model_.data(index, "disabled"))
 
         menu.addAction(edit)
-        menu.addAction(disable)
         menu.addSeparator()
         menu.addAction(default)
         menu.addAction(earliest)
@@ -433,20 +431,24 @@ class Packages(AbstractDockWidget):
             self._widgets["view"].edit(index)
 
         def on_default():
-            model_.setData(index, None, "override")
-            model_.setData(index, False, "disabled")
+            package = model_.data(index, "package")
+            self._ctrl.patch(package.name)
             self.message.emit("Package set to default")
 
         def on_earliest():
             versions = model_.data(index, "versions")
-            model_.setData(index, versions[0], "override")
-            model_.setData(index, False, "disabled")
+            earliest = versions[0]
+            package = model_.data(index, "package")
+            self._ctrl.patch("%s==%s" % (package.name, earliest))
+
             self.message.emit("Package set to earliest")
 
         def on_latest():
             versions = model_.data(index, "versions")
-            model_.setData(index, versions[-1], "override")
-            model_.setData(index, False, "disabled")
+            latest = versions[-1]
+            package = model_.data(index, "package")
+            self._ctrl.patch("%s==%s" % (package.name, latest))
+
             self.message.emit("Package set to latest version")
 
         def on_openfile():

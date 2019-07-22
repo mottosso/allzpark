@@ -471,12 +471,24 @@ class Controller(QtCore.QObject):
             on_failure=_on_failure
         )
 
-    def patch(self, request):
-        self.debug("Patching %s.." % request)
-        current = self._state.retrieve("patch", "").split()
-        if request not in current:
-            current += [request]
-        self._state.store("patch", " ".join(current))
+    def patch(self, new):
+        self.debug("Patching %s.." % new)
+
+        new = rez.PackageRequest(new)
+        old = odict(
+            (rez.PackageRequest(req).name, rez.PackageRequest(req))
+            for req in self._state.retrieve("patch", "").split()
+        )
+
+        if new.name in old:
+            old.pop(new.name)
+
+        if str(new.range):
+            # Otherwise, let it return to the originally resolved value
+            old[new.name] = new
+
+        patch = " ".join(str(pkg) for pkg in old.values())
+        self._state.store("patch", patch)
         self.reset()
 
     @util.async_
