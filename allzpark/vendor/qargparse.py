@@ -342,6 +342,10 @@ class String(QArgument):
             self.changed.emit()
             self._previous = current
 
+        else:
+            # Clarify to the user that his command was acknowledged
+            self.sender().clearFocus()
+
 
 class Info(String):
     pass
