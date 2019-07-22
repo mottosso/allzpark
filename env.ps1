@@ -1,0 +1,1 @@
+rez env --quiet bleeding_rez git localz python-3 pyside2 $args
