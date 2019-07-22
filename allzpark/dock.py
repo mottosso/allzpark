@@ -335,6 +335,7 @@ class Packages(AbstractDockWidget):
         patch = self._ctrl.state.retrieve("patch", "")
         arg = self._widgets["args"].find("patch")
         arg._write(patch)
+        arg._previous = patch
 
     def set_model(self, model_):
         proxy_model = model.ProxyModel(model_)
