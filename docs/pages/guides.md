@@ -359,7 +359,7 @@ Every command we've typed so far has been entirely in the hands of Rez and you c
 For this next part, we'll need `git`.
 
 ```powershell
-git --verison
+git --version
 # git version 2.16.1
 ```
 
