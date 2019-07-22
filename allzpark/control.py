@@ -265,12 +265,6 @@ class Controller(QtCore.QObject):
     def resolved_packages(self, app_request):
         return self._state["rezContexts"][app_request].resolved_packages
 
-    def find(self, package_name, callback=lambda result: None):
-        return util.defer(
-            rez.find, args=[package_name],
-            on_success=callback
-        )
-
     # ----------------
     # Events
     # ----------------
@@ -328,6 +322,52 @@ class Controller(QtCore.QObject):
     # Methods
     # ----------------
 
+    def find(self, family, range_=None):
+        """Find packages, relative Allzpark state
+
+        Arguments:
+            family (str): Name of package
+            range (str): Range, e.g. "1" or "==0.3.13"
+
+        """
+
+        package_filter = self._package_filter()
+        paths = self._package_paths()
+        it = rez.find(family, range_, paths=paths)
+        it = sorted(
+            it,
+
+            # Make e.g. 1.10 appear after 1.9
+            key=lambda p: util.natural_keys(str(p.version))
+        )
+
+        for pkg in it:
+            if package_filter.excludes(pkg):
+                self.debug("Excluding %s.." % pkg)
+                continue
+
+            yield pkg
+
+    def env(self, request, use_filter=True):
+        """Resolve context, relative Allzpark state
+
+        Arguments:
+            request (str): Fully formatted request, including any
+                number of packages. E.g. "six==1.2 PySide2"
+            use_filter (bool, optional): Whether or not to apply
+                the current package_filter
+
+        """
+
+        package_filter = self._package_filter()
+        paths = self._package_paths()
+
+        return rez.env(
+            request,
+            package_paths=paths,
+            package_filter=package_filter if use_filter else None
+        )
+
     def update_command(self, mode=None):
         if self._state["appRequest"] not in self._state["rezContexts"]:
             return
@@ -374,6 +414,15 @@ class Controller(QtCore.QObject):
         self._state["fullCommand"] = " ".join(command)
         self.command_changed.emit(self._state["fullCommand"])
 
+    def _package_filter(self):
+        package_filter = rez.PackageFilterList.singleton.copy()
+
+        if allzparkconfig.exclude_filter:
+            rule = rez.Rule.parse_rule(allzparkconfig.exclude_filter)
+            package_filter.add_exclusion(rule)
+
+        return package_filter
+
     @util.async_
     def reset(self, root=None, on_success=lambda: None):
         """Initialise controller with `root`
@@ -399,15 +448,7 @@ class Controller(QtCore.QObject):
 
                 # Find project package
                 package = None
-                it = rez.find(name, paths=self._package_paths())
-                it = sorted(
-                    it,
-
-                    # Make e.g. 1.10 appear after 1.9
-                    key=lambda p: util.natural_keys(str(p.version))
-                )
-
-                for package in it:
+                for package in self.find(name):
 
                     if name not in projects:
                         projects[name] = dict()
@@ -790,21 +831,16 @@ class Controller(QtCore.QObject):
         # E.g. maya-2018|2019 == ["maya-2018", "maya-2019"]
         all_apps = list()
         for request in apps:
-            all_apps += rez.find(
+            all_apps += self.find(
                 request.name,
                 range_=request.range,
-                paths=paths
             )
 
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
 
         # Optional filtering
-        PackageFilterList = rez.PackageFilterList
-        package_filter = PackageFilterList.singleton.copy()
-        if allzparkconfig.exclude_filter:
-            rule = rez.Rule.parse_rule(allzparkconfig.exclude_filter)
-            package_filter.add_exclusion(rule)
+        package_filter = self._package_filter()
 
         contexts = odict()
         with util.timing() as t:
@@ -829,10 +865,8 @@ class Controller(QtCore.QObject):
                 self.info("Resolving request: %s" % " ".join(request))
 
                 try:
-                    context = rez.env(
+                    context = self.env(
                         request,
-                        package_paths=paths,
-                        package_filter=package_filter,
                     )
 
                 except rez.RezError:
@@ -850,14 +884,9 @@ class Controller(QtCore.QObject):
                 if patch and not isinstance(context, model.BrokenContext):
                     self.info("Patching request: %s" % " ".join(request))
                     request = context.get_patched_request(patch)
-                    context = rez.env(
+                    context = self.env(
                         request,
-                        package_paths=paths,
-                        package_filter=(
-                            package_filter
-                            if self._state.retrieve("patchWithFilter", True)
-                            else None
-                        )
+                        use_filter=self._state.retrieve("patchWithFilter", True)
                     )
 
                 contexts[app_request] = context
@@ -980,7 +1009,7 @@ class Command(QtCore.QObject):
 
         if self.overrides or self.disabled:
             # Apply overrides to a new context, to preserve the original
-            context = rez.env(context.requested_packages())
+            context = self.env(context.requested_packages())
             packages = context.resolved_packages[:]
 
             name_to_package_lut = {
@@ -997,7 +1026,7 @@ class Command(QtCore.QObject):
 
                 # Find a replacement, taking implciit variants into account
                 request = "%s-%s" % (name, version)
-                replacement = rez.env([request])
+                replacement = self.env([request])
                 replacement = {
                     package.name: package
                     for package in replacement.resolved_packages
