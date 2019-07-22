@@ -37,6 +37,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
         }
 
         for name, widget in panels.items():
+            widget.setAttribute(QtCore.Qt.WA_StyledBackground)
             widget.setObjectName("dock%s" % name.title())
 
         central = QtWidgets.QWidget()
@@ -894,6 +895,9 @@ class Preferences(AbstractDockWidget):
         )),
         qargparse.Integer("clearCacheTimeout", minimum=1, default=10, help=(
             "Clear package repository cache at this interval, in seconds. \n\n"
+
+            "Default 10. (Requires restart)\n\n"
+
             "Normally, filesystem calls like `os.listdir` are cached \n"
             "so as to avoid unnecessary calls. However, whenever a new \n"
             "version of a package is released, it will remain invisible \n"
