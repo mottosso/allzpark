@@ -370,7 +370,10 @@ class Controller(QtCore.QObject):
 
     def update_command(self, mode=None):
         if self._state["appRequest"] not in self._state["rezContexts"]:
-            return
+            # In this case, we have no context, so there
+            # is very little to actually try and reproduce
+            self._state["fullCommand"] = ""
+            return self.command_changed.emit("")
 
         if mode:
             self._state["serialisationMode"] = mode
