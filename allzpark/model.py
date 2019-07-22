@@ -320,9 +320,10 @@ class PackagesModel(AbstractTableModel):
         "beta",
     ]
 
-    def __init__(self, parent=None):
+    def __init__(self, ctrl, parent=None):
         super(PackagesModel, self).__init__(parent)
 
+        self._ctrl = ctrl
         self._overrides = {}
         self._disabled = {}
 
@@ -331,6 +332,10 @@ class PackagesModel(AbstractTableModel):
 
         self.beginResetModel()
         self.items[:] = []
+
+        # TODO: This isn't nice. The model should
+        # not have to reach into the controller.
+        paths = self._ctrl._package_paths()
 
         for pkg in packages:
             root = os.path.dirname(pkg.uri)
@@ -345,7 +350,7 @@ class PackagesModel(AbstractTableModel):
             version = str(pkg.version)
 
             # Fetch all versions of package
-            versions = rez.find(pkg.name)
+            versions = rez.find(pkg.name, paths=paths)
             versions = sorted(
                 [str(v.version) for v in versions],
                 key=util.natural_keys

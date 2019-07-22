@@ -187,7 +187,7 @@ class Controller(QtCore.QObject):
             "apps": model.ApplicationModel(),
 
             # Docks
-            "packages": model.PackagesModel(),
+            "packages": model.PackagesModel(self),
             "context": model.JsonModel(),
             "environment": model.EnvironmentModel(),
             "commands": model.CommandsModel(),
@@ -317,6 +317,9 @@ class Controller(QtCore.QObject):
     # ----------------
 
     def update_command(self, mode=None):
+        if self._state["appRequest"] not in self._state["rezContexts"]:
+            return
+
         if mode:
             self._state["serialisationMode"] = mode
             self._state.store("serialisationMode", mode)
@@ -346,6 +349,13 @@ class Controller(QtCore.QObject):
         # Important for submitting contexts across
         # machines at different times
         command += ["--time", str(context.timestamp)]
+
+        if localz and not self._state.retrieve("useLocalizedPackages", True):
+            paths = os.pathsep.join(self._package_paths())
+            command += ["--paths"] + ["\"%s\"" % paths]
+
+        elif not self._state.retrieve("useDevelopmentPackages"):
+            command += ["--no-local"]
 
         command += ["--", tool]
 
@@ -377,8 +387,15 @@ class Controller(QtCore.QObject):
 
                 # Find project package
                 package = None
-                for package in sorted(rez.find(name),
-                                      key=lambda p: p.version):
+                it = rez.find(name, paths=self._package_paths())
+                it = sorted(
+                    it,
+
+                    # Make e.g. 1.10 appear after 1.9
+                    key=lambda p: util.natural_keys(str(p.version))
+                )
+
+                for package in it:
 
                     if name not in projects:
                         projects[name] = dict()
@@ -387,9 +404,10 @@ class Controller(QtCore.QObject):
                     projects[name][Latest] = package
 
                 if package is None:
+                    package = model.BrokenPackage(name)
                     projects[name] = {
-                        "0.0": model.BrokenPackage(name),
-                        Latest: model.BrokenPackage(name),
+                        "0.0": package,
+                        Latest: package,
                     }
 
                 # Default to latest of last
@@ -679,10 +697,12 @@ class Controller(QtCore.QObject):
 
         # Optional development packages
         if not self._state.retrieve("useDevelopmentPackages"):
+            self.debug("Excluding development packages")
             paths = util.normpaths(*rez.config.nonlocal_packages_path)
 
         # Optional package localisation
         if localz and not self._state.retrieve("useLocalizedPackages", True):
+            self.debug("Excluding localized packages")
             path = localz.localized_packages_path()
 
             try:
