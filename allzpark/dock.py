@@ -6,7 +6,7 @@ import collections
 from itertools import chain
 
 from .vendor.Qt import QtWidgets, QtCore, QtGui, QtCompat
-from .vendor import qargparse
+from .vendor import qargparse, QtImageViewer
 
 from . import resources as res, model, delegates, util
 from . import allzparkconfig
@@ -269,7 +269,11 @@ class Packages(AbstractDockWidget):
         self.setObjectName("Packages")
 
         panels = {
-            "central": QtWidgets.QWidget()
+            "central": QtWidgets.QTabWidget(),
+        }
+
+        pages = {
+            "packages": QtWidgets.QWidget(),
         }
 
         args = [
@@ -298,7 +302,9 @@ class Packages(AbstractDockWidget):
 
         self.setWidget(panels["central"])
 
-        layout = QtWidgets.QVBoxLayout(panels["central"])
+        panels["central"].addTab(pages["packages"], "Packages")
+
+        layout = QtWidgets.QVBoxLayout(pages["packages"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addWidget(widgets["args"])
@@ -317,6 +323,8 @@ class Packages(AbstractDockWidget):
         ctrl.resetted.connect(self.on_resetted)
 
         self._ctrl = ctrl
+        self._panels = panels
+        self._pages = pages
         self._widgets = widgets
 
     def on_argument_changed(self, arg):
@@ -503,25 +511,70 @@ class Context(AbstractDockWidget):
     icon = "App_Generic_4_32"
     advanced = True
 
-    def __init__(self, parent=None):
+    def __init__(self, ctrl, parent=None):
         super(Context, self).__init__("Context", parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("Context")
 
         panels = {
-            "central": QtWidgets.QWidget()
+            "central": QtWidgets.QTabWidget(),
+        }
+
+        pages = {
+            "context": QtWidgets.QWidget(),
+            "graph": QtWidgets.QWidget(),
         }
 
         widgets = {
-            "view": QtWidgets.QTreeView()
+            "view": QtWidgets.QTreeView(),
+            "graph": QtImageViewer.QtImageViewer(),
+            "generateGraph": QtWidgets.QPushButton("Update"),
+            "graphHotkeys": QtWidgets.QLabel(),
+            "overlay": QtWidgets.QWidget(),
         }
 
-        layout = QtWidgets.QVBoxLayout(panels["central"])
+        # Expose to CSS
+        for name, widget in chain(panels.items(),
+                                  pages.items(),
+                                  widgets.items()):
+            widget.setAttribute(QtCore.Qt.WA_StyledBackground)
+            widget.setObjectName(name)
+
+        layout = QtWidgets.QVBoxLayout(pages["context"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["view"])
 
+        layout = QtWidgets.QVBoxLayout(pages["graph"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["graph"], 1)
+
+        layout = QtWidgets.QVBoxLayout(widgets["overlay"])
+        layout.addWidget(widgets["graphHotkeys"])
+        layout.addWidget(widgets["generateGraph"])
+        layout.addWidget(QtWidgets.QWidget(), 1)
+
+        panels["central"].addTab(pages["context"], "Context")
+        panels["central"].addTab(pages["graph"], "Graph")
+
+        ctrl.application_changed.connect(self.on_application_changed)
+
+        widgets["overlay"].setParent(pages["graph"])
+        widgets["overlay"].show()
+
+        widgets["generateGraph"].clicked.connect(self.on_generate_clicked)
+        widgets["graphHotkeys"].setText("""\
+<font color=\"steelblue\"><b>Hotkeys</b></font>
+<br>
+<br>
+- <b>Pan</b>: Left mouse <br>
+- <b>Zoom</b>: Right mouse + drag <br>
+- <b>Reset</b>: Double-click right mouse <br>
+""")
+
+        self._ctrl = ctrl
         self._panels = panels
         self._widgets = widgets
+        self._model = None
 
         widgets["view"].setSortingEnabled(True)
         self.setWidget(panels["central"])
@@ -530,6 +583,33 @@ class Context(AbstractDockWidget):
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(model_)
         self._widgets["view"].setModel(proxy_model)
+        self._model = model_
+
+    def on_generate_clicked(self):
+        pixmap = self._ctrl.graph()
+
+        if not pixmap:
+            self._widgets["graphHotkeys"].setText(
+                "<b>GraphViz not found</b>"
+                "<br>"
+                "<br>"
+                "This feature requires `dot` on PATH<br>"
+                "See <a href=https://allzpark.com>allzpark.com</a> "
+                "for details."
+            )
+            self._widgets["generateGraph"].hide()
+            return
+
+        self._widgets["graph"].setImage(pixmap)
+        self._widgets["graph"]._pixmapHandle.setGraphicsEffect(None)
+
+    def on_application_changed(self):
+        if not self._widgets["graph"]._pixmapHandle:
+            return
+
+        grayscale = QtWidgets.QGraphicsColorizeEffect()
+        grayscale.setColor(QtGui.QColor(0, 0, 0))
+        self._widgets["graph"]._pixmapHandle.setGraphicsEffect(grayscale)
 
 
 class Environment(AbstractDockWidget):

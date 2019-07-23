@@ -11,11 +11,6 @@ import contextlib
 from .version import version
 from . import allzparkconfig
 
-try:
-    import localz
-except ImportError:
-    localz = None
-
 timing = {}
 
 
@@ -183,6 +178,12 @@ def main():
 
         if allzparkconfig.startup_application:
             storage.setValue("startupApp", allzparkconfig.startup_application)
+
+    try:
+        __import__("localz")
+        allzparkconfig._localz_enabled = True
+    except ImportError:
+        allzparkconfig._localz_enabled = False
 
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 

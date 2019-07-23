@@ -8,14 +8,18 @@ from rez.package_repository import package_repository_manager
 from rez.packages_ import Package
 from rez.utils.formatting import PackageRequest
 from rez.config import config
+from rez.util import which
 from rez import __version__ as version
 from rez.exceptions import (
     PackageFamilyNotFoundError,
     RexUndefinedVariableError,
     RexError,
     PackageCommandError,
+    PackageNotFoundError,
     RezError,
 )
+from rez.utils.graph_utils import save_graph
+
 
 try:
     from rez import project
@@ -42,9 +46,14 @@ __all__ = [
     "RexUndefinedVariableError",
     "RexError",
     "PackageCommandError",
+    "PackageNotFoundError",
     "RezError",
 
     # Filters
     "Rule",
     "PackageFilterList",
+
+    # Extras
+    "which",
+    "save_graph",
 ]

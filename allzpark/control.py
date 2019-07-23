@@ -12,7 +12,7 @@ import subprocess
 
 from collections import OrderedDict as odict
 
-from .vendor.Qt import QtCore
+from .vendor.Qt import QtCore, QtGui
 from .vendor import transitions
 from . import model, util, allzparkconfig
 
@@ -160,6 +160,8 @@ class Controller(QtCore.QObject):
     project_changed = QtCore.Signal(
         str, str, bool)  # project, version, refreshed
 
+    application_changed = QtCore.Signal()
+
     # The current command to launch an application has changed
     command_changed = QtCore.Signal(str)  # command
 
@@ -190,7 +192,7 @@ class Controller(QtCore.QObject):
 
             # Docks
             "packages": model.PackagesModel(self),
-            "context": model.JsonModel(),
+            "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
             "commands": model.CommandsModel(),
         }
@@ -198,6 +200,7 @@ class Controller(QtCore.QObject):
         timers = {
             "commandsPoller": QtCore.QTimer(self),
             "cacheCleaner": QtCore.QTimer(self),
+            "applicationSelector": QtCore.QTimer(self),
         }
 
         timers["commandsPoller"].timeout.connect(self.on_tasks_polled)
@@ -206,6 +209,9 @@ class Controller(QtCore.QObject):
         timeout = int(state.retrieve("clearCacheTimeout", 1))
         timers["cacheCleaner"].timeout.connect(self.on_cache_cleared)
         timers["cacheCleaner"].start(timeout * 1000)
+
+        timers["applicationSelector"].setSingleShot(True)
+        timers["applicationSelector"].timeout.connect(self._select_application)
 
         # Initialize the state machine
         self._machine = transitions.Machine(
@@ -218,6 +224,7 @@ class Controller(QtCore.QObject):
             auto_transitions=True,
         )
 
+        self._timers = timers
         self._models = models
         self._storage = storage
         self._state = state
@@ -303,20 +310,71 @@ class Controller(QtCore.QObject):
 
         """
 
-        if rez.RexError is type:
+        # Potentially overridden by the below
+        self._state["error"] = "".join(traceback.format_tb(tb))
+        self._state.to_errored()
+
+        if rez.PackageNotFoundError is type:
+            package = value.value.rsplit(": ", 1)[-1]
+            paths = self._package_paths()
+            message = (
+                "<h2>{package}<font color=\"red\"> not found</font></h2>"
+                "Package family was found, but not this version.<br>"
+                "<br>"
+                "I searched in these paths:"
+                "<br>"
+                "<br>"
+                "{paths}"
+            )
+
+            self._state["error"] = message.format(
+                package=package,
+                paths="<br>".join(
+                    "  - %s" % path for path in paths
+                )
+            )
+
+            self._state.to_noapps()
+            return True
+
+        elif rez.PackageFamilyNotFoundError is type:
+            # package family not found: occoc (searched: C:\)
+            _, package, paths = value.value.split(": ", 2)
+            package = package.split(" (", 1)[0]
+            paths = paths.rstrip(")")
+
+            message = (
+                "<h2>{package}<font color=\"red\"> not found</font></h2>"
+                "Package family was not found at all.<br>"
+                "<br>"
+                "I searched in these paths:"
+                "<br>"
+                "<br>"
+                "{paths}"
+            )
+
+            self._state["error"] = message.format(
+                package=package,
+                paths="<br>".join(
+                    "  - %s" % p for p in paths.split(os.pathsep)
+                )
+            )
+
+            self._state.to_noapps()
+            return True
+
+        elif rez.RexError is type:
             # These are re-raised as a more specific
             # exception, e.g. RexUndefinedVariableError
-            pass
+            self._state.to_errored()
 
-        if rez.RexUndefinedVariableError is type:
-            pass
+        elif rez.RexUndefinedVariableError is type:
+            self._state.to_errored()
 
-        if rez.PackageCommandError is type:
-            pass
+        elif rez.PackageCommandError is type:
+            self._state.to_errored()
 
-        self.error("".join(traceback.format_tb(tb)))
-        self.error(str(value))
-        self._state.to_errored()
+        self.error(self._state["error"])
 
     # ----------------
     # Methods
@@ -369,15 +427,15 @@ class Controller(QtCore.QObject):
         )
 
     def update_command(self, mode=None):
+        if mode:
+            self._state["serialisationMode"] = mode
+            self._state.store("serialisationMode", mode)
+
         if self._state["appRequest"] not in self._state["rezContexts"]:
             # In this case, we have no context, so there
             # is very little to actually try and reproduce
             self._state["fullCommand"] = ""
             return self.command_changed.emit("")
-
-        if mode:
-            self._state["serialisationMode"] = mode
-            self._state.store("serialisationMode", mode)
 
         mode = self._state["serialisationMode"]
         app = self._state["appRequest"]
@@ -502,8 +560,7 @@ class Controller(QtCore.QObject):
             on_success()
 
         def _on_failure(error, trace):
-            self.error("There was a problem")
-            self.error(trace)
+            raise error
 
         self._state["rezContexts"].clear()
         self._state["rezApps"].clear()
@@ -713,8 +770,8 @@ class Controller(QtCore.QObject):
             self._state.to_ready()
 
         def on_apps_not_found(error, trace):
-            self._state.to_noapps()
-            self.error(trace)
+            # Handled by on_unhandled_exception
+            raise error
 
         try:
             project_versions = self._state["rezProjects"][project_name]
@@ -736,6 +793,15 @@ class Controller(QtCore.QObject):
             self._state.to_notresolved()
 
     def select_application(self, app_request):
+        self.__app_request = app_request
+
+        # Delay acting on application select, to avoid
+        # processing to happen too frequently and affect
+        # the user experience.
+        self._timers["applicationSelector"].start(250)
+
+    def _select_application(self):
+        app_request = self.__app_request
         self._state["appRequest"] = app_request
         self.info("%s selected" % app_request)
 
@@ -760,6 +826,7 @@ class Controller(QtCore.QObject):
         # Use this application on next launch or change of project
         self.update_command()
         self._state.store("startupApplication", app_request)
+        self.application_changed.emit()
 
     def select_tool(self, tool_name):
         self.debug("%s selected" % tool_name)
@@ -798,8 +865,6 @@ class Controller(QtCore.QObject):
 
         apps = []
         _apps = allzparkconfig.applications
-
-        paths = self._package_paths()
 
         if self._state.retrieve("showAllApps") and not _apps:
             self.info("Requires allzparkconfig.applications")
@@ -841,9 +906,6 @@ class Controller(QtCore.QObject):
 
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
-
-        # Optional filtering
-        package_filter = self._package_filter()
 
         contexts = odict()
         with util.timing() as t:
@@ -889,7 +951,9 @@ class Controller(QtCore.QObject):
                     request = context.get_patched_request(patch)
                     context = self.env(
                         request,
-                        use_filter=self._state.retrieve("patchWithFilter", True)
+                        use_filter=self._state.retrieve(
+                            "patchWithFilter", False
+                        )
                     )
 
                 contexts[app_request] = context
@@ -939,6 +1003,29 @@ class Controller(QtCore.QObject):
 
         self._state["rezContexts"] = contexts
         return app_packages
+
+    def graph(self):
+        context = self._state["rezContexts"][self._state["appRequest"]]
+        graph_str = context.graph(as_dot=True)
+
+        self.debug("Generating graph from %s" % graph_str)
+
+        tempdir = tempfile.mkdtemp()
+        fname = os.path.join(tempdir, "graph.png")
+
+        try:
+            rez.save_graph(graph_str, fname)
+            pixmap = QtGui.QPixmap(fname)
+
+        except IOError:
+            self.error("GraphViz not found")
+            return QtGui.QPixmap()
+
+        finally:
+            # Don't need this no more
+            shutil.rmtree(tempdir)
+
+        return pixmap
 
 
 class Command(QtCore.QObject):

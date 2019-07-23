@@ -50,7 +50,7 @@ class Window(QtWidgets.QMainWindow):
             "loadingMessage": QtWidgets.QLabel("Loading"),
             "errorMessage": QtWidgets.QLabel("Uh oh..<br>"
                                              "See Console for details"),
-            "noappsMessage": QtWidgets.QLabel("No applications found"),
+            "noappsMessage": QtWidgets.QTextEdit(),
             "noprojectMessage": QtWidgets.QLabel("No project found"),
             "pkgnotfoundMessage": QtWidgets.QLabel(
                 "One or more packages could not be found"
@@ -80,7 +80,7 @@ class Window(QtWidgets.QMainWindow):
         docks = odict((
             ("app", dock.App(ctrl)),
             ("packages", dock.Packages(ctrl)),
-            ("context", dock.Context()),
+            ("context", dock.Context(ctrl)),
             ("environment", dock.Environment(ctrl)),
             ("console", dock.Console()),
             ("commands", dock.Commands()),
@@ -135,9 +135,7 @@ class Window(QtWidgets.QMainWindow):
         layout = QtWidgets.QVBoxLayout(pages["noapps"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(QtWidgets.QWidget(), 1)
-        layout.addWidget(widgets["noappsMessage"], 0, QtCore.Qt.AlignHCenter)
-        layout.addWidget(QtWidgets.QWidget(), 1)
+        layout.addWidget(widgets["noappsMessage"], 0)
 
         layout = QtWidgets.QVBoxLayout(pages["noproject"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -236,6 +234,8 @@ class Window(QtWidgets.QMainWindow):
         widgets["projectBtn"].setToolTip("Click to change project")
         widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
 
+        widgets["noappsMessage"].setReadOnly(True)
+
         css = "QWidget { border-image: url(%s); }"
         widgets["projectBtn"].setStyleSheet(css % res.find("Default_Project"))
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
@@ -272,7 +272,7 @@ class Window(QtWidgets.QMainWindow):
             self.on_app_right_click)
 
         selection_model = widgets["apps"].selectionModel()
-        selection_model.selectionChanged.connect(self.on_app_changed)
+        selection_model.selectionChanged.connect(self.on_app_selection_changed)
 
         ctrl.models["apps"].modelReset.connect(self.on_apps_reset)
         ctrl.models["projectNames"].modelReset.connect(
@@ -285,6 +285,7 @@ class Window(QtWidgets.QMainWindow):
         ctrl.project_changed.connect(self.on_project_changed)
         ctrl.repository_changed.connect(self.on_repository_changed)
         ctrl.command_changed.connect(self.on_command_changed)
+        ctrl.application_changed.connect(self.on_app_changed)
 
         self._pages = pages
         self._widgets = widgets
@@ -599,11 +600,9 @@ class Window(QtWidgets.QMainWindow):
             self._widgets["projectVersion"].setEnabled(state == "ready")
 
         elif page_name == "noapps":
+            message = self._ctrl.state["error"]
             self._widgets["projectBtn"].setEnabled(True)
-            self._widgets["noappsMessage"].setText(
-                "No apps was found for '%s'\n"
-                "Check your REZ_PACKAGES_PATH" % self._ctrl.current_project
-            )
+            self._widgets["noappsMessage"].setText(message)
 
         elif page_name == "noproject":
             self._widgets["projectBtn"].setEnabled(True)
@@ -673,7 +672,7 @@ class Window(QtWidgets.QMainWindow):
         app.show()
         self.on_dock_toggled(app, visible=True)
 
-    def on_app_changed(self, selected, deselected):
+    def on_app_selection_changed(self, selected, deselected):
         """The current app was changed
 
         Arguments:
@@ -691,6 +690,10 @@ class Window(QtWidgets.QMainWindow):
         model = index.model()
         app_request = model.data(index, "name")
         self._ctrl.select_application(app_request)
+
+    def on_app_changed(self):
+        selection_model = self._widgets["apps"].selectionModel()
+        index = selection_model.selectedIndexes()[0]
         self._docks["app"].refresh(index)
 
     def showEvent(self, event):

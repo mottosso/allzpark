@@ -536,6 +536,10 @@ class EnvironmentModel(JsonModel):
         super(EnvironmentModel, self).load(data)
 
 
+class ContextModel(JsonModel):
+    pass
+
+
 class TriStateSortFilterProxyModel(QtCore.QSortFilterProxyModel):
     askOrder = QtCore.Signal(int, QtCore.Qt.SortOrder)  # column, order
 
