@@ -522,11 +522,11 @@ class Window(QtWidgets.QMainWindow):
         # Happens when editing requirements
         action = "Refreshing" if refreshed else "Changing"
 
-        self.tell("%s %s-%s" % (action, project, version))
-        self.setWindowTitle("%s | %s" % (project, self.title))
-
         package = self._ctrl.state["rezProjects"][project][version]
         data = allzparkconfig.metadata_from_package(package)
+
+        self.tell("%s %s-%s" % (action, project, version))
+        self.setWindowTitle("%s | %s" % (data["label"], self.title))
 
         self._widgets["projectName"].setText(data["label"])
         self._widgets["projectVersion"].setText(version)
@@ -574,15 +574,15 @@ class Window(QtWidgets.QMainWindow):
         self._docks["console"].append(self._ctrl.current_error)
         self._docks["console"].raise_()
 
-    def tell(self, message):
-        self._docks["console"].append(message, logging.INFO)
+    def tell(self, message, level=logging.INFO):
+        self._docks["console"].append(message, level)
         self.statusBar().showMessage(message, 2000)
 
     def on_logged(self, message, level):
         self._docks["console"].append(message, level)
 
     def on_state_changed(self, state):
-        self.tell("State: %s" % state)
+        self.tell("State: %s" % state, logging.DEBUG)
 
         page = self._pages.get(str(state), self._pages["home"])
         page_name = page.objectName()
@@ -702,12 +702,12 @@ class Window(QtWidgets.QMainWindow):
         self._ctrl.state.store("default/windowState", self.saveState())
 
         if self._ctrl.state.retrieve("geometry"):
-            self.tell("Restoring layout..")
+            self.tell("Restoring layout..", logging.DEBUG)
             self.restoreGeometry(self._ctrl.state.retrieve("geometry"))
             self.restoreState(self._ctrl.state.retrieve("windowState"))
 
     def closeEvent(self, event):
-        self.tell("Storing state..")
+        self.tell("Storing state..", logging.DEBUG)
         self._ctrl.state.store("geometry", self.saveGeometry())
         self._ctrl.state.store("windowState", self.saveState())
 

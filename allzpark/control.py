@@ -108,7 +108,7 @@ class State(dict):
         return value
 
     def on_enter_booting(self):
-        self._ctrl.info("Booting..")
+        self._ctrl.debug("Booting..")
 
     def on_enter_selectproject(self):
         pass
@@ -117,18 +117,18 @@ class State(dict):
         pass
 
     def on_enter_launching(self):
-        self._ctrl.info("Application is being launched..")
+        self._ctrl.debug("Application is being launched..")
         util.delay(self.to_ready, 500)
 
     def on_enter_noapps(self):
         project = self["projectName"]
-        self._ctrl.info("No applications were found for %s" % project)
+        self._ctrl.debug("No applications were found for %s" % project)
 
     def on_enter_loading(self):
-        self._ctrl.info("Loading..")
+        self._ctrl.debug("Loading..")
 
     def on_enter_ready(self):
-        self._ctrl.info("Ready")
+        self._ctrl.debug("Ready")
 
 
 class _State(transitions.State):
@@ -267,7 +267,12 @@ class Controller(QtCore.QObject):
         return self._state["rezContexts"][app_request].to_dict()
 
     def environ(self, app_request):
-        return self._state["rezContexts"][app_request].get_environ()
+        try:
+            return self._state["rezContexts"][app_request].get_environ()
+        except rez.ResolvedContextError:
+            return {
+                "error": "Failed context"
+            }
 
     def resolved_packages(self, app_request):
         return self._state["rezContexts"][app_request].resolved_packages
@@ -363,6 +368,12 @@ class Controller(QtCore.QObject):
             self._state.to_noapps()
             return True
 
+        elif rez.ResolvedContextError is type:
+            # Cannot perform operation in a failed context
+            self.error(str(value))
+            self._state.to_ready()
+            return True
+
         elif rez.RexError is type:
             # These are re-raised as a more specific
             # exception, e.g. RexUndefinedVariableError
@@ -446,7 +457,7 @@ class Controller(QtCore.QObject):
         if mode == "used_resolve":
             packages = [
                 "%s==%s" % (pkg.name, pkg.version)
-                for pkg in context.resolved_packages
+                for pkg in context.resolved_packages or []
             ]
 
         else:
@@ -599,7 +610,7 @@ class Controller(QtCore.QObject):
             rez_context = self._state["rezContexts"][app_request]
             rez_app = self._state["rezApps"][app_request]
 
-            self.info("Found app: %s=%s" % (
+            self.debug("Found app: %s=%s" % (
                 rez_app.name, rez_app.version
             ))
 
@@ -620,10 +631,15 @@ class Controller(QtCore.QObject):
             disabled = self._models["packages"]._disabled
             environ = self._state.retrieve("userEnv", {})
 
-            self.info(
+            self.debug(
                 "Launching %s%s.." % (
                     tool_name, " (detached)" if is_detached else "")
             )
+
+            def on_error(error):
+                # Forward error from Command()
+                raise error
+                # raise rez.ResolvedContextError(str(error))
 
             cmd = Command(
                 context=rez_context,
@@ -638,6 +654,9 @@ class Controller(QtCore.QObject):
 
             cmd.stdout.connect(self.info)
             cmd.stderr.connect(self.error)
+            cmd.error.connect(on_error)
+
+            cmd.execute()
 
             self._state["commands"].append(cmd)
             self._models["commands"].append(cmd)
@@ -652,25 +671,25 @@ class Controller(QtCore.QObject):
         tempdir = tempfile.mkdtemp()
 
         def do():
-            self.info("Resolving %s.." % name)
+            self.debug("Resolving %s.." % name)
             variant = localz.resolve(name)[0]  # Guaranteed to be one
 
             try:
-                self.info("Preparing %s.." % name)
+                self.debug("Preparing %s.." % name)
                 copied = localz.prepare(variant, tempdir, verbose=2)[0]
 
-                self.info("Computing size..")
+                self.debug("Computing size..")
                 size = localz.dirsize(tempdir) / (10.0 ** 6)  # mb
 
-                self.info("Localising %.2f mb.." % size)
+                self.debug("Localising %.2f mb.." % size)
                 result = localz.localize(copied,
                                          localz.localized_packages_path(),
                                          verbose=2)
 
-                self.info("Localised %s" % result)
+                self.debug("Localised %s" % result)
 
             finally:
-                self.info("Cleaning up..")
+                self.debug("Cleaning up..")
                 shutil.rmtree(tempdir)
 
         def on_success(result):
@@ -687,7 +706,7 @@ class Controller(QtCore.QObject):
         def do():
             item = self._models["packages"].find(name)
             package = item["package"]
-            self.info("Delocalizing %s" % package.root)
+            self.debug("Delocalizing %s" % package.root)
             localz.delocalize(package)
 
         def on_success(result):
@@ -803,7 +822,6 @@ class Controller(QtCore.QObject):
     def _select_application(self):
         app_request = self.__app_request
         self._state["appRequest"] = app_request
-        self.info("%s selected" % app_request)
 
         try:
             context = self.context(app_request)
@@ -829,7 +847,6 @@ class Controller(QtCore.QObject):
         self.application_changed.emit()
 
     def select_tool(self, tool_name):
-        self.debug("%s selected" % tool_name)
         self._state["tool"] = tool_name
         self.update_command()
 
@@ -867,7 +884,7 @@ class Controller(QtCore.QObject):
         _apps = allzparkconfig.applications
 
         if self._state.retrieve("showAllApps") and not _apps:
-            self.info("Requires allzparkconfig.applications")
+            self.warning("Requires allzparkconfig.applications")
 
         elif self._state.retrieve("showAllApps"):
             if isinstance(_apps, (tuple, list)):
@@ -885,8 +902,8 @@ class Controller(QtCore.QObject):
                                        errno.ENOTDIR):
                         raise
 
-                    self.info("Could not show all apps, "
-                              "missing `allzparkconfig.applications`")
+                    self.warning("Could not show all apps, "
+                                 "missing `allzparkconfig.applications`")
 
         if not apps:
             apps[:] = allzparkconfig.applications_from_package(project)
@@ -927,27 +944,22 @@ class Controller(QtCore.QObject):
                                           app_package.version)
 
                 request = [variant.qualified_package_name, app_request]
-                self.info("Resolving request: %s" % " ".join(request))
+                self.debug("Resolving request: %s" % " ".join(request))
 
                 try:
-                    context = self.env(
-                        request,
-                    )
+                    context = self.env(request)
 
                 except rez.RezError:
                     context = model.BrokenContext(app_request, request)
                     context.failure_description = traceback.format_exc()
                     self.error(traceback.format_exc())
+                    self.warning(
+                        "Could not resolve a context for '%s'"
+                        % app_request
+                    )
 
-                if not context.success:
-                    # Happens on failed resolve, e.g. version conflict
-                    description = context.failure_description
-                    context = model.BrokenContext(app_request, request)
-                    context.failure_description = description
-                    self.error(description)
-
-                if patch and not isinstance(context, model.BrokenContext):
-                    self.info("Patching request: %s" % " ".join(request))
+                if context.success and patch:
+                    self.debug("Patching request: %s" % " ".join(request))
                     request = context.get_patched_request(patch)
                     context = self.env(
                         request,
@@ -968,9 +980,30 @@ class Controller(QtCore.QObject):
                 )
 
             except StopIteration:
-                # Can happen with a patched context, where the application
-                # itself is patched away. E.g. "^maya". This is a user error.
                 rez_pkg = model.BrokenPackage(app_request)
+
+                self.warning(
+                    "Couldn't find a corresponding package for "
+                    "application %s. This can happen if an application is "
+                    "patched away, using the ^-operator."
+                    % app_request
+                )
+
+            except TypeError:
+                # resolved_packages was None, a sign that a context was broken
+                rez_pkg = model.BrokenPackage(app_request)
+
+                if rez_context.success:
+                    self.warning(
+                        "This shouldn't have happened, "
+                        "I was expecting a broken context here."
+                    )
+
+                self.error(
+                    "Context for '%s' had no resolved packages, this is "
+                    "likely due to a version conflict and broken resolve. "
+                    "Try graphing it." % app_request
+                )
 
             self._state["rezApps"][app_request] = rez_pkg
 
@@ -981,13 +1014,11 @@ class Controller(QtCore.QObject):
         app_packages = []
         show_hidden = self._state.retrieve("showHiddenApps")
         for app_request, context in contexts.items():
-            for package in context.resolved_packages:
+            for package in context.resolved_packages or []:
                 if package.name in [a.name for a in all_apps]:
                     break
             else:
-                raise ValueError(
-                    "Could not find package for app %s" % app_request
-                )
+                package = model.BrokenPackage(app_request)
 
             data = allzparkconfig.metadata_from_package(package)
             hidden = data.get("hidden", False)
@@ -1033,6 +1064,8 @@ class Command(QtCore.QObject):
     stderr = QtCore.Signal(str)
     killed = QtCore.Signal()
 
+    error = QtCore.Signal(Exception)
+
     def __str__(self):
         return "Command('%s')" % self.cmd
 
@@ -1047,8 +1080,8 @@ class Command(QtCore.QObject):
                  parent=None):
         super(Command, self).__init__(parent)
 
-        self.overrides = overrides or {}
-        self.disabled = disabled or {}
+        self.overrides = overrides or {}  # unused
+        self.disabled = disabled or {}  # unused
         self.environ = environ or {}
 
         self.context = context
@@ -1060,21 +1093,12 @@ class Command(QtCore.QObject):
         # between class and argument
         self.cmd = command
 
-        self.nicecmd = "rez env {request} -- {cmd}".format(
-            request=" ".join(
-                str(pkg)
-                for pkg in context.requested_packages()
-            ),
-            cmd=command
-        )
-
         self._running = False
 
         # Launching may take a moment, and there's no need
         # for the user to wait around for that to happen.
-        thread = threading.Thread(target=self.execute)
+        thread = threading.Thread(target=self._execute)
         thread.daemon = True
-        thread.start()
 
         self.thread = thread
 
@@ -1084,6 +1108,9 @@ class Command(QtCore.QObject):
             return self.popen.pid
 
     def execute(self):
+        self.thread.start()
+
+    def _execute(self):
         kwargs = {
             "command": self.cmd,
             "stdout": subprocess.PIPE,
@@ -1094,55 +1121,6 @@ class Command(QtCore.QObject):
 
         context = self.context
 
-        # Output to console
-        log.info("Console command: %s" % self.nicecmd)
-
-        if self.overrides or self.disabled:
-            # Apply overrides to a new context, to preserve the original
-            context = self.env(context.requested_packages())
-            packages = context.resolved_packages[:]
-
-            name_to_package_lut = {
-                package.name: package
-                for package in packages
-            }
-
-            for name, version in self.overrides.items():
-                try:
-                    original = name_to_package_lut[name]
-                except KeyError:
-                    # Override not part of this context, that's fine
-                    continue
-
-                # Find a replacement, taking implciit variants into account
-                request = "%s-%s" % (name, version)
-                replacement = self.env([request])
-                replacement = {
-                    package.name: package
-                    for package in replacement.resolved_packages
-                }[name]
-
-                packages.remove(original)
-                packages.append(replacement)
-
-                log.info("Overriding %s.%s -> %s.%s" % (
-                    name, original.version,
-                    name, replacement.version
-                ))
-
-            for package_name in self.disabled:
-                package = name_to_package_lut[package_name]
-
-                try:
-                    packages.remove(package)
-                except ValueError:
-                    # It wasn't in there, and that's OK
-                    continue
-
-                log.info("Disabling %s" % package_name)
-
-            context.resolved_packages[:] = packages
-
         if self.environ:
             # Inject user environment
             #
@@ -1152,7 +1130,10 @@ class Command(QtCore.QObject):
             # by a package. Win some lose some
             kwargs["parent_environ"] = dict(os.environ, **self.environ)
 
-        self.popen = context.execute_shell(**kwargs)
+        try:
+            self.popen = context.execute_shell(**kwargs)
+        except Exception as e:
+            return self.error.emit(e)
 
         for target in (self.listen_on_stdout,
                        self.listen_on_stderr):

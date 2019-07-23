@@ -38,7 +38,7 @@ import os
 import logging
 import itertools
 
-from . import allzparkconfig, util
+from . import allzparkconfig, util, resources as res
 from . import _rezapi as rez
 
 from .vendor.Qt import QtCore, QtGui, QtCompat
@@ -176,6 +176,10 @@ class ApplicationModel(AbstractTableModel):
         "version"
     ]
 
+    def __init__(self, *args, **kwargs):
+        super(ApplicationModel, self).__init__(*args, **kwargs)
+        self._broken_icon = res.icon("Action_Stop_1_32.png")
+
     def reset(self, applications=None):
         applications = applications or []
 
@@ -214,16 +218,9 @@ class ApplicationModel(AbstractTableModel):
 
         self.endResetModel()
 
-    def flags(self, index):
-        model = index.model()
-
-        if model.data(index, "broken"):
-            return QtCore.Qt.ItemIsEnabled
-
-        return super(ApplicationModel, self).flags(index)
-
     def data(self, index, role):
         row = index.row()
+        col = index.column()
 
         try:
             data = self.items[row]
@@ -233,6 +230,23 @@ class ApplicationModel(AbstractTableModel):
         if data["hidden"]:
             if role == QtCore.Qt.ForegroundRole:
                 return QtGui.QColor("gray")
+
+        if data["broken"]:
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("red")
+
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
+
+            if role == QtCore.Qt.DisplayRole:
+                if col == 0:
+                    return data["label"] + " (failed)"
+
+            if role == IconRole:
+                if col == 0:
+                    return self._broken_icon
 
         return super(ApplicationModel, self).data(index, role)
 
@@ -258,14 +272,21 @@ class BrokenPackage(object):
     def __str__(self):
         return self.name
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, request):
+        request = rez.PackageRequest(request)
+        versions = request.range.to_versions() or ["0"]
+
+        self.name = request.name
+        self.version = versions[-1]
         self.uri = ""
         self.requires = []
-        self.version = "0.0"
         self.resource = type(
             "BrokenResource", (object,), {"repository_type": None}
         )()
+
+        self._data = {
+            "label": request.name,
+        }
 
 
 def is_local(pkg):
@@ -473,7 +494,6 @@ class CommandsModel(AbstractTableModel):
         0: {
             QtCore.Qt.DisplayRole: "cmd",
             QtCore.Qt.DecorationRole: "icon",
-            QtCore.Qt.UserRole + 1: "niceCmd",
         },
         1: {
             QtCore.Qt.DisplayRole: "running",
@@ -494,7 +514,6 @@ class CommandsModel(AbstractTableModel):
         self.beginInsertRows(QtCore.QModelIndex(), index, index + 1)
         self.items.append({
             "cmd": command.cmd,
-            "niceCmd": command.nicecmd,
             "pid": None,
             "running": "waiting..",
             "icon": parse_icon(root, template=data["icon"]),

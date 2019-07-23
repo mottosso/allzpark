@@ -242,7 +242,10 @@ class Console(AbstractDockWidget):
 
     def append(self, line, level=logging.INFO):
         color = {
-            logging.WARNING: "<font color=\"red\">",
+            logging.DEBUG: "<font color=\"grey\">",
+            logging.WARNING: "<font color=\"darkorange\">",
+            logging.ERROR: "<font color=\"red\">",
+            logging.CRITICAL: "<font color=\"red\">",
         }.get(level, "<font color=\"#222\">")
 
         line = "%s%s</font><br>" % (color, line)
@@ -563,13 +566,13 @@ class Context(AbstractDockWidget):
 
         widgets["generateGraph"].clicked.connect(self.on_generate_clicked)
         widgets["graphHotkeys"].setText("""\
-<font color=\"steelblue\"><b>Hotkeys</b></font>
-<br>
-<br>
-- <b>Pan</b>: Left mouse <br>
-- <b>Zoom</b>: Right mouse + drag <br>
-- <b>Reset</b>: Double-click right mouse <br>
-""")
+            <font color=\"steelblue\"><b>Hotkeys</b></font>
+            <br>
+            <br>
+            - <b>Pan</b>: Left mouse <br>
+            - <b>Zoom</b>: Right mouse + drag <br>
+            - <b>Reset</b>: Double-click right mouse <br>
+        """)
 
         self._ctrl = ctrl
         self._panels = panels
@@ -696,9 +699,6 @@ class Commands(AbstractDockWidget):
 
         widgets = {
             "view": SlimTableView(),
-            "command": QtWidgets.QLineEdit(),
-            "stdout": QtWidgets.QListView(),
-            "stderr": QtWidgets.QListView(),
         }
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
@@ -712,31 +712,18 @@ class Commands(AbstractDockWidget):
 
         layout = QtWidgets.QVBoxLayout(panels["footer"])
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(widgets["command"])
-        # layout.addWidget(widgets["stderr"])
-        # layout.addWidget(widgets["stderr"])
 
         widgets["view"].setSortingEnabled(True)
         widgets["view"].customContextMenuRequested.connect(self.on_right_click)
-        widgets["command"].setReadOnly(True)
 
         self._panels = panels
         self._widgets = widgets
 
         self.setWidget(panels["central"])
 
-    def on_selection_changed(self, selected, deselected):
-        selected = selected.indexes()[0]
-        model = selected.model()
-        cmd = model.data(selected, "niceCmd")
-        self._widgets["command"].setText(cmd)
-
     def set_model(self, model_):
         proxy_model = model.ProxyModel(model_)
         self._widgets["view"].setModel(proxy_model)
-
-        smodel = self._widgets["view"].selectionModel()
-        smodel.selectionChanged.connect(self.on_selection_changed)
 
     def on_right_click(self, position):
         view = self._widgets["view"]
@@ -776,12 +763,21 @@ class Commands(AbstractDockWidget):
             clipboard.setText(cmd)
             self.message.emit("Copying %s" % cmd)
 
-        kill.triggered.connect(on_kill)
-        kill.triggered.connect(on_copy_command)
-        kill.triggered.connect(on_copy_pid)
+        if model.data(index, "running") != "killed":
+            kill.triggered.connect(on_kill)
+            copy_command.triggered.connect(on_copy_command)
+            copy_pid.triggered.connect(on_copy_pid)
+        else:
+            kill.setEnabled(False)
+            copy_command.setEnabled(False)
+            copy_pid.setEnabled(False)
 
+        # TODO: This doesn't work on Windows, and possibly not
+        # even Linux, due to what's really being managed here
+        # is the *parent* of a given process, like Maya, as
+        # opposed to the actual Maya process.
         menu.addAction(kill) if os.name != "nt" else None
-        menu.addAction(copy_command)
+
         menu.addAction(copy_pid)
         menu.move(QtGui.QCursor.pos())
 

@@ -13,6 +13,7 @@ from rez import __version__ as version
 from rez.exceptions import (
     PackageFamilyNotFoundError,
     RexUndefinedVariableError,
+    ResolvedContextError,
     RexError,
     PackageCommandError,
     PackageNotFoundError,
@@ -43,6 +44,7 @@ __all__ = [
 
     # Exceptions
     "PackageFamilyNotFoundError",
+    "ResolvedContextError",
     "RexUndefinedVariableError",
     "RexError",
     "PackageCommandError",
