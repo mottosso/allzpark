@@ -150,10 +150,16 @@ Window #header QPushButton[type=toggle] {
 }
 
 Window #logo {
+    width: 32px;
     max-width: 32px;
+    height: 32px;
     max-height: 32px;
+    padding: 0;
+}
 
-    padding: 8px;
+/* Give it a slight nudge */
+Window #logo:hover {
+    border: -1px solid transparent;
 }
 
 Console {

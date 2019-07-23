@@ -11,7 +11,11 @@ import os as __os
 import sys as __sys
 
 
+# Default filter, editable via the Preferences page
 exclude_filter = "*.beta"
+
+# Where to go when clicking the logo
+help_url = "https://allzpark.com"
 
 
 def projects():

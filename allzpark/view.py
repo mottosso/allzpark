@@ -57,8 +57,8 @@ class Window(QtWidgets.QMainWindow):
             ),
 
             # Header
-            "logo": QtWidgets.QLabel(),  # unused
-            "appVersion": QtWidgets.QLabel(version),  # unused
+            "logo": QtWidgets.QToolButton(),
+            "appVersion": QtWidgets.QLabel(version),
 
             "projectBtn": QtWidgets.QToolButton(),
             "projectName": LineEditWithCompleter(),
@@ -228,9 +228,10 @@ class Window(QtWidgets.QMainWindow):
         status_bar = self.statusBar()
         status_bar.addPermanentWidget(widgets["stateIndicator"])
 
-        # Setup
-        widgets["logo"].setPixmap(res.pixmap("Logo_64"))
-        widgets["logo"].setScaledContents(True)
+        # Setu
+        css = "QWidget { border-image: url(%s); }"
+        widgets["logo"].setStyleSheet(css % res.find("Logo_64"))
+        widgets["logo"].clicked.connect(self.on_logo_clicked)
         widgets["projectBtn"].setToolTip("Click to change project")
         widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
 
@@ -240,6 +241,7 @@ class Window(QtWidgets.QMainWindow):
         widgets["projectBtn"].setStyleSheet(css % res.find("Default_Project"))
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
 
+        widgets["logo"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["projectBtn"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["projectName"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["projectVersion"].setCursor(QtCore.Qt.PointingHandCursor)
@@ -517,6 +519,10 @@ class Window(QtWidgets.QMainWindow):
 
         completer = widget.completer()
         completer.complete()
+
+    def on_logo_clicked(self):
+        url = allzparkconfig.help_url
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
 
     def on_project_changed(self, project, version, refreshed=False):
         # Happens when editing requirements
