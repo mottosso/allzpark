@@ -255,6 +255,7 @@ class BrokenContext(object):
     def __init__(self, app_name, request):
         self.resolved_packages = [BrokenPackage(app_name)]
         self.success = False
+        self.timestamp = 0
 
         self._request = request
 
@@ -279,6 +280,8 @@ class BrokenPackage(object):
         self.name = request.name
         self.version = versions[-1]
         self.uri = ""
+        self.root = ""
+        self.relocatable = False
         self.requires = []
         self.resource = type(
             "BrokenResource", (object,), {"repository_type": None}

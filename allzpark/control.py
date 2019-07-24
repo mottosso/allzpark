@@ -322,15 +322,15 @@ class Controller(QtCore.QObject):
         if rez.PackageNotFoundError is type:
             package = value.value.rsplit(": ", 1)[-1]
             paths = self._package_paths()
-            message = (
-                "<h2>{package}<font color=\"red\"> not found</font></h2>"
-                "Package family was found, but not this version.<br>"
-                "<br>"
-                "I searched in these paths:"
-                "<br>"
-                "<br>"
-                "{paths}"
-            )
+            message = """
+                <h2>Package '{package}'<font color=\"red\">
+                not found</font></h2>
+                The project requires {package}, but it couldn't be found. 
+                I searched in these paths:
+                <br>
+                <br>
+                {paths}
+            """
 
             self._state["error"] = message.format(
                 package=package,
@@ -348,15 +348,15 @@ class Controller(QtCore.QObject):
             package = package.split(" (", 1)[0]
             paths = paths.rstrip(")")
 
-            message = (
-                "<h2>{package}<font color=\"red\"> not found</font></h2>"
-                "Package family was not found at all.<br>"
-                "<br>"
-                "I searched in these paths:"
-                "<br>"
-                "<br>"
-                "{paths}"
-            )
+            message = """
+                <h2>Package '{package}'<font color=\"red\">
+                not found</font></h2>
+                The project requires {package}, but it couldn't be found. 
+                I searched in these paths:
+                <br>
+                <br>
+                {paths}
+            """
 
             self._state["error"] = message.format(
                 package=package,
@@ -777,15 +777,6 @@ class Controller(QtCore.QObject):
 
         def on_apps_found(apps):
             self._models["apps"].reset(apps)
-            self._state["projectName"] = project_name
-
-            refreshed = self._state["projectName"] == project_name
-            self.project_changed.emit(
-                str(active_project.name),
-                str(active_project.version),
-                refreshed
-            )
-
             self._state.to_ready()
 
         def on_apps_not_found(error, trace):
@@ -795,6 +786,14 @@ class Controller(QtCore.QObject):
         try:
             project_versions = self._state["rezProjects"][project_name]
             active_project = project_versions[version_name]
+            refreshed = self._state["projectName"] == project_name
+            self._state["projectName"] = project_name
+
+            self.project_changed.emit(
+                str(active_project.name),
+                str(active_project.version),
+                refreshed
+            )
 
             # Update versions model
             versions = list(filter(None, project_versions))  # Exclude "Latest"
@@ -941,17 +940,7 @@ class Controller(QtCore.QObject):
                 request = [variant.qualified_package_name, app_request]
                 self.debug("Resolving request: %s" % " ".join(request))
 
-                try:
-                    context = self.env(request)
-
-                except rez.RezError:
-                    context = model.BrokenContext(app_request, request)
-                    context.failure_description = traceback.format_exc()
-                    self.error(traceback.format_exc())
-                    self.warning(
-                        "Could not resolve a context for '%s'"
-                        % app_request
-                    )
+                context = self.env(request)
 
                 if context.success and patch:
                     self.debug("Patching request: %s" % " ".join(request))
