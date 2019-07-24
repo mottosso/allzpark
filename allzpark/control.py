@@ -857,12 +857,10 @@ class Controller(QtCore.QObject):
 
         # Optional development packages
         if not self._state.retrieve("useDevelopmentPackages"):
-            self.debug("Excluding development packages")
             paths = util.normpaths(*rez.config.nonlocal_packages_path)
 
         # Optional package localisation
         if localz and not self._state.retrieve("useLocalizedPackages", True):
-            self.debug("Excluding localized packages")
             path = localz.localized_packages_path()
 
             try:
