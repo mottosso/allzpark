@@ -56,6 +56,7 @@ setup(
     },
     classifiers=classifiers,
     install_requires=[
+        "bleeding-rez>=2.38.2",
     ],
     python_requires=">2.7, <4",
 )
