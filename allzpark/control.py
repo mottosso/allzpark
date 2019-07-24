@@ -867,10 +867,7 @@ class Controller(QtCore.QObject):
                 paths.remove(util.normpath(path))
             except ValueError:
                 # It may not be part of the path
-                self.warning(
-                    "%s was not found on your "
-                    "package path." % path
-                )
+                pass
 
         return paths
 
