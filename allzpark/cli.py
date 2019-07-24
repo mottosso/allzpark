@@ -27,7 +27,7 @@ def _load_userconfig(fname=None):
     with open(fname) as f:
         exec(compile(f.read(), f.name, 'exec'), mod)
 
-    tell("- Loading custom allzparkconfig..")
+    tell("- Loading custom %s.." % fname)
     for key in dir(allzparkconfig):
         if key.startswith("__"):
             continue
@@ -37,7 +37,6 @@ def _load_userconfig(fname=None):
         except KeyError:
             continue
 
-        tell("  - %s=%r" % (key, value))
         setattr(allzparkconfig, key, value)
 
 
@@ -81,8 +80,9 @@ def main():
         "Do not load custom allzparkconfig.py"))
     parser.add_argument("--root", help=(
         "Path to where projects live on disk, "
-        "defaults to allzparkconfig.projects_dir"
-    ))
+        "defaults to allzparkconfig.projects_dir"))
+    parser.add_argument("--demo", action="store_true", help=(
+        "Run demo material"))
 
     opts = parser.parse_args()
 
@@ -93,6 +93,23 @@ def main():
     print("=" * 30)
     print(" allzpark (%s)" % version)
     print("=" * 30)
+
+    if opts.demo:
+        with timings("- Loading demo.."):
+            try:
+                import allzparkdemo
+            except ImportError:
+                sys.stderr.write(
+                    "ERROR: The --demo flag requires allzparkdemo, "
+                    "try running `pip install allzparkdemo`\n"
+                )
+                exit(1)
+
+            os.environ["REZ_CONFIG_FILE"] = allzparkdemo.rezconfig
+            opts.config_file = allzparkdemo.allzparkconfig
+
+        tell("  - %s" % allzparkdemo.rezconfig)
+        tell("  - %s" % allzparkdemo.allzparkconfig)
 
     with timings("- Loading Rez.. "):
         try:
@@ -125,7 +142,9 @@ def main():
         _load_userconfig(opts.config_file)
     except (IOError, OSError):
         # That's OK
-        pass
+        if opts.verbose:
+            import traceback
+            traceback.print_exc()
 
     logging.basicConfig(format=(
         "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
