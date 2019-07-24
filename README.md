@@ -1,6 +1,9 @@
 ### Allzpark
 
-Application launcher and environment management tool for games and digital post-production, built on [Rez](https://github.com/mottosso/bleeding-rez).
+[![Build Status](https://mottosso.visualstudio.com/allzpark/_apis/build/status/mottosso.allzpark?branchName=master)](https://mottosso.visualstudio.com/allzpark/_build/latest?definitionId=2&branchName=master) [![](https://badge.fury.io/py/allzpark.svg)](https://pypi.org/project/allzpark/)
+
+
+Application launcher and environment management tool for games and digital post-production, built on [Rez](https://github.com/mottosso/allzpark).
 
 <br>
 
