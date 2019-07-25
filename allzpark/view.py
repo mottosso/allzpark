@@ -527,39 +527,44 @@ class Window(QtWidgets.QMainWindow):
     def on_project_changed(self, project, version, refreshed=False):
         # Happens when editing requirements
         action = "Refreshing" if refreshed else "Changing"
+        icon = res.find("Default_Project")
+        label = project
 
-        package = self._ctrl.state["rezProjects"][project][version]
-        data = allzparkconfig.metadata_from_package(package)
+        try:
+            package = self._ctrl.state["rezProjects"][project][version]
+            data = allzparkconfig.metadata_from_package(package)
+            label = data["label"]
+
+            # Facilitate overriding of icon via package metadata
+            if data.get("icon"):
+                try:
+                    values = {
+                        "root": os.path.dirname(package.uri),
+                        "width": px(32),
+                        "height": px(32),
+                    }
+
+                    icon = data["icon"].format(**values).replace("\\", "/")
+
+                except KeyError:
+                    self.tell("Misformatted %s.icon" % package.name)
+
+                except TypeError:
+                    self.tell("Unsupported package repository "
+                              "for icon of %s" % package.uri)
+
+                except Exception:
+                    self.tell("Unexpected error coming from icon of %s"
+                              % package.uri)
+        except KeyError:
+            # Project may not exist
+            pass
 
         self.tell("%s %s-%s" % (action, project, version))
-        self.setWindowTitle("%s | %s" % (data["label"], self.title))
+        self.setWindowTitle("%s | %s" % (label, self.title))
 
-        self._widgets["projectName"].setText(data["label"])
+        self._widgets["projectName"].setText(label)
         self._widgets["projectVersion"].setText(version)
-
-        icon = res.find("Default_Project")
-
-        # Facilitate overriding of icon via package metadata
-        if data.get("icon"):
-            try:
-                values = {
-                    "root": os.path.dirname(package.uri),
-                    "width": px(32),
-                    "height": px(32),
-                }
-
-                icon = data["icon"].format(**values).replace("\\", "/")
-
-            except KeyError:
-                self.tell("Misformatted %s.icon" % package.name)
-
-            except TypeError:
-                self.tell("Unsupported package repository "
-                          "for icon of %s" % package.uri)
-
-            except Exception:
-                self.tell("Unexpected error coming from icon of %s"
-                          % package.uri)
 
         css = "QWidget { border-image: url(%s); }"
         button = self._widgets["projectBtn"]
