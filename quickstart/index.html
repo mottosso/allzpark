@@ -533,8 +533,8 @@ $ allzpark-venv<span style="color: #ae81ff">\S</span>cripts<span style="color: #
 <p>Following the installation of <code>rez</code>, you should have gotten a message about which path was missing from your <code>PATH</code>, you can either add this yourself, or use the <code>virtualenv</code> method from the above <code>Permission denied</code> box.</p>
 </details>
 <details class="quote"><summary>Could not find ... PySide2</summary><p>The instructions assume Python 3, but Allzpark is written with <a href="https://github.com/mottosso/Qt.py">Qt.py</a> and supports any available binding, for both Python 2 and 3.</p>
-<p>For Python 2, try installing Allzpark dependencies manually.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>pip install --no-deps python-qt5 allzpark allzparkdemo bleeding-rez
+<p>Try installing Allzpark dependencies manually, replacing PySide2 with PySide(1).</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>pip install --no-deps PySide allzpark allzparkdemo bleeding-rez
 </pre></div>
 
 </details>
