@@ -7,7 +7,7 @@ This page will get you up and running with Allzpark in less than 2 minutes.
 The below commands will install Allzpark and its dependencies, including Rez.
 
 ```bash
-pip install allzpark
+pip install allzpark -U
 rez bind --quickstart
 allzpark --demo
 ```
