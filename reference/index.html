@@ -245,8 +245,32 @@
 
 
   <li class="md-nav__item">
-    <a href="../guides/" title="Guide" class="md-nav__link">
-      Guide
+    <a href="../quickstart/" title="Quickstart" class="md-nav__link">
+      Quickstart
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
+      Getting Started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../workflow/" title="Workflow" class="md-nav__link">
+      Workflow
     </a>
   </li>
 
@@ -432,6 +456,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#conversation" title="Conversation" class="md-nav__link">
+    Conversation
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -474,6 +505,34 @@
         <li class="md-nav__item">
   <a href="#all-applications" title="All Applications" class="md-nav__link">
     All Applications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#opt-out-environment" title="Opt-out Environment" class="md-nav__link">
+    Opt-out Environment
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph" title="Graph" class="md-nav__link">
+    Graph
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#localisation" title="Localisation" class="md-nav__link">
+    Localisation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allzpark-performance-considerations" title="Allzpark Performance Considerations" class="md-nav__link">
+    Allzpark Performance Considerations
   </a>
   
 </li>
@@ -720,6 +779,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#conversation" title="Conversation" class="md-nav__link">
+    Conversation
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -766,6 +832,34 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#opt-out-environment" title="Opt-out Environment" class="md-nav__link">
+    Opt-out Environment
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graph" title="Graph" class="md-nav__link">
+    Graph
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#localisation" title="Localisation" class="md-nav__link">
+    Localisation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allzpark-performance-considerations" title="Allzpark Performance Considerations" class="md-nav__link">
+    Allzpark Performance Considerations
+  </a>
+  
+</li>
+      
       
       
       
@@ -781,7 +875,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-18</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/reference.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -1193,6 +1287,12 @@ rez env packageA-1.0.0.beta  <span style="color: #75715e"># packageA-1.0.0.beta<
 
 <p>And presto, a cross-platform reproducible request!</p>
 <p><br></p>
+<h4 id="conversation">Conversation</h4>
+<p>As you can tell, there are many ways to skin this cat. The following is a conversation about the various pros and cons and what to look out for.</p>
+<ul>
+<li><a href="https://gist.github.com/mottosso/54451ac5dd50ffdc8ba3e309e55c2d71">Slack Conversation</a></li>
+</ul>
+<p><br></p>
 <h3 id="testing-packages">Testing Packages</h3>
 <p>Like any software projects, you need good tests. Software packaged with Rez is no exception, and doesn't <em>necessarily</em> change how you normally approach test.</p>
 <p>There are a few ways to exercise your package.</p>
@@ -1241,6 +1341,83 @@ nosetests2
 <p><br></p>
 <h3 id="all-applications">All Applications</h3>
 <p>Each project specifies what applications to make available to the artist and developer. But sometimes, you don't care about that and just want to run Application X in a particular project environment.</p>
+<blockquote>
+<p>Work in progress</p>
+</blockquote>
+<p>If you got this far, and know more or want more, feel free to submit <a href="https://github.com/mottosso/allzpark/issues">an issue</a>.</p>
+<p><br></p>
+<h3 id="opt-out-environment">Opt-out Environment</h3>
+<p>Per default, the parent environment is inherited by a Rez context, unless one or more packages reference it internally.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$env</span>:MY_PATH<span style="color: #f92672">=</span><span style="color: #e6db74">&quot;path1;path2&quot;</span>
+rez env
+&gt; <span style="color: #f8f8f2">$env</span>:MY_PATH
+<span style="color: #75715e"># path1;path2</span>
+</pre></div>
+
+<p>Note the inheritance there. However, if any package references <code>MY_PATH</code> then it will automatically clear itself prior to being re-added by the package.</p>
+<p><strong>package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_package&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;MY_PATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">append(</span><span style="color: #e6db74">&quot;path1&quot;</span><span style="color: #f8f8f2">)</span>  <span style="color: #75715e"># Clearing existing PATH</span>
+</pre></div>
+
+<p>If we include this package, the variable now looks like this.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env my_package
+&gt; <span style="color: #f8f8f2">$env</span>:MY_PATH
+<span style="color: #75715e"># path1</span>
+</pre></div>
+
+<p>This is considered a bug in the underlying bleeding-rez library, and is being addressed here.</p>
+<ul>
+<li>See also <a href="https://github.com/mottosso/bleeding-rez/issues/70">https://github.com/mottosso/bleeding-rez/issues/70</a></li>
+</ul>
+<p><br></p>
+<h3 id="graph">Graph</h3>
+<p>Allzpark is able to visualise a resolved context as a graph.</p>
+<p><img alt="" src="" /></p>
+<p><strong>Prerequisities</strong></p>
+<p>In order to enable graph drawing, you need the following package(s).</p>
+<ul>
+<li><code>graphviz-2+</code></li>
+</ul>
+<p><strong>Usage</strong></p>
+<p>To make Allzpark aware of <code>graphviz</code>, simply include it in your request prior to launching.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">graphviz</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">python-3</span> <span style="color: #f8f8f2">bleeding_rez</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">-m</span> <span style="color: #f8f8f2">allzpark</span>
+</pre></div>
+
+<p><br></p>
+<h3 id="localisation">Localisation</h3>
+<p>Users are able to interactively localize packages from the Packages tab, to save on performance or to work offline.</p>
+<p><strong>Prerequisities</strong></p>
+<p>In order to enable localization, you'll need the following package(s).</p>
+<ul>
+<li><code>localz-1+</code></li>
+</ul>
+<p><strong>Usage</strong></p>
+<p>Make Allzpark aware of <code>localz</code> by including it in your request.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">localz</span> <span style="color: #f8f8f2">pyside2</span> <span style="color: #f8f8f2">python3</span> <span style="color: #f8f8f2">bleeding_rez</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">python</span> <span style="color: #f8f8f2">-m</span> <span style="color: #f8f8f2">allzpark</span>
+</pre></div>
+
+<p><br></p>
+<h3 id="allzpark-performance-considerations">Allzpark Performance Considerations</h3>
+<p>Use of the Allzpark can be divided into roughly three parts.</p>
+<ol>
+<li>Time taken to load libraries such as PySide2 - you should be seeing timings in the console<ul>
+<li>Can be resolved by localizing packages, primarily python and PySide</li>
+</ul>
+</li>
+<li>Time taken to get the window open<ul>
+<li>Is actual building of the Allzpark and difficult to avoid</li>
+</ul>
+</li>
+<li>Time taken to when applications, like Maya, actually show up<ul>
+<li>This is the actual Rez resolves taking place. It will vary depending on whether the contexts can be found in memcached or not, which is about 90% of the time.</li>
+</ul>
+</li>
+</ol>
+<p>From there most things are stored in-memory and won't perform many if any IO or CPU intensive calls, with a few exceptions like generating the resolve graph in the Context tab.</p>
                 
                   
                 
@@ -1262,7 +1439,7 @@ nosetests2
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../guides/" title="Guide" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../workflow/" title="Workflow" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -1271,7 +1448,7 @@ nosetests2
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Guide
+                Workflow
               </span>
             </div>
           </a>
@@ -1318,6 +1495,8 @@ nosetests2
       <script src="../assets/javascripts/application.245445c6.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+        <script src="../extra.js"></script>
       
     
   </body>

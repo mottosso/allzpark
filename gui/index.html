@@ -14,7 +14,7 @@
         <meta name="description" content="The package-based application launcher">
       
       
-        <link rel="canonical" href="https://allzpark.com/about/">
+        <link rel="canonical" href="https://allzpark.com/gui/">
       
       
         <meta name="author" content="mottosso">
@@ -45,7 +45,7 @@
 
     
       
-        <title>About - Allzpark</title>
+        <title>Gui - Allzpark</title>
       
     
     
@@ -96,7 +96,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#background" tabindex="1" class="md-skip">
+      <a href="#preferences" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -122,7 +122,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                About
+                Gui
               
             </span>
           
@@ -339,72 +339,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        About
-      </label>
-    
-    <a href="./" title="About" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../about/" title="About" class="md-nav__link">
       About
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#background" title="Background" class="md-nav__link">
-    Background
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#journal" title="Journal" class="md-nav__link">
-    Journal
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#story-time" title="Story time" class="md-nav__link">
-    Story time
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a-closer-look" title="A closer look" class="md-nav__link">
-    A closer look
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -427,36 +366,16 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#background" title="Background" class="md-nav__link">
-    Background
+  <a href="#preferences" title="Preferences" class="md-nav__link">
+    Preferences
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#journal" title="Journal" class="md-nav__link">
-    Journal
+  <a href="#advanced-controls" title="Advanced Controls" class="md-nav__link">
+    Advanced Controls
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#story-time" title="Story time" class="md-nav__link">
-    Story time
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a-closer-look" title="A closer look" class="md-nav__link">
-    A closer look
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -478,91 +397,17 @@
 <small class="modified-date"><br><i>Updated 2019-07-26</i></small>
 
                 
-                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/about.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/gui.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>About</h1>
+                  <h1>Gui</h1>
                 
-                <p>This section outlines the rationale behind Allzpark, to help you determine whether or not it is of use to you.</p>
+                <h2 id="preferences">Preferences</h2>
+<p>This tab contains preferences about the application and relevant information for where packages are found.</p>
 <p><br></p>
-<h3 id="background">Background</h3>
-<p>Allzpark (a.k.a. LaunchApp2) started as a 4-month commission for the Japanese <a href="http://www.studioanima.co.jp/">Studio Anima</a>. Time was divided into roughly these parts.</p>
-<ol>
-<li><strong>Week 0-0</strong> Tour of physical building, infrastructure and crew</li>
-<li><strong>Week 1-2</strong> Requirements gathering, an evaluation if current system</li>
-<li><strong>Week 3-4</strong> Evaluation of off-the-shelf options, e.g. Rez</li>
-<li><strong>Week 5-6</strong> Evaluation of studio, system and personnel resources</li>
-<li><strong>Week 7-8</strong> Integration and testing of fundamental infrastucture software, Ansible</li>
-<li><strong>Week 9-10</strong> Research and development of Rez to fit the criteria and initial <a href="https://github.com/mottosso/rez-for-projects">prototype</a></li>
-<li><strong>Week 11-12</strong> Conversion of existing package repository</li>
-<li><strong>Week 13-14</strong> Implementation of graphical user interface, LaunchApp2</li>
-<li><strong>Week 15-16</strong> Refinement of features, including localisation</li>
-<li><strong>Week 17-18</strong> Final integration and training of staff</li>
-</ol>
-<p><br></p>
-<h3 id="journal">Journal</h3>
-<p>Allzpark was initially an internal project, never intended to be open sourced. As a result, the first 2 months of development are locked away behind an internal journal for the company (due to disclosure of sensitive information).</p>
-<p>Luckily, it was around this time that Allzpark got approved for open source and when I was able to start sharing its development publicly, so that you are able to take part in the design decisions made, the why and how. This way, you're able to accurately determine whether a solution to a new problem takes the original requirements into consideration; something all too often lost in software projects.</p>
-<ul>
-<li><a href="https://github.com/mottosso/allzpark/issues/1">Journal</a></li>
-</ul>
-<p><br></p>
-<h2 id="story-time">Story time</h2>
-<p>When Hannah - working at a digital production company like Framestore or ILM - arrives at work in the morning, she typically types something like this into her console.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">go</span> <span style="color: #f8f8f2">gravity</span>
-<span style="color: #f8f8f2">maya</span>
-</pre></div>
-
-<p>What this does is put Hannah in the "context" of the <code>gravity</code> project. The subsequent call to <code>maya</code> then launches a given application, in this case Autodesk Maya. But which version? And why does it matter?</p>
-<p><br></p>
-<h3 id="a-closer-look">A closer look</h3>
-<p>To better understand what's happening here, let's take a closer look at what these commands do. Following the command <code>go gravity</code>, a few things happen.</p>
-<ol>
-<li>The argument <code>gravity</code> is correlated to a project (either on disk or database)</li>
-<li>The project is associated with metadata, detailing what  software and versions are in use<ul>
-<li><code>maya-2015</code></li>
-<li><code>arnold-4.12</code></li>
-<li><code>mgear-2.4</code></li>
-<li><code>fbake-4.1</code></li>
-<li><code>fasset-1.14</code></li>
-<li><code>...</code></li>
-</ul>
-</li>
-<li>The associated software is loaded into command-line <code>environment</code></li>
-</ol>
-<p>At this point, the subsequent command <code>maya</code> unambiguously refers to <code>maya-2015</code>, which is how Framestore - and virtually every visual effects, feature animation, commercial and games facility - is able to tie a specific version of each set of software to a given project.</p>
-<p>Why is this important? The answer lies in <strong>interoperability</strong>.</p>
-<p>You see, whatever comes out of Hannah's department must interoperate with subsequent departments. Like an assembly line, the pace of the line remains consistent till the end, and every tool depends on the output of whatever came before it.</p>
-<p>This holds true for individual applications, like Maya or Visual Studio, but also sub-components of applications - plug-ins.</p>
-<p>Take <code>arnold-4.12</code> as an example. This particular version needs to interoperate with <code>maya-2015</code>.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">2015</span>   <span style="color: #f8f8f2">2016</span>   <span style="color: #f8f8f2">2017</span>   <span style="color: #f8f8f2">2018</span>   <span style="color: #f8f8f2">2019</span>
-<span style="color: #f8f8f2">maya</span>      <span style="color: #f8f8f2">|--------------------------|</span>
-<span style="color: #f8f8f2">arnold-1</span>  <span style="color: #f8f8f2">|-------|</span>
-<span style="color: #f8f8f2">arnold-2</span>      <span style="color: #f8f8f2">|-----------|</span>
-<span style="color: #f8f8f2">arnold-3</span>             <span style="color: #f8f8f2">|-----------|</span>
-<span style="color: #f8f8f2">arnold-4</span>                  <span style="color: #f8f8f2">|----------|</span>
-</pre></div>
-
-<p>In order to leverage <code>maya-2015</code> for a given project, your choice of <code>arnold</code> is limited to those that support it, or vice versa.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>                          <span style="color: #f8f8f2">interoperable</span>
-                             <span style="color: #f8f8f2">slice</span>
-<span style="color: #f8f8f2">maya</span>      <span style="color: #f8f8f2">|-----------------|------|---|</span>
-<span style="color: #f8f8f2">arnold-1</span>  <span style="color: #f8f8f2">|-------|</span>         <span style="color: #f8f8f2">|</span>      <span style="color: #f8f8f2">|</span>
-<span style="color: #f8f8f2">arnold-2</span>      <span style="color: #f8f8f2">|-----------|</span> <span style="color: #f8f8f2">|</span>      <span style="color: #f8f8f2">|</span>    
-<span style="color: #f8f8f2">arnold-3</span>             <span style="color: #f8f8f2">|------|------|</span>
-<span style="color: #f8f8f2">arnold-4</span>                  <span style="color: #f8f8f2">|-|------|---|</span>
-                            <span style="color: #f8f8f2">|</span>      <span style="color: #f8f8f2">|</span>
-</pre></div>
-
-<p>This issue is compounded by the number of libraries and plug-ins you use for a given project. Consider <code>openimageio</code>, <code>qt</code>, <code>ilmbase</code> and other off-the-shelf projects you may want to employ in a given project, and you can start to get some idea of how narrow </p>
-<p>It is then further compounded by in-house development projects, such as  your <a href="http://getavalon.github.io"><em>pipeline</em></a>.</p>
-<p>None of this would have been a problem, if you were able to say:</p>
-<ol>
-<li>We will ever only work on a single project at a time</li>
-<li>We know which versions to use</li>
-<li>We don't develop any new software ourselves</li>
-</ol>
-<p>In which case you could simply install each of these applications and get to work. But more often than not, things change. And in order to facilitate this change, there needs to be a system in place to help manage the combinatorial complexity of applications, software, and projects.</p>
+<h2 id="advanced-controls">Advanced Controls</h2>
+<p>In the <a href="#preferences">Preferences</a> you'll find an option to enable "Advanced Controls". These are designed to separate what is useful to an artist versus a developer.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61855966-0bb36600-aeb9-11e9-8202-0bd9e6c98bed.png" /></p>
                 
                   
                 
@@ -580,27 +425,6 @@
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../windows/" title="Windows" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Windows
-              </span>
-            </div>
-          </a>
-        
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

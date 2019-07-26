@@ -1,0 +1,961 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+        <meta name="description" content="The package-based application launcher">
+      
+      
+        <link rel="canonical" href="https://allzpark.com/getting-started/">
+      
+      
+        <meta name="author" content="mottosso">
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.4.0">
+    
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,500|Source+Code+Pro" rel="stylesheet">
+
+    
+      
+        <title>Getting Started - Allzpark</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.0284f74d.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-palette.01803549.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.74668098.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+      <link rel="stylesheet" href="../extra.css">
+    
+    
+      
+    
+    
+  </head>
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="white" data-md-color-accent="white">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#what-is-allzpark" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="https://allzpark.com" title="Allzpark" class="md-header-nav__button md-logo">
+          
+            <img src="../logo.png" width="24" height="24">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Allzpark
+            </span>
+            <span class="md-header-nav__topic">
+              
+                Getting Started
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="https://github.com/mottosso/allzpark/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    mottosso/allzpark
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="https://allzpark.com" title="Allzpark" class="md-nav__button md-logo">
+      
+        <img src="../logo.png" width="48" height="48">
+      
+    </a>
+    Allzpark
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="https://github.com/mottosso/allzpark/" title="Go to repository" class="md-source" data-md-source="github">
+  
+    <div class="md-source__icon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    mottosso/allzpark
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Home" class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../quickstart/" title="Quickstart" class="md-nav__link">
+      Quickstart
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Getting Started
+      </label>
+    
+    <a href="./" title="Getting Started" class="md-nav__link md-nav__link--active">
+      Getting Started
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-allzpark" title="What is Allzpark?" class="md-nav__link">
+    What is Allzpark?
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-project" title="What is a "project"?" class="md-nav__link">
+    What is a "project"?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-is-an-application" title="What is an "application"?" class="md-nav__link">
+    What is an "application"?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-project" title="Your first project" class="md-nav__link">
+    Your first project
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-line" title="Command Line" class="md-nav__link">
+    Command Line
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#king-kong" title="King Kong" class="md-nav__link">
+    King Kong
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-weve-learned" title="What we've learned" class="md-nav__link">
+    What we've learned
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-application" title="Your first application" class="md-nav__link">
+    Your first application
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#an-application-package" title="An application package" class="md-nav__link">
+    An application package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-weve-learned_1" title="What we've learned" class="md-nav__link">
+    What we've learned
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-payload" title="Your first payload" class="md-nav__link">
+    Your first payload
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../workflow/" title="Workflow" class="md-nav__link">
+      Workflow
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../reference/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../rez/" title="Packaging" class="md-nav__link">
+      Packaging
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../examples/" title="Examples" class="md-nav__link">
+      Examples
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../shells/" title="Shells" class="md-nav__link">
+      Shells
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../windows/" title="Windows" class="md-nav__link">
+      Windows
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../about/" title="About" class="md-nav__link">
+      About
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-allzpark" title="What is Allzpark?" class="md-nav__link">
+    What is Allzpark?
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-is-a-project" title="What is a "project"?" class="md-nav__link">
+    What is a "project"?
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-is-an-application" title="What is an "application"?" class="md-nav__link">
+    What is an "application"?
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-project" title="Your first project" class="md-nav__link">
+    Your first project
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#command-line" title="Command Line" class="md-nav__link">
+    Command Line
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#king-kong" title="King Kong" class="md-nav__link">
+    King Kong
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-weve-learned" title="What we've learned" class="md-nav__link">
+    What we've learned
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-application" title="Your first application" class="md-nav__link">
+    Your first application
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#an-application-package" title="An application package" class="md-nav__link">
+    An application package
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-weve-learned_1" title="What we've learned" class="md-nav__link">
+    What we've learned
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-payload" title="Your first payload" class="md-nav__link">
+    Your first payload
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
+
+                
+                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/getting-started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Getting Started</h1>
+                
+                <p>This page carries on from a successful 👈 <a href="/quickstart">quickstart</a> into making it relevant to your usecase.</p>
+<p><br></p>
+<h3 id="what-is-allzpark">What is Allzpark?</h3>
+<p>It's an <a href="https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers">application launcher</a>, similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements. An important aspect of any endevour involving multiple stakeholders, especially when requirements involve frequent change.</p>
+<p>Here's how you would typically use Allzpark.</p>
+<ol>
+<li>Boot machine</li>
+<li>Boot Allzpark</li>
+<li>Select <a href="#what-is-a-project">project</a></li>
+<li>Boot <a href="#what-is-an-application">application</a></li>
+</ol>
+<p>For the purposes of this quick walkthrough, I'll assume you are part of a visual effects studio whereby "project" means e.g. Alita and "application" means e.g. Blender.</p>
+<p><br></p>
+<h4 id="what-is-a-project">What is a "project"?</h4>
+<p>Alita is the name given to a project within work is performed by multiple stakeholders towards a common goal, also referred to as a "show" or "game" depending on your context. It typically consists of these components.</p>
+<ul>
+<li>Name</li>
+<li>Version</li>
+<li>Applications</li>
+<li>Requirements</li>
+<li>Environment</li>
+</ul>
+<p>Whereby "applications" are the software used to craft this project, such as Blender, Photoshop and Sublime Text.</p>
+<p>The "requirements" indicate what software or libraries your project depend on, such as <code>python-3</code> or <code>git-2.21</code>.</p>
+<p>The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, <code>PROJECT_NAME=alita</code> is a relevant variable to add, to allow for the application and your software to identify which project an application was launched in.</p>
+<p>As you might have guessed, projects are <em>versioned</em> and we'll get into more about this and "packages" in general a little later.</p>
+<p><br></p>
+<h4 id="what-is-an-application">What is an "application"?</h4>
+<p>Blender is an application within which work is performed.</p>
+<p>In Allzpark, the project dictates which applications are available to the user, in order to faciliate a "data pipeline" being built around a pre-determined set of software and libraries.</p>
+<p>An application typically consists of these components.</p>
+<ul>
+<li>Name</li>
+<li>Version</li>
+<li>Requirements</li>
+<li>Environment</li>
+</ul>
+<p>Notice that it isn't unlike a project, and in fact not unlike any other software you'll encounter later on. These are both "packages" and we'll talk a lot more about what that is as we progress through this guide.</p>
+<p><br></p>
+<h3 id="your-first-project">Your first project</h3>
+<p>You and I are going to embark on a new project. Let's call it <code>kingkong</code>.</p>
+<p><br></p>
+<h4 id="command-line">Command Line</h4>
+<p>The way we'll establish this project, and packages like it, is going to involve the command-line, so let's get comfortable with how it works.</p>
+<p>I'll provide command-line instructions for both <code>powershell</code> and <code>bash</code>, to cover both Windows, Linux and MacOS users. You can follow along using either of the two flavours, but odds are the one pre-selected is the one you'll want to use.</p>
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$env:POWERSHELL=</span><span style="color: #e6db74">&quot;These lines are for powershell&quot;</span>
+
+<span style="color: #f8f8f2">$var</span> <span style="color: #f8f8f2">=</span> <span style="color: #e6db74">&quot;If you are on Windows, this is where we&#39;ll</span>
+<span style="color: #e6db74">        spend most of our time. It also applies to</span>
+<span style="color: #e6db74">        pwsh, the cross-platform PowerShell 6+.&quot;</span>
+</pre></div>
+
+</div>
+<div class="tab-content bash">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">echo</span> These lines are <span style="color: #66d9ef">for</span> bash
+<span style="color: #f8f8f2">echo</span> typically used in MacOS and Linux
+</pre></div>
+
+</div>
+<p>Now select a shell of your choice and let's get going.</p>
+<div class="admonition hint">
+<p class="admonition-title">JavaScript</p>
+<p>If you aren't seeing any code, make sure you have JavaScript enabled. If this is a problem for you, <a href="https://github.com/mottosso/allzpark/issues">let me know</a>.</p>
+</div>
+<p><br></p>
+<h4 id="king-kong">King Kong</h4>
+<p>Each project requires a folder and a file called <code>package.py</code>.</p>
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">~/kingkong</span>
+<span style="color: #f8f8f2">cd ~/kingkong</span>
+<span style="color: #e6db74">@&quot;</span>
+<span style="color: #e6db74">name = &quot;kingkong&quot;</span>
+<span style="color: #e6db74">version = &quot;1.0.0&quot;</span>
+<span style="color: #e6db74">build_command = False</span>
+<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Out-File</span> <span style="color: #f8f8f2">package.py</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>
+</pre></div>
+
+</div>
+<div class="tab-content bash">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>mkdir ~/kingkong
+<span style="color: #f8f8f2">cd</span> ~/kingkong
+<span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span> &gt;&gt; package.py
+<span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.0&quot;</span> &gt;&gt; package.py
+<span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> False &gt;&gt; package.py
+rez build --install
+</pre></div>
+
+</div>
+<p>That's it, we've now got a brand new project. Let's add it to Allzpark and see what it looks like.</p>
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$env:MY_PROJECTS=</span><span style="color: #e6db74">&quot;kingkong&quot;</span>
+<span style="color: #f8f8f2">allzpark</span> <span style="color: #f8f8f2">--demo</span>
+</pre></div>
+
+</div>
+<div class="tab-content bash">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">export</span> <span style="color: #f8f8f2">MY_PROJECTS</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;kingkong&quot;</span>
+allzpark --demo
+</pre></div>
+
+</div>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61939300-dd05c000-af8a-11e9-8a3d-429ce532e0d6.png" /></p>
+<p>We'll do a lot more of this as we go along, so don't worry if it doesn't quite make sense just yet.</p>
+<div class="admonition note">
+<p class="admonition-title">Regarding <code>MY_PROJECTS</code></p>
+<p>I've programmed this demo to take the environment variable <code>MY_PROJECTS</code> into account, but we'll have a look later at how you can customise how projects are actually discovered either from disk, a production tracking system like Shotgun or arbitrary function you provide.</p>
+</div>
+<p><br></p>
+<h4 id="what-weve-learned">What we've learned</h4>
+<p>Let's take a moment to reflect on what we've accomplished so far.</p>
+<ol>
+<li>We've gotten familiar with the <code>rez</code> command</li>
+<li>We've authored a new Rez package from scratch</li>
+<li>We've used <code>rez build</code>, one of many Rez sub-commands, to build and install a package</li>
+<li>We've made Allzpark aware of this new project package, via the <code>MY_PROJECTS</code> environment variable.</li>
+</ol>
+<p>Next we'll have a look at how to add an application to your project, and how to actually make a new application from scratch.</p>
+<p><br></p>
+<h3 id="your-first-application">Your first application</h3>
+<p>There isn't much we can do with a project unless we've got an application, so let's add one.</p>
+<ol>
+<li>Open <code>kingkong/package.py</code> in your favourite text editor</li>
+<li>Edit it as follows.</li>
+</ol>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span>
+<span style="background-color: #49483e"><span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.1&quot;</span>
+</span><span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
+
+<span style="background-color: #49483e"><span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+</span><span style="background-color: #49483e">    <span style="color: #e6db74">&quot;~maya==2018.0.6&quot;</span><span style="color: #f8f8f2">,</span>
+</span><span style="background-color: #49483e">    <span style="color: #e6db74">&quot;~blender==2.80.0&quot;</span><span style="color: #f8f8f2">,</span>
+</span><span style="background-color: #49483e"><span style="color: #f8f8f2">]</span>
+</span></pre></div>
+
+<p>As you may have guessed, these are the <em>requirements</em> of this project. That little squiggly <code>~</code> character ahead of <code>maya</code> indicates that this is a "weak" reference, which Allzpark interprets as application in this project.</p>
+<div class="admonition hint">
+<p class="admonition-title">Protip</p>
+<p>If you're already familiar with Rez and think to yourself "This isn't very flexible", you're right. Looking for applications in the requirements section of a package is a default you can customise later via the <code>allzparkconfig.py:applications_from_package()</code> function.</p>
+</div>
+<p>We'll talk more about requirements next, let's install this package and launch Allzpark.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> kingkong
+rez build --install
+allzpark --demo
+</pre></div>
+
+<p><img alt="allzpark_kingkong" src="https://user-images.githubusercontent.com/2152766/61941483-7e8f1080-af8f-11e9-9192-235b5c139dfb.gif" /></p>
+<div class="admonition hint">
+<p class="admonition-title">Protip</p>
+<p>You'll notice the order in which you specified the applications are respected in the GUI.</p>
+</div>
+<p><br></p>
+<h4 id="an-application-package">An application package</h4>
+<p>Ok, but we didn't really create an application so much as just add an existing one to the project. Let's create a new application from your OS and add <em>that</em> to the project too.</p>
+<p>You can pick any application you'd like, for the purposes of this guide I'll make a package for a text editor.</p>
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">~/texteditor</span>
+<span style="color: #f8f8f2">cd ~/texteditor</span>
+<span style="color: #e6db74">@&quot;</span>
+<span style="color: #e6db74">name = &quot;texteditor&quot;</span>
+<span style="color: #e6db74">version = &quot;1.5.0&quot;</span>
+<span style="color: #e6db74">build_command = False</span>
+<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Out-File</span> <span style="color: #f8f8f2">package.py</span>
+<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>
+</pre></div>
+
+</div>
+<div class="tab-content bash">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>mkdir ~/texteditor
+<span style="color: #f8f8f2">cd</span> ~/texteditor
+<span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;texteditor&quot;</span> &gt;&gt; package.py
+<span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.5.0&quot;</span> &gt;&gt; package.py
+<span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> False &gt;&gt; package.py
+rez build --install
+</pre></div>
+
+</div>
+<p>You'll notice the similarity to creating a project and that's no coincidence. These are both Rez "packages". But there's something missing.</p>
+<p>Unlike a project, an application must either reference an executable on disk, or encapsulate this executable into the package. We'll get into encapsulating files with a package a little later, for now let's have a look at how to reference a file on disk.</p>
+<p><strong>texteditor/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;texteditor&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.5.1&quot;</span>
+<span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
+
+<span style="background-color: #49483e"><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+</span><span style="background-color: #49483e">    <span style="color: #f92672">import</span> <span style="color: #f8f8f2">os</span>
+</span><span style="background-color: #49483e">    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">alias</span>
+</span><span style="background-color: #49483e">
+</span><span style="background-color: #49483e">    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">==</span> <span style="color: #e6db74">&quot;nt&quot;</span><span style="color: #f8f8f2">:</span>
+</span><span style="background-color: #49483e">        <span style="color: #f8f8f2">alias(</span><span style="color: #e6db74">&quot;texteditor&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">r&quot;notepad&quot;</span><span style="color: #f8f8f2">)</span>
+</span><span style="background-color: #49483e">    <span style="color: #66d9ef">elif</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">==</span> <span style="color: #e6db74">&quot;darwin&quot;</span><span style="color: #f8f8f2">:</span>
+</span><span style="background-color: #49483e">        <span style="color: #f8f8f2">alias(</span><span style="color: #e6db74">&quot;texteditor&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">r&quot;textedit&quot;</span><span style="color: #f8f8f2">)</span>
+</span><span style="background-color: #49483e">    <span style="color: #66d9ef">else</span><span style="color: #f8f8f2">:</span>
+</span><span style="background-color: #49483e">        <span style="color: #f8f8f2">alias(</span><span style="color: #e6db74">&quot;texteditor&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">r&quot;gedit&quot;</span><span style="color: #f8f8f2">)</span>
+</span></pre></div>
+
+<p>The <code>commands()</code> function is called whenever your package is referenced, and <code>alias()</code> creates a command you can use from within a context. We're able to leverage regular Python imports and commands here as well, which is how we detect the running operating system.</p>
+<div class="admonition note">
+<p class="admonition-title">About assumptions</p>
+<p>One of the issues with referencing system software like this is, well, how can we be sure these actually exist on the target operating system? For Windows it's a given, but what about Linux? We'll see this problem crop up again later, and is in fact already an issue with the pre-existing demo packages for Maya and Blender.</p>
+<p>For the purposes of this guide, these assumptions are fine and I'll show you later how you can avoid making them, and at what cost.</p>
+</div>
+<p>Let's try this out.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> texteditor
+rez build --install
+rez env texteditor
+&gt; texteditor
+</pre></div>
+
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61943522-88b30e00-af93-11e9-9be3-b4e52923adf2.png" /></p>
+<p>This is the equivalent command-line procedure to what Allzpark is doing when you launch an application. Let's try it out in Allzpark too.</p>
+<p><strong>kingkong/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span>
+<span style="background-color: #49483e"><span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.2&quot;</span>
+</span><span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
+
+<span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;~maya==2018.0.6&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;~blender==2.80.0&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;~texteditor==1.5.1&quot;</span><span style="color: #f8f8f2">,</span>
+<span style="background-color: #49483e"><span style="color: #f8f8f2">]</span>
+</span></pre></div>
+
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> kingkong
+rez build --install
+allzpark --demo
+</pre></div>
+
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61945604-4dffa480-af98-11e9-863d-3856d5654832.png" /></p>
+<p>And presto!</p>
+<div class="admonition hint">
+<p class="admonition-title">Protip</p>
+<p>Notice that our terminal doesn't yet have an icon, and its name is all lowercase and plain. We'll address this next, in the <a href="#your-first-payload">Payload</a> chapter.</p>
+</div>
+<p><br></p>
+<h4 id="what-weve-learned_1">What we've learned</h4>
+<p>You made it! Let's reflect on what we've learned so far.</p>
+<ol>
+<li>Creating a new application is not unlike creating a new project</li>
+<li>Packages have a <code>commands()</code> function you can use to "bootstrap" an environment with custom commands</li>
+<li>There's pros and cons to referencing system software, like a text editor.</li>
+</ol>
+<p><br></p>
+<h3 id="your-first-payload">Your first payload</h3>
+<p>We've managed to make a new project, and an application and we're just about ready to start developing the next King Kong movie.</p>
+<p>But there is something else missing. For the purposes of this chapter, I will assume you are developing King Kong using Autodesk Maya, but the same applies to just about any application.</p>
+<div class="admonition hint">
+<p class="admonition-title">In Development</p>
+<p>Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the <a href="https://github.com/mottosso/allzpark">GitHub repo</a> for changes as that's where these are coming from.</p>
+</div>
+                
+                  
+                
+              
+
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../quickstart/" title="Quickstart" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Quickstart
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../workflow/" title="Workflow" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Workflow
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2019 mottosso
+          </div>
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.245445c6.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+        <script src="../extra.js"></script>
+      
+    
+  </body>
+</html>
