@@ -13,10 +13,12 @@ copyright: "Copyright &copy; 2019 mottosso"
 # Page tree
 nav:
   - Home: index.md
-  - Guide: guides.md
+  - Quickstart: quickstart.md
+  - Getting Started: getting-started.md
+  # - Guide: guides.md
+  - Workflow: workflow.md
   - Reference: reference.md
   - Packaging: rez.md
-  # - Localisation: localisation.md
   - Examples: examples.md
   - Shells: shells.md
   - Windows: windows.md
@@ -41,6 +43,9 @@ extra_css:
 extra:
   feature:
     tabs: true
+
+extra_javascript:
+  - "extra.js"
 
 markdown_extensions:
   - codehilite:

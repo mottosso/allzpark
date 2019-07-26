@@ -12,16 +12,42 @@ Let's start with the basics.
 
 Create and use a new package from scratch in under 40 seconds.
 
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
 ```powershell
+mkdir mypackage             # Name of your Git project
+cd mypackage                # Rez definition
+@"
+name = "mypackage"          # Rez package name
+version = "1.0"             # Rez package version
+build_command = False       # Called when building package
+"@ | Out-File package.py
+rez build --install         # Build package
+rez env mypackage           # Use package
+>                           # A new environment with your package
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
 mkdir mypackage                           # Name of your Git project
 cd mypackage                              # Rez definition
-"name = `"mypackage`""  | Add-Content package.py  # Rez package name
-"version = `"1.0`""     | Add-Content package.py  # Rez package version
-"build_command = False" | Add-Content package.py  # Called on building package
+echo name = "mypackage" >> package.py     # Rez package name
+echo version = "1.0" >> package.py        # Rez package version
+echo build_command = False >> package.py  # Called when building package
 rez build --install                       # Build package
 rez env mypackage                         # Use package
-> $                                       # A new environment with your package
+>                                         # A new environment with your package
 ```
+
+</div>
 
 - The `>` symbol means you are in a Rez "context".
 - Type `exit` to exit the context.
@@ -50,12 +76,32 @@ This package will assign `"Yes"` to MYVARIABLE.
 - `env["MYVARIABLE"]` - An environment variable
 - `env.MYVARIABLE` - This is also OK
 
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
 ```powershell
-$ rez build --install
-$ rez env mypackage
-> $ echo %MYVARIABLE%
-Yes
+rez build --install
+rez env mypackage
+> $env:MYVARIABLE
+# Yes
 ```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+rez build --install
+rez env mypackage
+> echo $MYVARIABLE
+# Yes
+```
+
+</div>
 
 <br>
 
@@ -82,12 +128,32 @@ This package will assign `"{root}"` to `PYTHONPATH`.
 - `env["PYTHONPATH"].prepend()` - Prepend a value to this variable
 - `env["PYTHONPATH"].append()` - Append a value to this variable
 
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
 ```powershell
-$ rez build --install
-$ rez env mypackage
-> $ echo %PYTHONPATH%
-\\server\packages\mypackage\1.2;\\server\packages\int\mypackage\1.2\python
+rez build --install
+rez env mypackage
+> $env:PYTHONPATH
+# \\server\packages\mypackage\1.2;\\server\packages\int\mypackage\1.2\python
 ```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+rez build --install
+rez env mypackage
+> echo $PYTHONPATH
+# \server\packages\mypackage\1.2:\server\packages\int\mypackage\1.2\python
+```
+
+</div>
 
 <br>
 
@@ -95,12 +161,32 @@ $ rez env mypackage
 
 Most packages will depend on another package.
 
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
 ```powershell
+cd mypackage
+cd ..
+mkdir mypackage2
+$null >> mypackage2/package.py
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
 cd mypackage
 cd ..
 mkdir mypackage2
 touch mypackage2/package.py
 ```
+
+</div>
 
 **mypackage2/package.py**
 
@@ -113,24 +199,24 @@ requires = ["python-3", "mypackage-1.2"]
 
 This package now requires `python-3` and `mypackage-1.2`.
 
-```powershell
-$ rez build --install
-$ rez env mypackage2
-resolved by manima@toy, on Thu Jun 27 11:12:18 2019, using Rez v2.32.1
-
-requested packages:
-mypackage2
-~platform==windows           (implicit)
-~arch==AMD64                 (implicit)
-~os==windows-10.0.18362.SP0  (implicit)
-
-resolved packages:
-arch-AMD64        C:\Users\manima\packages\arch\AMD64                                (local)
-mypackage-1.3     C:\Users\manima\packages\mypackage\1.3                             (local)
-mypackage2-1.0    C:\Users\manima\packages\mypackage2\1.0                            (local)
-platform-windows  C:\Users\manima\packages\platform\windows                          (local)
-python-3.7.3      C:\Users\manima\packages\python\3.7.3\platform-windows\arch-AMD64  (local)
-> $
+```bash
+rez build --install
+rez env mypackage2
+# resolved by manima@toy, on Thu Jun 27 11:12:18 2019, using Rez v2.32.1
+# 
+# requested packages:
+# mypackage2
+# ~platform==windows           (implicit)
+# ~arch==AMD64                 (implicit)
+# ~os==windows-10.0.18362.SP0  (implicit)
+# 
+# resolved packages:
+# arch-AMD64        C:\Users\manima\packages\arch\AMD64                                (local)
+# mypackage-1.3     C:\Users\manima\packages\mypackage\1.3                             (local)
+# mypackage2-1.0    C:\Users\manima\packages\mypackage2\1.0                            (local)
+# platform-windows  C:\Users\manima\packages\platform\windows                          (local)
+# python-3.7.3      C:\Users\manima\packages\python\3.7.3\platform-windows\arch-AMD64  (local)
+> 
 ```
 
 <br>
@@ -139,13 +225,34 @@ python-3.7.3      C:\Users\manima\packages\python\3.7.3\platform-windows\arch-AM
 
 Most packages will have additional files, such as Python modules. This is where `build_command` comes in.
 
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
 ```powershell
-$ cd mypackage
-$ touch install.py                           # Additional script for build
-$ mkdir python                               # Payload directory
-$ cd python                                  # 
-$ echo print("Hello World!") >> mymodule.py  # Python payload shipped alongside package
+cd mypackage
+$null >> install.py                        # Additional script for build
+mkdir python                               # Payload directory
+cd python                                  # 
+"print('Hello World!')" | Out-File mymodule.py  # Python payload shipped alongside package
 ```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+cd mypackage
+touch install.py                           # Additional script for build
+mkdir python                               # Payload directory
+cd python                                  # 
+echo print("Hello World!") >> mymodule.py  # Python payload shipped alongside package
+```
+
+</div>
 
 **package.py**
 
@@ -190,9 +297,9 @@ if int(os.getenv("REZ_BUILD_INSTALL")):
 
 Now let's build it.
 
-```powershell
-$ rez build --install
-$ rez env mypackage
-> $ python -m mymodule
-Hello World!
+```bash
+rez build --install
+rez env mypackage
+> python -m mymodule
+# Hello World!
 ```

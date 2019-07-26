@@ -532,6 +532,14 @@ And presto, a cross-platform reproducible request!
 
 <br>
 
+#### Conversation
+
+As you can tell, there are many ways to skin this cat. The following is a conversation about the various pros and cons and what to look out for.
+
+- [Slack Conversation](https://gist.github.com/mottosso/54451ac5dd50ffdc8ba3e309e55c2d71)
+
+<br>
+
 ### Testing Packages
 
 Like any software projects, you need good tests. Software packaged with Rez is no exception, and doesn't *necessarily* change how you normally approach test.
@@ -606,3 +614,100 @@ Now when this application is associated with a project, it is hidden per default
 
 Each project specifies what applications to make available to the artist and developer. But sometimes, you don't care about that and just want to run Application X in a particular project environment.
 
+> Work in progress
+
+If you got this far, and know more or want more, feel free to submit [an issue](https://github.com/mottosso/allzpark/issues).
+
+<br>
+
+### Opt-out Environment
+
+Per default, the parent environment is inherited by a Rez context, unless one or more packages reference it internally.
+
+```bash
+$env:MY_PATH="path1;path2"
+rez env
+> $env:MY_PATH
+# path1;path2
+```
+
+Note the inheritance there. However, if any package references `MY_PATH` then it will automatically clear itself prior to being re-added by the package.
+
+**package.py**
+
+```python
+name = "my_package"
+version = "1.0"
+
+def commands():
+    env["MY_PATH"].append("path1")  # Clearing existing PATH
+```
+
+If we include this package, the variable now looks like this.
+
+```bash
+rez env my_package
+> $env:MY_PATH
+# path1
+```
+
+This is considered a bug in the underlying bleeding-rez library, and is being addressed here.
+
+- See also https://github.com/mottosso/bleeding-rez/issues/70
+
+<br>
+
+### Graph
+
+Allzpark is able to visualise a resolved context as a graph.
+
+![]()
+
+**Prerequisities**
+
+In order to enable graph drawing, you need the following package(s).
+
+- `graphviz-2+`
+
+**Usage**
+
+To make Allzpark aware of `graphviz`, simply include it in your request prior to launching.
+
+```powershell
+rez env graphviz pyside2 python-3 bleeding_rez -- python -m allzpark
+```
+
+<br>
+
+### Localisation
+
+Users are able to interactively localize packages from the Packages tab, to save on performance or to work offline.
+
+**Prerequisities**
+
+In order to enable localization, you'll need the following package(s).
+
+- `localz-1+`
+
+**Usage**
+
+Make Allzpark aware of `localz` by including it in your request.
+
+```powershell
+rez env localz pyside2 python3 bleeding_rez -- python -m allzpark
+```
+
+<br>
+
+### Allzpark Performance Considerations
+
+Use of the Allzpark can be divided into roughly three parts.
+
+1. Time taken to load libraries such as PySide2 - you should be seeing timings in the console
+    - Can be resolved by localizing packages, primarily python and PySide
+2. Time taken to get the window open
+    - Is actual building of the Allzpark and difficult to avoid
+3. Time taken to when applications, like Maya, actually show up
+    - This is the actual Rez resolves taking place. It will vary depending on whether the contexts can be found in memcached or not, which is about 90% of the time.
+
+From there most things are stored in-memory and won't perform many if any IO or CPU intensive calls, with a few exceptions like generating the resolve graph in the Context tab.

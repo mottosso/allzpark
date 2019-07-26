@@ -2,9 +2,36 @@ This section outlines the rationale behind Allzpark, to help you determine wheth
 
 <br>
 
+### Background
+
+Allzpark (a.k.a. LaunchApp2) started as a 4-month commission for the Japanese [Studio Anima](http://www.studioanima.co.jp/). Time was divided into roughly these parts.
+
+1. **Week 0-0** Tour of physical building, infrastructure and crew
+1. **Week 1-2** Requirements gathering, an evaluation if current system
+1. **Week 3-4** Evaluation of off-the-shelf options, e.g. Rez
+1. **Week 5-6** Evaluation of studio, system and personnel resources
+4. **Week 7-8** Integration and testing of fundamental infrastucture software, Ansible
+5. **Week 9-10** Research and development of Rez to fit the criteria and initial [prototype](https://github.com/mottosso/rez-for-projects)
+1. **Week 11-12** Conversion of existing package repository
+1. **Week 13-14** Implementation of graphical user interface, LaunchApp2
+1. **Week 15-16** Refinement of features, including localisation
+1. **Week 17-18** Final integration and training of staff
+
+<br>
+
+### Journal
+
+Allzpark was initially an internal project, never intended to be open sourced. As a result, the first 2 months of development are locked away behind an internal journal for the company (due to disclosure of sensitive information).
+
+Luckily, it was around this time that Allzpark got approved for open source and when I was able to start sharing its development publicly, so that you are able to take part in the design decisions made, the why and how. This way, you're able to accurately determine whether a solution to a new problem takes the original requirements into consideration; something all too often lost in software projects.
+
+- [Journal](https://github.com/mottosso/allzpark/issues/1)
+
+<br>
+
 ## Story time
 
-When Hannah - working at ILM, Weta, MPC, Framestore, Goodbye Kansas or Double Negative - arrives at work in the morning, she typically types something like this into her console.
+When Hannah - working at a digital production company like Framestore or ILM - arrives at work in the morning, she typically types something like this into her console.
 
 ```powershell
 go gravity

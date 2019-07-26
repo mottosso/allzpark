@@ -1,13 +1,5 @@
 The starting point to using and understanding Allzpark.
 
-![image](https://user-images.githubusercontent.com/2152766/60737617-5ba2ab00-9f53-11e9-8a8b-4d7e1d0527eb.png)
-
-<br>
-
-## In development
-
-Allzpark is currently [being developed](https://github.com/mottosso/allzpark) and is not yet ready for use. If you're interested in early-access to collaborate and or contribute, [get in touch](mailto:marcus@abstractfactory.io). A 1.0 is scheduled for release in early August 2019.
-
 <br>
 <br>
 <br>
@@ -31,8 +23,6 @@ Allzpark isn't just a pretty face, it's the backbone of any competent production
 That backbone is made up of **packages**.
 
 ### What is a package?
-
-![image](https://user-images.githubusercontent.com/2152766/60737613-55acca00-9f53-11e9-846f-cb482acb1099.png)
 
 A package is a group of files with some metadata attached, declaring a name, version and its relationship to other packages. When one package requires another, a *requirement hierarchy* is formed.
 
@@ -70,7 +60,7 @@ As you can see, the number of iterations and complexity therein can grow signifi
 
 ## Prerequisities
 
-To resolve requirements, we'll utilise [bleeding-rez]().
+To resolve requirements, we'll utilise [bleeding-rez](https://github.com/mottosso/bleeding-rez).
 
 ```bash
 pip install bleeding-rez
@@ -635,4 +625,29 @@ Including this package in your resolve results in Maya exposing the Legacy Viewp
 
 <br>
 
-###
+### Performance
+
+Rez is heavily dependent on a server-side application called `memcached`, which as the name suggests is a cache for queries involving the filesystem. Without it, resolving new environments can take seconds to minutes compared to milliseconds, so it's recommended that you set it up.
+
+??? quote "With Docker"
+    If you've got access to Docker, then this is the simplest option for both a local and distributed install.
+
+    ```bash
+    docker run -ti --rm -p 11211:11211 memcached
+    ```
+
+    This will expose `memcached` to its default port 11211.
+
+??? quote "With RaspberryPi"
+    Memcached isn't particularly memory intensive (>=32 mb of RAM) and can run on low-end hardware like a Pi, and should keep you covered up to 500 versions or so.
+
+    ```bash
+    apt-get install memcached
+    ```
+
+    This will expose `memcached` to its default port 11211.
+
+??? quote "Bare metal"
+    You can also install onto your local machine, however it requires a Linux or MacOS operating system for that.
+
+    - https://www.memcached.org/downloads

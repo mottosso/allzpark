@@ -74,12 +74,6 @@ rez env scoopz -- install python
 
 <br>
 
-## Windows Gotchas
-
-Here are a few things to keep in mind when working with Rez on Windows.
-
-<br>
-
 ## Package version and Python
 
 Every package containing a payload typically involves two version numbers.
