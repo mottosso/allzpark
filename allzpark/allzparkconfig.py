@@ -56,9 +56,12 @@ startup_project = "no_project"  # (optional)
 def applications_from_package(variant):
     """Return applications relative `variant`"""
 
+    # May not be defined
+    requirements = variant.requires or []
+
     return list(
         str(req)
-        for req in variant.requires
+        for req in requirements
         if req.weak
     )
 

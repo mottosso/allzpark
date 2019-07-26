@@ -50,7 +50,7 @@ class Window(QtWidgets.QMainWindow):
             "loadingMessage": QtWidgets.QLabel("Loading"),
             "errorMessage": QtWidgets.QLabel("Uh oh..<br>"
                                              "See Console for details"),
-            "noappsMessage": QtWidgets.QTextEdit(),
+            "noappsMessage": QtWidgets.QTextBrowser(),
             "noprojectMessage": QtWidgets.QLabel("No project found"),
             "pkgnotfoundMessage": QtWidgets.QLabel(
                 "One or more packages could not be found"
@@ -236,6 +236,7 @@ class Window(QtWidgets.QMainWindow):
         widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
 
         widgets["noappsMessage"].setReadOnly(True)
+        widgets["noappsMessage"].setOpenExternalLinks(True)
 
         css = "QWidget { border-image: url(%s); }"
         widgets["projectBtn"].setStyleSheet(css % res.find("Default_Project"))
@@ -298,6 +299,7 @@ class Window(QtWidgets.QMainWindow):
         self.setup_docks()
         self.on_state_changed("booting")
         self.update_advanced_controls()
+        self.setFocus()
 
         # Enable mouse tracking for tooltips
         QtWidgets.QApplication.instance().installEventFilter(self)
@@ -530,35 +532,31 @@ class Window(QtWidgets.QMainWindow):
         icon = res.find("Default_Project")
         label = project
 
-        try:
-            package = self._ctrl.state["rezProjects"][project][version]
-            data = allzparkconfig.metadata_from_package(package)
-            label = data["label"]
+        package = self._ctrl.state["rezProjects"][project][version]
+        data = allzparkconfig.metadata_from_package(package)
+        label = data["label"]
 
-            # Facilitate overriding of icon via package metadata
-            if data.get("icon"):
-                try:
-                    values = {
-                        "root": os.path.dirname(package.uri),
-                        "width": px(32),
-                        "height": px(32),
-                    }
+        # Facilitate overriding of icon via package metadata
+        if data.get("icon"):
+            try:
+                values = {
+                    "root": os.path.dirname(package.uri),
+                    "width": px(32),
+                    "height": px(32),
+                }
 
-                    icon = data["icon"].format(**values).replace("\\", "/")
+                icon = data["icon"].format(**values).replace("\\", "/")
 
-                except KeyError:
-                    self.tell("Misformatted %s.icon" % package.name)
+            except KeyError:
+                self.tell("Misformatted %s.icon" % package.name)
 
-                except TypeError:
-                    self.tell("Unsupported package repository "
-                              "for icon of %s" % package.uri)
+            except TypeError:
+                self.tell("Unsupported package repository "
+                          "for icon of %s" % package.uri)
 
-                except Exception:
-                    self.tell("Unexpected error coming from icon of %s"
-                              % package.uri)
-        except KeyError:
-            # Project may not exist
-            pass
+            except Exception:
+                self.tell("Unexpected error coming from icon of %s"
+                          % package.uri)
 
         self.tell("%s %s-%s" % (action, project, version))
         self.setWindowTitle("%s | %s" % (label, self.title))
@@ -577,6 +575,13 @@ class Window(QtWidgets.QMainWindow):
 
         button.setIconSize(QtCore.QSize(width, height))
         button.setAutoFillBackground(True)
+
+    def setStyleSheet(self, style):
+        style = style % {
+            "root": os.path.dirname(__file__).replace("\\", "/"),
+            "res": res.dirname.replace("\\", "/"),
+        }
+        super(Window, self).setStyleSheet(style)
 
     def on_repository_changed(self):
         self.reset()

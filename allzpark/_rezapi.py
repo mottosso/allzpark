@@ -16,10 +16,17 @@ from rez.exceptions import (
     ResolvedContextError,
     RexError,
     PackageCommandError,
+    PackageRequestError,
     PackageNotFoundError,
     RezError,
 )
 from rez.utils.graph_utils import save_graph
+
+
+def clear_caches():
+    for path in config.packages_path:
+        repo = package_repository_manager.get_repository(path)
+        repo.clear_caches()
 
 
 try:
@@ -49,6 +56,7 @@ __all__ = [
     "RexError",
     "PackageCommandError",
     "PackageNotFoundError",
+    "PackageRequestError",
     "RezError",
 
     # Filters
@@ -58,4 +66,5 @@ __all__ = [
     # Extras
     "which",
     "save_graph",
+    "clear_caches",
 ]

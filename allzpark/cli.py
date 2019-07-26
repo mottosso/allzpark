@@ -95,6 +95,10 @@ def main():
     print("=" * 30)
 
     if opts.demo:
+
+        # Keep settings from interfering with demo
+        opts.clear_settings = True
+
         with timings("- Loading demo.."):
             try:
                 import allzparkdemo
@@ -198,6 +202,11 @@ def main():
         if allzparkconfig.startup_application:
             storage.setValue("startupApp", allzparkconfig.startup_application)
 
+        if opts.demo:
+            # Normally unsafe, but for the purposes of a demo
+            # a convenient location for installed packages
+            storage.setValue("useDevelopmentPackages", True)
+
     try:
         __import__("localz")
         allzparkconfig._localz_enabled = True
@@ -233,14 +242,34 @@ def main():
 
     window.show()
 
-    def measure():
-        duration = time.time() - timing["beforeReset"]
-        print("- Resolving contexts.. ok %.2fs" % duration)
+    def projects_from_dir(path):
+        try:
+            projects = os.listdir(opts.root)
+        except IOError:
+            sys.stderr.write(
+                "ERROR: Could not list directory %s" % opts.root
+            )
+
+        # Support directory names that use dash in place of underscore
+        projects = [p.replace("-", "_") for p in projects]
+
+        return projects
 
     def init():
         timing["beforeReset"] = time.time()
-        root = opts.root or allzparkconfig.projects
+        projects = []
+
+        if opts.root:
+            sys.stderr.write("The flag --root has been deprecated, "
+                             "use allzparkconfig.py instead.")
+            projects = projects_from_dir(opts.root)
+
+        root = projects or allzparkconfig.projects
         ctrl.reset(root, on_success=measure)
+
+    def measure():
+        duration = time.time() - timing["beforeReset"]
+        tell("- Resolved contexts.. ok %.2fs" % duration)
 
     # Give the window a moment to appear before occupying it
     QtCore.QTimer.singleShot(50, init)

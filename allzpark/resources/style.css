@@ -6,6 +6,7 @@ Window {
     min-width: 580px;
     min-height: 300px;
     height: 350px;
+    background: #eee;
 }
 
 Window #header {
@@ -118,18 +119,30 @@ FullCommand QLineEdit {
   color: rgba(0, 0, 0, 0.2);
 }
 
-FullCommand QLineEdit:hover {
-  color: #333;
+FullCommand QComboBox {
+    background: white;
+    color: #222;
 }
 
 FullCommand QComboBox {
-    background: transparent;
+    border: none;
+    padding: 0;
+    padding-left: 3px;
+}
+
+FullCommand QComboBox::drop-down {
+    border: none;
+    width: 0;
+}
+
+FullCommand QComboBox::down-arrow {
+    image: url(%(res)s/logo_64.png);
 }
 
 Window #body QLineEdit {
     border: 1px solid #ddd;
     padding: 3px;
-  margin: 3px;
+    margin: 3px;
 }
 
 LineEditWithCompleter {
