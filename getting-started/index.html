@@ -645,6 +645,19 @@
 <p>The "requirements" indicate what software or libraries your project depend on, such as <code>python-3</code> or <code>git-2.21</code>.</p>
 <p>The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, <code>PROJECT_NAME=alita</code> is a relevant variable to add, to allow for the application and your software to identify which project an application was launched in.</p>
 <p>As you might have guessed, projects are <em>versioned</em> and we'll get into more about this and "packages" in general a little later.</p>
+<div class="admonition into">
+<p class="admonition-title">Data pipeline</p>
+<p>This refers to a pre-defined system of interconnected components designed to pass data between stakeholders in an organisation, such as from an modeling artist to a character rigger.</p>
+<p><strong>Examples</strong></p>
+<p>These are a number of off-the-shelf data pipelines suitable for use with Allzpark.</p>
+<ul>
+<li><a href="http://getavalon.github.io">Avalon</a></li>
+<li><a href="https://www.kabaretstudio.com/home">Kabaret</a></li>
+<li><a href="http://www.piperpipeline.com">Piper</a></li>
+<li><a href="https://github.com/kiryha/AnimationDNA">AnimationDNA</a></li>
+<li><a href="http://www.ardakutlu.com/tik-manager/">Tik Manager</a></li>
+</ul>
+</div>
 <p><br></p>
 <h4 id="what-is-an-application">What is an "application"?</h4>
 <p>Blender is an application within which work is performed.</p>
@@ -845,12 +858,12 @@ rez build --install
 <p>Let's try this out.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> texteditor
 rez build --install
-rez env texteditor
+rez env texteditor --paths <span style="color: #66d9ef">$(</span>allzparkdemo --packages<span style="color: #66d9ef">)</span>
 &gt; texteditor
 </pre></div>
 
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61943522-88b30e00-af93-11e9-9be3-b4e52923adf2.png" /></p>
-<p>This is the equivalent command-line procedure to what Allzpark is doing when you launch an application. Let's try it out in Allzpark too.</p>
+<p>This is the equivalent command-line procedure to what Allzpark is doing when you launch an application. Don't worry too much about what <code>rez env</code> actually does right now, we'll talk a lot more about it later. Let's try this out in Allzpark too.</p>
 <p><strong>kingkong/package.py</strong></p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span>
 <span style="background-color: #49483e"><span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.2&quot;</span>
