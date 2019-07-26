@@ -928,25 +928,18 @@ class Controller(QtCore.QObject):
         if not apps:
             apps[:] = allzparkconfig.applications_from_package(project)
 
-        # Strip the "weak" property of the request, else iter_packages
-        # isn't able to find the requested versions.
-        apps = [rez.PackageRequest(req.strip("~")) for req in apps]
-
-        # Expand versions into their full range
-        # E.g. maya-2018|2019 == ["maya-2018", "maya-2019"]
-        all_apps = list()
-        for request in apps:
-            all_apps += self.find(
-                request.name,
-                range_=request.range,
-            )
-
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
 
+        # Exclude filtered
+        package_filter = self._package_filter()
+        for app in apps[:]:
+            if package_filter.excludes(app):
+                apps.remove(app)
+
         contexts = odict()
         with util.timing() as t:
-            for app_package in all_apps:
+            for app_package in apps:
                 variants = list(project.iter_variants())
                 variant = variants[0]
 
@@ -1025,7 +1018,7 @@ class Controller(QtCore.QObject):
         show_hidden = self._state.retrieve("showHiddenApps")
         for app_request, context in contexts.items():
             for package in context.resolved_packages or []:
-                if package.name in [a.name for a in all_apps]:
+                if package.name in [a.name for a in apps]:
                     break
             else:
                 package = model.BrokenPackage(app_request)
