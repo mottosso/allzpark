@@ -374,6 +374,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#your-first-environment" title="Your first environment" class="md-nav__link">
+    Your first environment
+  </a>
+  
+</li>
+      
       
       
       
@@ -578,6 +585,13 @@
         <li class="md-nav__item">
   <a href="#your-first-payload" title="Your first payload" class="md-nav__link">
     Your first payload
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-environment" title="Your first environment" class="md-nav__link">
+    Your first environment
   </a>
   
 </li>
@@ -872,6 +886,31 @@ allzpark --demo
 <h3 id="your-first-payload">Your first payload</h3>
 <p>We've managed to make a new project, and an application and we're just about ready to start developing the next King Kong movie.</p>
 <p>But there is something else missing. For the purposes of this chapter, I will assume you are developing King Kong using Autodesk Maya, but the same applies to just about any application.</p>
+<div class="admonition hint">
+<p class="admonition-title">In Development</p>
+<p>Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the <a href="https://github.com/mottosso/allzpark">GitHub repo</a> for changes as that's where these are coming from.</p>
+</div>
+<p><br></p>
+<h3 id="your-first-environment">Your first environment</h3>
+<p>So your project has got some custom data, that's perfect. Now let's add some <em>metadata</em> as well.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.2&quot;</span>
+<span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
+
+<span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;~maya==2018.0.6&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;~blender==2.80.0&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;~texteditor==1.5.1&quot;</span><span style="color: #f8f8f2">,</span>
+<span style="color: #f8f8f2">]</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">env</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PROJECT_ID&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;12&quot;</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PROJECT_NAME&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PROJECT_FRAMERATE&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;25&quot;</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PROJECT_TAGS&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;awesome,great,best&quot;</span>
+</pre></div>
+
 <div class="admonition hint">
 <p class="admonition-title">In Development</p>
 <p>Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the <a href="https://github.com/mottosso/allzpark">GitHub repo</a> for changes as that's where these are coming from.</p>
