@@ -48,7 +48,6 @@ jobs:
         displayName: "Use Python $(python.version)"
 
       - script: |
-          pip install --upgrade pip
           pip install . --no-deps
         displayName: "pip install"
 
@@ -70,7 +69,6 @@ jobs:
         displayName: "Use Python $(python.version)"
 
       - script: |
-          pip install --upgrade pip
           pip install . --no-deps
         displayName: "pip install"
 
@@ -90,7 +88,6 @@ jobs:
           versionSpec: "$(python.version)"
         displayName: "Use Python $(python.version)"
       - powershell: |
-          pip install --upgrade pip
           pip install . --no-deps
         displayName: "pip install"
 
