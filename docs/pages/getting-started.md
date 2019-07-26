@@ -350,3 +350,32 @@ But there is something else missing. For the purposes of this chapter, I will as
 
 !!! hint "In Development"
     Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the [GitHub repo](https://github.com/mottosso/allzpark) for changes as that's where these are coming from.
+
+
+<br>
+
+### Your first environment
+
+So your project has got some custom data, that's perfect. Now let's add some *metadata* as well.
+
+```python
+name = "kingkong"
+version = "1.0.2"
+build_command = False
+
+requires = [
+    "~maya==2018.0.6",
+    "~blender==2.80.0",
+    "~texteditor==1.5.1",
+]
+
+def commands():
+    global env
+    env["PROJECT_ID"] = "12"
+    env["PROJECT_NAME"] = "kingkong"
+    env["PROJECT_FRAMERATE"] = "25"
+    env["PROJECT_TAGS"] = "awesome,great,best"
+```
+
+!!! hint "In Development"
+    Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the [GitHub repo](https://github.com/mottosso/allzpark) for changes as that's where these are coming from.
