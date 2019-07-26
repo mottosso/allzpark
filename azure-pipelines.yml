@@ -49,7 +49,7 @@ jobs:
 
       - script: |
           pip install --upgrade pip
-          pip install .
+          pip install . --no-deps
         displayName: "pip install"
 
 
@@ -71,7 +71,7 @@ jobs:
 
       - script: |
           pip install --upgrade pip
-          pip install .
+          pip install . --no-deps
         displayName: "pip install"
 
   - job: Windows
@@ -91,7 +91,7 @@ jobs:
         displayName: "Use Python $(python.version)"
       - powershell: |
           pip install --upgrade pip
-          pip install .
+          pip install . --no-deps
         displayName: "pip install"
 
 
