@@ -18,6 +18,18 @@ Press the **Watch** icon top-right for notifications.
 
 <br>
 
+### Rez Integration
+
+For production, Allzpark should be deployed as a Rez package, so as to facilitate running independent versions across multiple projects. Deploy Allzpark as a Rez package with [`rez-pipz`](https://github.com/mottosso/rez-pipz).
+
+```bash
+git clone https://github.com/mottosso/allzpark.git
+cd allzpark
+rez env pipz -- install . --prefix /path/to/packages
+```
+
+<br>
+
 ### Development
 
 To make changes and/or contribute to Allzpark, here's how to run it from its Git repository.
