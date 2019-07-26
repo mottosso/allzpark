@@ -30,7 +30,7 @@ def projects():
     try:
         return __os.listdir(__os.path.expanduser("~/projects"))
     except IOError:
-        return ["no_project"]
+        return []
 
 
 def applications():
@@ -41,16 +41,16 @@ def applications():
 
     """
 
-    return ["no_application"]
+    return []
 
 
 # Load this project on startup.
-# Defaults to the first available from `projects_dir`
-startup_application = "no_application"  # (optional)
+# Defaults to the first available from `projects`
+startup_project = ""  # (optional)
 
 # Pre-select this application in the list of applications,
 # if it exists in the startup project.
-startup_project = "no_project"  # (optional)
+startup_application = ""  # (optional)
 
 
 def applications_from_package(variant):

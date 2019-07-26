@@ -158,7 +158,7 @@ class Controller(QtCore.QObject):
     repository_changed = QtCore.Signal()
 
     project_changed = QtCore.Signal(
-        str, str, bool)  # project, version, refreshed
+        str, object, bool)  # project, version, refreshed
 
     application_changed = QtCore.Signal()
 
@@ -315,7 +315,7 @@ class Controller(QtCore.QObject):
             message = """
                 <h2><font color=\"red\">:(</font></h2>
 
-                Version '{package}' is required by this project,
+                Package '{package}' is required by this project,
                 but could <font color=\"red\">not be found.</font>
                 <br>
                 <br>
@@ -409,7 +409,7 @@ class Controller(QtCore.QObject):
 
         for pkg in it:
             if package_filter.excludes(pkg):
-                self.debug("Excluding %s.." % pkg)
+                self.debug("Excluding %s==%s.." % (pkg.name, pkg.version))
                 continue
 
             yield pkg
@@ -544,8 +544,9 @@ class Controller(QtCore.QObject):
             # the startup project.
             current_project = self._state["projectName"]
 
-            if current_project not in projects:
-                self.warning("Startup project '%s' did not exist")
+            if current_project and current_project not in projects:
+                self.warning("Startup project '%s' did not exist"
+                             % current_project)
                 current_project = None
 
             # The user has never opened the GUI before,
@@ -807,19 +808,18 @@ class Controller(QtCore.QObject):
             project_versions = self._state["rezProjects"][project_name]
             active_project = project_versions[version_name]
 
+            refreshed = self._state["projectName"] == project_name
+            self._state["projectName"] = project_name
+            self.project_changed.emit(
+                project_name,
+                version_name,
+                refreshed
+            )
+
             if isinstance(active_project, model.BrokenPackage):
                 raise rez.PackageNotFoundError(
                     "package not found: %s" % project_name
                 )
-
-            refreshed = self._state["projectName"] == project_name
-            self._state["projectName"] = project_name
-
-            self.project_changed.emit(
-                str(active_project.name),
-                str(active_project.version),
-                refreshed
-            )
 
             # Update versions model
             versions = list(filter(None, project_versions))  # Exclude "Latest"
