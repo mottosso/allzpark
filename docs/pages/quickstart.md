@@ -69,10 +69,10 @@ Did anything go wrong?
 ??? quote "Could not find ... PySide2"
     The instructions assume Python 3, but Allzpark is written with [Qt.py](https://github.com/mottosso/Qt.py) and supports any available binding, for both Python 2 and 3.
 
-    For Python 2, try installing Allzpark dependencies manually.
+    Try installing Allzpark dependencies manually, replacing PySide2 with PySide(1).
 
     ```bash
-    pip install --no-deps python-qt5 allzpark allzparkdemo bleeding-rez
+    pip install --no-deps PySide allzpark allzparkdemo bleeding-rez
     ```
 
 ??? quote "Something else happened"
