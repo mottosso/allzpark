@@ -199,16 +199,11 @@ class Controller(QtCore.QObject):
 
         timers = {
             "commandsPoller": QtCore.QTimer(self),
-            "cacheCleaner": QtCore.QTimer(self),
             "applicationSelector": QtCore.QTimer(self),
         }
 
         timers["commandsPoller"].timeout.connect(self.on_tasks_polled)
         timers["commandsPoller"].start(500)
-
-        timeout = int(state.retrieve("clearCacheTimeout", 1))
-        timers["cacheCleaner"].timeout.connect(self.on_cache_cleared)
-        timers["cacheCleaner"].start(timeout * 1000)
 
         timers["applicationSelector"].setSingleShot(True)
         timers["applicationSelector"].timeout.connect(self._select_application)
@@ -284,11 +279,6 @@ class Controller(QtCore.QObject):
     def on_tasks_polled(self):
         self._models["commands"].poll()
 
-    def on_cache_cleared(self):
-        for path in self._package_paths():
-            repo = rez.package_repository_manager.get_repository(path)
-            repo.clear_caches()
-
     def on_state_changed(self):
         state = self._name_to_state[self._state.state]
         self.state_changed.emit(state)
@@ -323,19 +313,20 @@ class Controller(QtCore.QObject):
             package = value.value.rsplit(": ", 1)[-1]
             paths = self._package_paths()
             message = """
-                <h2>Package '{package}'<font color=\"red\">
-                not found</font></h2>
-                The project requires {package}, but it couldn't be found. 
+                <h2><font color=\"red\">:(</font></h2>
+
+                Version '{package}' is required by this project,
+                but could <font color=\"red\">not be found.</font>
+                <br>
+                <br>
                 I searched in these paths:
-                <br>
-                <br>
                 {paths}
             """
 
             self._state["error"] = message.format(
                 package=package,
-                paths="<br>".join(
-                    "  - %s" % path for path in paths
+                paths="<ul>%s</ul>" % "".join(
+                    "<li>%s</li>" % path for path in paths
                 )
             )
 
@@ -346,22 +337,23 @@ class Controller(QtCore.QObject):
             # package family not found: occoc (searched: C:\)
             _, package, paths = value.value.split(": ", 2)
             package = package.split(" (", 1)[0]
-            paths = paths.rstrip(")")
+            paths = paths.rstrip(")").split(os.pathsep)
 
             message = """
-                <h2>Package '{package}'<font color=\"red\">
-                not found</font></h2>
-                The project requires {package}, but it couldn't be found. 
+                <h2><font color=\"red\">:(</font></h2>
+
+                Package '{package}' is required by this project,
+                but could <font color=\"red\">not be found.</font>
+                <br>
+                <br>
                 I searched in these paths:
-                <br>
-                <br>
                 {paths}
             """
 
             self._state["error"] = message.format(
                 package=package,
-                paths="<br>".join(
-                    "  - %s" % p for p in paths.split(os.pathsep)
+                paths="<ul>%s</ul>" % "".join(
+                    "<li>%s</li>" % path for path in paths
                 )
             )
 
@@ -384,6 +376,11 @@ class Controller(QtCore.QObject):
 
         elif rez.PackageCommandError is type:
             self._state.to_errored()
+
+        elif rez.PackageRequestError is type:
+            message = "<h2><font color=\"red\">:(</font></h2>%s"
+            self._state["error"] = message % value
+            self._state.to_noapps()
 
         self.error(self._state["error"])
 
@@ -547,9 +544,9 @@ class Controller(QtCore.QObject):
             # the startup project.
             current_project = self._state["projectName"]
 
-            # Find last used project from user preferences
-            if not current_project:
-                current_project = self._state.retrieve("startupProject")
+            if current_project not in projects:
+                self.warning("Startup project '%s' did not exist")
+                current_project = None
 
             # The user has never opened the GUI before,
             # or user preferences has been wiped.
@@ -558,7 +555,7 @@ class Controller(QtCore.QObject):
 
             # Fallback
             if not current_project:
-                current_project = "No project"
+                current_project = "no_project"
 
             self._state["projectName"] = current_project
             self._state["root"] = root
@@ -575,6 +572,12 @@ class Controller(QtCore.QObject):
 
         self._state["rezContexts"].clear()
         self._state["rezApps"].clear()
+
+        # Rez stores file listings and more
+        # in memory, in addition to memcached.
+        # This function clears the in-memory cache,
+        # so that we can pick up new packages.
+        rez.clear_caches()
 
         self._state.to_booting()
         util.defer(
@@ -744,24 +747,21 @@ class Controller(QtCore.QObject):
         assert root, "Tried listing without a root, this is a bug"
 
         if isinstance(root, (tuple, list)):
-            return root
+            projects = root
 
-        try:
-            if callable(root):
+        elif callable(root):
+            try:
                 projects = root()
 
-            else:
-                _, projects, _ = next(os.walk(root))
+            except Exception:
+                if log.level < logging.INFO:
+                    traceback.print_exc()
 
-                # Support directory names that use dash in place of underscore
-                projects = [p.replace("-", "_") for p in projects]
+                self.error("Could not find projects in %s" % root)
+                projects = []
 
-        except Exception:
-            if log.level < logging.INFO:
-                traceback.print_exc()
-
-            self.error("Could not find projects in %s" % root)
-            projects = []
+        # Facilitate accidental empty family names, e.g. None or ''
+        projects = list(filter(None, projects))
 
         return projects
 
@@ -776,8 +776,28 @@ class Controller(QtCore.QObject):
         self._models["projectVersions"].setStringList([])
 
         def on_apps_found(apps):
-            self._models["apps"].reset(apps)
-            self._state.to_ready()
+            if not apps:
+                self._state["error"] = """
+                <h2><font color=\"red\">:(</font></h2>
+                <br>
+                <br>
+                The project was found, but no applications.
+                <br>
+                <br>
+                The project didn't specify an application for you to use.<br>
+                This is likely due to a misconfigured project. Don't forget<br>
+                to provide one or more packages as <i>weak references</i>.
+                <br>
+                <br>
+                See <a href=https://allzpark.com/getting-started>
+                    allzpark.com/getting-started</a> for more details.
+
+                """
+                self._state.to_noapps()
+
+            else:
+                self._models["apps"].reset(apps)
+                self._state.to_ready()
 
         def on_apps_not_found(error, trace):
             # Handled by on_unhandled_exception
@@ -786,6 +806,12 @@ class Controller(QtCore.QObject):
         try:
             project_versions = self._state["rezProjects"][project_name]
             active_project = project_versions[version_name]
+
+            if isinstance(active_project, model.BrokenPackage):
+                raise rez.PackageNotFoundError(
+                    "package not found: %s" % project_name
+                )
+
             refreshed = self._state["projectName"] == project_name
             self._state["projectName"] = project_name
 
