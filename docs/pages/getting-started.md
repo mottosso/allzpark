@@ -19,7 +19,7 @@ For the purposes of this quick walkthrough, I'll assume you are part of a visual
 
 #### What is a "project"?
 
-Alita is the name given to a project within work is performed by multiple stakeholders towards a common goal, also referred to as a "show" or "game" depending on your context. It typically consists of these components.
+Alita is the name given to a project within which work is performed by multiple stakeholders towards a common goal, also referred to as a "show" or "game" depending on your context. It typically consists of these components.
 
 - Name
 - Version
@@ -34,6 +34,19 @@ The "requirements" indicate what software or libraries your project depend on, s
 The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, `PROJECT_NAME=alita` is a relevant variable to add, to allow for the application and your software to identify which project an application was launched in.
 
 As you might have guessed, projects are *versioned* and we'll get into more about this and "packages" in general a little later.
+
+!!! into "Data pipeline"
+    This refers to a pre-defined system of interconnected components designed to pass data between stakeholders in an organisation, such as from an modeling artist to a character rigger.
+
+    **Examples**
+
+    These are a number of off-the-shelf data pipelines suitable for use with Allzpark.
+
+    - [Avalon](http://getavalon.github.io)
+    - [Kabaret](https://www.kabaretstudio.com/home)
+    - [Piper](http://www.piperpipeline.com)
+    - [AnimationDNA](https://github.com/kiryha/AnimationDNA)
+    - [Tik Manager](http://www.ardakutlu.com/tik-manager/)
 
 <br>
 
@@ -295,13 +308,13 @@ Let's try this out.
 ```bash
 cd texteditor
 rez build --install
-rez env texteditor
+rez env texteditor --paths $(allzparkdemo --packages)
 > texteditor
 ```
 
 ![image](https://user-images.githubusercontent.com/2152766/61943522-88b30e00-af93-11e9-9be3-b4e52923adf2.png)
 
-This is the equivalent command-line procedure to what Allzpark is doing when you launch an application. Let's try it out in Allzpark too.
+This is the equivalent command-line procedure to what Allzpark is doing when you launch an application. Don't worry too much about what `rez env` actually does right now, we'll talk a lot more about it later. Let's try this out in Allzpark too.
 
 **kingkong/package.py**
 
