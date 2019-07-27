@@ -44,17 +44,16 @@ def _load_userconfig(fname=None):
 def timings(title, timing=True):
     sys.stdout.write(title)
     t0 = time.time()
+    message = {"success": "ok - {:.2f}\n" if timing else "ok\n",
+               "failure": "fail\n"}
 
     try:
-        yield
+        yield message
     except Exception:
-        sys.stdout.write("fail\n")
+        sys.stdout.write(message["failure"])
         raise
     else:
-        if timing:
-            sys.stdout.write("ok - %.2fs\n" % (time.time() - t0))
-        else:
-            sys.stdout.write("ok\n")
+        sys.stdout.write(message["success"].format(time.time() - t0))
 
 
 def tell(msg):
@@ -115,22 +114,25 @@ def main():
         tell("  - %s" % allzparkdemo.rezconfig)
         tell("  - %s" % allzparkdemo.allzparkconfig)
 
-    with timings("- Loading Rez.. "):
+    with timings("- Loading Rez.. ") as msg:
         try:
             from rez import __file__ as _rez_location
             from rez.utils._version import _rez_version
             from rez.config import config
+            msg["success"] = "(%s) - ok {:.2f}\n" % _rez_version
         except ImportError:
             tell("ERROR: allzpark requires rez")
             exit(1)
 
-    with timings("- Loading Qt.. "):
+    with timings("- Loading Qt.. ") as msg:
         try:
             from .vendor import Qt
+            msg["success"] = "(%s) - ok {:.2f}\n" % Qt.__binding__
         except ImportError:
-            tell("ERROR: allzpark requires a Python binding for Qt,\n"
-                 "such as PySide, PySide2, PyQt4 or PyQt5.")
-            exit(1)
+            msg["failure"] = (
+                "ERROR: allzpark requires a Python binding for Qt,\n"
+                "such as PySide, PySide2, PyQt4 or PyQt5.\n"
+            )
 
         from .vendor import six
         from .vendor.Qt import QtWidgets, QtCore
