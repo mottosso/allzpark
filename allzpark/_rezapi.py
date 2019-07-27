@@ -32,7 +32,7 @@ def clear_caches():
 try:
     from rez import project
 except ImportError:
-    # Vanilla Rez
+    # nerdvegas/rez
     project = "rez"
 
 

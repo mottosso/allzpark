@@ -11,6 +11,14 @@ import os as __os
 import sys as __sys
 
 
+# Load this profile on startup.
+# Defaults to the first available from `profiles`
+startup_profile = ""  # (optional)
+
+# Pre-select this application in the list of applications,
+# if it exists in the startup profile.
+startup_application = ""  # (optional)
+
 # Default filter, editable via the Preferences page
 exclude_filter = "*.beta"
 
@@ -18,8 +26,8 @@ exclude_filter = "*.beta"
 help_url = "https://allzpark.com"
 
 
-def projects():
-    """Return list of projects
+def profiles():
+    """Return list of profiles
 
     This function is called asynchronously, and is suitable
     for making complex filesystem or database queries.
@@ -28,7 +36,7 @@ def projects():
     """
 
     try:
-        return __os.listdir(__os.path.expanduser("~/projects"))
+        return __os.listdir(__os.path.expanduser("~/profiles"))
     except IOError:
         return []
 
@@ -36,21 +44,12 @@ def projects():
 def applications():
     """Return list of applications
 
-    Applications are typically provided by the project,
+    Applications are typically provided by the profile,
     this function is called when "Show all apps" is enabled.
 
     """
 
     return []
-
-
-# Load this project on startup.
-# Defaults to the first available from `projects`
-startup_project = ""  # (optional)
-
-# Pre-select this application in the list of applications,
-# if it exists in the startup project.
-startup_application = ""  # (optional)
 
 
 def applications_from_package(variant):
@@ -85,7 +84,7 @@ def applications_from_package(variant):
 def metadata_from_package(variant):
     """Return metadata relative `variant`
 
-    Blocking call, during change of project.
+    Blocking call, during change of profile.
 
     IMPORTANT: this function must return at least the
         members part of the original function, else the program
@@ -110,13 +109,3 @@ def metadata_from_package(variant):
         "icon": data.get("icon", ""),
         "hidden": data.get("hidden", False),
     })
-
-
-# Backup-copies of originals, with `_` prefix
-# Useful for augmenting an existing value with your own config
-__self__ = __sys.modules[__name__]
-for member in dir(__self__):
-    if member.startswith("__"):
-        continue
-
-    setattr(__self__, "_%s" % member, getattr(__self__, member))

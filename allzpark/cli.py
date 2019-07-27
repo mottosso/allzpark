@@ -12,6 +12,7 @@ from .version import version
 from . import allzparkconfig
 
 timing = {}
+log = logging.getLogger("allzpark")
 
 
 def _load_userconfig(fname=None):
@@ -27,7 +28,6 @@ def _load_userconfig(fname=None):
     with open(fname) as f:
         exec(compile(f.read(), f.name, 'exec'), mod)
 
-    tell("- Loading custom %s.." % fname)
     for key in dir(allzparkconfig):
         if key.startswith("__"):
             continue
@@ -38,6 +38,32 @@ def _load_userconfig(fname=None):
             continue
 
         setattr(allzparkconfig, key, value)
+
+    return fname
+
+
+def _backwards_compatibility():
+    # The term "project" was renamed "profile" in version 1.2.100
+    if hasattr(allzparkconfig, "projects"):
+        allzparkconfig.profiles = allzparkconfig.projects
+
+    if hasattr(allzparkconfig, "startup_project"):
+        allzparkconfig.startup_profile = allzparkconfig.startup_project
+
+
+def _patch_allzparkconfig():
+    """Make backup copies of originals, with `_` prefix
+
+    Useful for augmenting an existing value with your own config
+
+    """
+
+    for member in dir(allzparkconfig):
+        if member.startswith("__"):
+            continue
+
+        setattr(allzparkconfig, "_%s" % member,
+                getattr(allzparkconfig, member))
 
 
 @contextlib.contextmanager
@@ -51,6 +77,15 @@ def timings(title, timing=True):
         yield message
     except Exception:
         sys.stdout.write(message["failure"])
+
+        if log.level < logging.WARNING:
+            import traceback
+            sys.stdout.write(traceback.format_exc())
+            sys.stdout.write("\n")
+
+        else:
+            tell("Pass --verbose for details")
+
         exit(1)
     else:
         sys.stdout.write(message["success"].format(time.time() - t0))
@@ -77,11 +112,11 @@ def main():
         "over ALLZPARK_CONFIG_FILE"))
     parser.add_argument("--no-config", action="store_true", help=(
         "Do not load custom allzparkconfig.py"))
-    parser.add_argument("--root", help=(
-        "Path to where projects live on disk, "
-        "defaults to allzparkconfig.projects_dir"))
     parser.add_argument("--demo", action="store_true", help=(
         "Run demo material"))
+    parser.add_argument("--root", help=(
+        "(DEPRECATED) Path to where profiles live on disk, "
+        "defaults to allzparkconfig.profiles"))
 
     opts = parser.parse_args()
 
@@ -89,9 +124,23 @@ def main():
         tell(version)
         exit(0)
 
-    print("=" * 30)
-    print(" allzpark (%s)" % version)
-    print("=" * 30)
+    tell("=" * 30)
+    tell(" allzpark (%s)" % version)
+    tell("=" * 30)
+
+    logging.basicConfig(format=(
+        "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
+        "%(message)s"
+    ))
+
+    log.setLevel(logging.DEBUG
+                 if opts.verbose >= 2
+                 else logging.INFO
+                 if opts.verbose == 1
+                 else logging.WARNING)
+    log.propagate = True
+
+    logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
 
     if opts.demo:
 
@@ -142,29 +191,17 @@ def main():
     sys.modules["Qt"] = Qt
     sys.modules["six"] = six
 
-    with timings("- Loading allzpark.. "):
+    with timings("- Loading allzpark.. ") as msg:
         from . import view, control, resources, util
+        msg["success"] = "(%s) - ok {:.2f}\n" % version
 
-    try:
-        _load_userconfig(opts.config_file)
-    except (IOError, OSError):
-        # That's OK
-        if opts.verbose:
-            import traceback
-            traceback.print_exc()
+    _patch_allzparkconfig()
 
-    logging.basicConfig(format=(
-        "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
-        "%(message)s"
-    ))
-    logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
-    logging.getLogger(__name__).setLevel(logging.DEBUG
-                                         if opts.verbose >= 2
-                                         else logging.INFO
-                                         if opts.verbose == 1
-                                         else logging.WARNING)
-    log = logging.getLogger(__name__)
-    log.propagate = True
+    with timings("- Loading user config.. ") as msg:
+        result = _load_userconfig(opts.config_file)
+        msg["success"] = "ok {:.2f} (%s)\n" % result
+
+    _backwards_compatibility()
 
     # Allow the application to die on CTRL+C
     signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -199,8 +236,8 @@ def main():
         for key, value in defaults.items():
             storage.setValue(key, value)
 
-        if allzparkconfig.startup_project:
-            storage.setValue("startupProject", allzparkconfig.startup_project)
+        if allzparkconfig.startup_profile:
+            storage.setValue("startupProfile", allzparkconfig.startup_profile)
 
         if allzparkconfig.startup_application:
             storage.setValue("startupApp", allzparkconfig.startup_application)
@@ -245,29 +282,29 @@ def main():
 
     window.show()
 
-    def projects_from_dir(path):
+    def profiles_from_dir(path):
         try:
-            projects = os.listdir(opts.root)
+            profiles = os.listdir(opts.root)
         except IOError:
             sys.stderr.write(
                 "ERROR: Could not list directory %s" % opts.root
             )
 
         # Support directory names that use dash in place of underscore
-        projects = [p.replace("-", "_") for p in projects]
+        profiles = [p.replace("-", "_") for p in profiles]
 
-        return projects
+        return profiles
 
     def init():
         timing["beforeReset"] = time.time()
-        projects = []
+        profiles = []
 
         if opts.root:
             sys.stderr.write("The flag --root has been deprecated, "
-                             "use allzparkconfig.py instead.")
-            projects = projects_from_dir(opts.root)
+                             "use allzparkconfig.py:profiles.\n")
+            profiles = profiles_from_dir(opts.root)
 
-        root = projects or allzparkconfig.projects
+        root = profiles or allzparkconfig.profiles
         ctrl.reset(root, on_success=measure)
 
     def measure():

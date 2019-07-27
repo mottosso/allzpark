@@ -23,10 +23,10 @@ but not vice versa as that would implicate a view when using it standalone.
 
 ### Architecture
 
-1. Projects are `os.listdir` from disk
-2. A project is chosen by the user, e.g. ATC
+1. Profiles are `os.listdir` from disk
+2. A profile is chosen by the user, e.g. ATC
 3. The "ATC" Rez package is discovered and queried for "apps"
-4. Each "app" is resolved alongside the current project,
+4. Each "app" is resolved alongside the current profile,
     providing dependencies, environment, label, icon and
     ultimately a context within which to launch a given
     application.

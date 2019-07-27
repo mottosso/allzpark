@@ -43,10 +43,10 @@ class State(dict):
 
     def __init__(self, ctrl, storage):
         super(State, self).__init__({
-            "projectName": storage.value("startupProject"),
+            "profileName": storage.value("startupProfile"),
             "appRequest": storage.value("startupApplication"),
 
-            # String or callable, returning list of project names
+            # String or callable, returning list of profile names
             "root": None,
 
             # Current error, if any
@@ -55,8 +55,8 @@ class State(dict):
             # Currently commands applications
             "commands": [],
 
-            # Previously loaded project Rez packages
-            "rezProjects": {},
+            # Previously loaded profile Rez packages
+            "rezProfiles": {},
 
             # Currently loaded Rez contexts
             "rezContexts": {},
@@ -110,7 +110,7 @@ class State(dict):
     def on_enter_booting(self):
         self._ctrl.debug("Booting..")
 
-    def on_enter_selectproject(self):
+    def on_enter_selectprofile(self):
         pass
 
     def on_enter_resolving(self):
@@ -121,8 +121,8 @@ class State(dict):
         util.delay(self.to_ready, 500)
 
     def on_enter_noapps(self):
-        project = self["projectName"]
-        self._ctrl.debug("No applications were found for %s" % project)
+        profile = self["profileName"]
+        self._ctrl.debug("No applications were found for %s" % profile)
 
     def on_enter_loading(self):
         self._ctrl.debug("Loading..")
@@ -157,8 +157,8 @@ class Controller(QtCore.QObject):
     # One or more packages have changed on disk
     repository_changed = QtCore.Signal()
 
-    project_changed = QtCore.Signal(
-        str, object, bool)  # project, version, refreshed
+    profile_changed = QtCore.Signal(
+        str, object, bool)  # profile, version, refreshed
 
     application_changed = QtCore.Signal()
 
@@ -174,7 +174,7 @@ class Controller(QtCore.QObject):
         _State("errored", help="Something has gone wrong"),
         _State("launching", help="An application is launching"),
         _State("ready", help="Awaiting user input"),
-        _State("noproject", help="A given project package was not found"),
+        _State("noprofile", help="A given profile package was not found"),
         _State("noapps", help="There were no applications to choose from"),
         _State("notresolved", help="Rez couldn't resolve a request"),
         _State("pkgnotfound", help="One or more packages was not found"),
@@ -186,8 +186,8 @@ class Controller(QtCore.QObject):
         state = State(self, storage)
 
         models = {
-            "projectVersions": QtCore.QStringListModel(),
-            "projectNames": QtCore.QStringListModel(),
+            "profileVersions": QtCore.QStringListModel(),
+            "profileNames": QtCore.QStringListModel(),
             "apps": model.ApplicationModel(),
 
             # Docks
@@ -247,8 +247,8 @@ class Controller(QtCore.QObject):
         return self._state["error"]
 
     @property
-    def current_project(self):
-        return self._state["projectName"]
+    def current_profile(self):
+        return self._state["profileName"]
 
     @property
     def current_application(self):
@@ -315,7 +315,7 @@ class Controller(QtCore.QObject):
             message = """
                 <h2><font color=\"red\">:(</font></h2>
 
-                Package '{package}' is required by this project,
+                Package '{package}' is required by this profile,
                 but could <font color=\"red\">not be found.</font>
                 <br>
                 <br>
@@ -342,7 +342,7 @@ class Controller(QtCore.QObject):
             message = """
                 <h2><font color=\"red\">:(</font></h2>
 
-                Package '{package}' is required by this project,
+                Package '{package}' is required by this profile,
                 but could <font color=\"red\">not be found.</font>
                 <br>
                 <br>
@@ -496,12 +496,12 @@ class Controller(QtCore.QObject):
     def reset(self, root=None, on_success=lambda: None):
         """Initialise controller with `root`
 
-        Projects are listed at `root` and matched
+        Profiles are listed at `root` and matched
         with its corresponding Rez package.
 
         Arguments:
-            root (str): Absolute path to projects on disk, or callable
-                returning names of projects
+            root (str): Absolute path to profiles on disk, or callable
+                returning names of profiles
 
         """
 
@@ -510,62 +510,62 @@ class Controller(QtCore.QObject):
         assert root, "Tried resetting without a root, this is a bug"
 
         def do():
-            projects = dict()
-            default_project = None
+            profiles = dict()
+            default_profile = None
 
-            for name in self.list_projects(root):
+            for name in self.list_profiles(root):
 
-                # Find project package
+                # Find profile package
                 package = None
                 for package in self.find(name):
 
-                    if name not in projects:
-                        projects[name] = dict()
+                    if name not in profiles:
+                        profiles[name] = dict()
 
-                    projects[name][str(package.version)] = package
-                    projects[name][Latest] = package
+                    profiles[name][str(package.version)] = package
+                    profiles[name][Latest] = package
 
                 if package is None:
                     package = model.BrokenPackage(name)
-                    projects[name] = {
+                    profiles[name] = {
                         "0.0": package,
                         Latest: package,
                     }
 
                 # Default to latest of last
-                default_project = name
+                default_profile = name
 
-            self._state["rezProjects"].update(projects)
-            self._models["projectNames"].setStringList(list(projects))
-            self._models["projectNames"].layoutChanged.emit()
+            self._state["rezProfiles"].update(profiles)
+            self._models["profileNames"].setStringList(list(profiles))
+            self._models["profileNames"].layoutChanged.emit()
 
             # On resetting after startup, there will be a
-            # currently selected project that may differ from
-            # the startup project.
-            current_project = self._state["projectName"]
+            # currently selected profile that may differ from
+            # the startup profile.
+            current_profile = self._state["profileName"]
 
-            if current_project and current_project not in projects:
-                self.warning("Startup project '%s' did not exist"
-                             % current_project)
-                current_project = None
+            if current_profile and current_profile not in profiles:
+                self.warning("Startup profile '%s' did not exist"
+                             % current_profile)
+                current_profile = None
 
             # The user has never opened the GUI before,
             # or user preferences has been wiped.
-            if not current_project:
-                current_project = default_project
+            if not current_profile:
+                current_profile = default_profile
 
             # Fallback
-            if not current_project:
-                current_project = "no_project"
+            if not current_profile:
+                current_profile = "no_profile"
 
-            self._state["projectName"] = current_project
+            self._state["profileName"] = current_profile
             self._state["root"] = root
 
             self._state.to_ready()
             self.resetted.emit()
 
         def _on_success():
-            self.select_project(self._state["projectName"])
+            self.select_profile(self._state["profileName"])
             on_success()
 
         def _on_failure(error, trace):
@@ -743,38 +743,38 @@ class Controller(QtCore.QObject):
         log.error(message)
         self.logged.emit(str(message), logging.ERROR)
 
-    def list_projects(self, root=None):
+    def list_profiles(self, root=None):
         root = root or self._state["root"]
         assert root, "Tried listing without a root, this is a bug"
 
         if isinstance(root, (tuple, list)):
-            projects = root
+            profiles = root
 
         elif callable(root):
             try:
-                projects = root()
+                profiles = root()
 
             except Exception:
                 if log.level < logging.INFO:
                     traceback.print_exc()
 
-                self.error("Could not find projects in %s" % root)
-                projects = []
+                self.error("Could not find profiles in %s" % root)
+                profiles = []
 
         # Facilitate accidental empty family names, e.g. None or ''
-        projects = list(filter(None, projects))
+        profiles = list(filter(None, profiles))
 
-        return projects
+        return profiles
 
     @util.async_
-    def select_project(self, project_name, version_name=Latest):
+    def select_profile(self, profile_name, version_name=Latest):
 
         # Wipe existing data
         self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
         self._models["packages"].reset()
-        self._models["projectVersions"].setStringList([])
+        self._models["profileVersions"].setStringList([])
 
         def on_apps_found(apps):
             if not apps:
@@ -782,11 +782,11 @@ class Controller(QtCore.QObject):
                 <h2><font color=\"red\">:(</font></h2>
                 <br>
                 <br>
-                The project was found, but no applications.
+                The profile was found, but no applications.
                 <br>
                 <br>
-                The project didn't specify an application for you to use.<br>
-                This is likely due to a misconfigured project. Don't forget<br>
+                The profile didn't specify an application for you to use.<br>
+                This is likely due to a misconfigured profile. Don't forget<br>
                 to provide one or more packages as <i>weak references</i>.
                 <br>
                 <br>
@@ -805,36 +805,45 @@ class Controller(QtCore.QObject):
             raise error
 
         try:
-            project_versions = self._state["rezProjects"][project_name]
-            active_project = project_versions[version_name]
-
-            refreshed = self._state["projectName"] == project_name
-            self._state["projectName"] = project_name
-            self.project_changed.emit(
-                project_name,
-                version_name,
-                refreshed
-            )
-
-            if isinstance(active_project, model.BrokenPackage):
-                raise rez.PackageNotFoundError(
-                    "package not found: %s" % project_name
-                )
-
-            # Update versions model
-            versions = list(filter(None, project_versions))  # Exclude "Latest"
-            self._models["projectVersions"].setStringList(versions)
-
-            self._state.to_loading()
-            util.defer(
-                self._list_apps,
-                args=[active_project],
-                on_success=on_apps_found,
-                on_failure=on_apps_not_found,
-            )
+            profile_versions = self._state["rezProfiles"][profile_name]
+            active_profile = profile_versions[version_name]
 
         except KeyError:
-            self._state.to_notresolved()
+            # This can only happen if somehow the view decided to pass
+            # along the name and version of a profile that didn't exist.
+            profile_name = self._state["profileName"]
+            profile_versions = self._state["rezProfiles"][profile_name]
+            active_profile = profile_versions[version_name]
+
+            if profile_name:
+                self.warning("%s was not found" % profile_name)
+            else:
+                self.error("select_profile was passed an empty string")
+
+        refreshed = self._state["profileName"] == profile_name
+        self._state["profileName"] = profile_name
+        self.profile_changed.emit(
+            profile_name,
+            version_name,
+            refreshed
+        )
+
+        if isinstance(active_profile, model.BrokenPackage):
+            raise rez.PackageNotFoundError(
+                "package not found: %s" % profile_name
+            )
+
+        # Update versions model
+        versions = list(filter(None, profile_versions))  # Exclude "Latest"
+        self._models["profileVersions"].setStringList(versions)
+
+        self._state.to_loading()
+        util.defer(
+            self._list_apps,
+            args=[active_profile],
+            on_success=on_apps_found,
+            on_failure=on_apps_not_found,
+        )
 
     def select_application(self, app_request):
         self.__app_request = app_request
@@ -866,7 +875,7 @@ class Controller(QtCore.QObject):
         tools = self._models["apps"].find(app_request)["tools"]
         self._state["tool"] = tools[0]
 
-        # Use this application on next launch or change of project
+        # Use this application on next launch or change of profile
         self.update_command()
         self._state.store("startupApplication", app_request)
         self.application_changed.emit()
@@ -896,8 +905,8 @@ class Controller(QtCore.QObject):
 
         return paths
 
-    def _list_apps(self, project):
-        # Each app has a unique context relative the current project
+    def _list_apps(self, profile):
+        # Each app has a unique context relative the current profile
         # Find it, and keep track of it.
 
         apps = []
@@ -926,7 +935,7 @@ class Controller(QtCore.QObject):
                                  "missing `allzparkconfig.applications`")
 
         if not apps:
-            apps[:] = allzparkconfig.applications_from_package(project)
+            apps[:] = allzparkconfig.applications_from_package(profile)
 
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
@@ -940,16 +949,16 @@ class Controller(QtCore.QObject):
         contexts = odict()
         with util.timing() as t:
             for app_package in apps:
-                variants = list(project.iter_variants())
+                variants = list(profile.iter_variants())
                 variant = variants[0]
 
                 if len(variants) > 1:
                     # Unsure of whether this is desirable. It would enable
-                    # a project per platform, or potentially other kinds
+                    # a profile per platform, or potentially other kinds
                     # of special-purpose situations. If you see this,
                     # and want this, submit an issue with your use case!
                     self.warning(
-                        "Projects with multiple variants are unsupported. "
+                        "Profiles with multiple variants are unsupported. "
                         "Using first found: %s" % variant
                     )
 

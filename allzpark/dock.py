@@ -924,8 +924,8 @@ class Preferences(AbstractDockWidget):
     icon = "Action_GoHome_32"
 
     options = [
-        qargparse.Info("startupProject", help=(
-            "Load this project on startup"
+        qargparse.Info("startupProfile", help=(
+            "Load this profile on startup"
         )),
         qargparse.Info("startupApplication", help=(
             "Load this application on startup"
@@ -957,7 +957,7 @@ class Preferences(AbstractDockWidget):
         )),
         qargparse.Boolean("showAllApps", help=(
             "List everything from allzparkconfig:applications\n"
-            "not just the ones specified for a given project."
+            "not just the ones specified for a given profile."
         )),
         qargparse.Boolean("showHiddenApps", help=(
             "Show apps with metadata['hidden'] = True"
