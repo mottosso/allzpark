@@ -99,3 +99,33 @@ None of this would have been a problem, if you were able to say:
 1. We don't develop any new software ourselves
 
 In which case you could simply install each of these applications and get to work. But more often than not, things change. And in order to facilitate this change, there needs to be a system in place to help manage the combinatorial complexity of applications, software, and projects.
+
+<br>
+
+### Rez Users
+
+Here are some of the studios using Rez today, along with some approximate numbers (sources linked).
+
+| Studio         | Active | People | Disk   | Packages | Versions | Frequency | Source
+|:---------------|:-------|:-------|:-------|:---------|:---------|:----------|:-----------
+| Anima          | 2019-  | 100    | 30 GB  | 199      | 2133     | 5 / day   | -
+| RodeoFX        | 2019-  | 200    | 223 GB | 400      | 6732     | -         | [a][]
+| Animal Logic   | 2018-  | 999    | 2 TB   | 1552     | 44939    | 20 / day  | [a][]
+| Mackievision   | 2019-  | 500    |        |          |          |           | -
+| Imageworks     | 2019-  | 999    |        |          |          |           | -
+| Puppetworks    | 2019-  | 200    |        |          |          |           | -
+| ToonBox        | 2017-  |        |        |          |          |           | [f][]
+| Pixomondo      | 2019-  |        |        |          |          |           | [b][]
+| Freefolk       | 2019-  |        |        |          |          |           | [b][]
+| MPC            | 2019-  |        |        |          |          |           | [b][]
+| Squeeze Studio | 2019-  |        |        |          |          |           | [c][]
+| Mikros         | 2019-  |        |        |          |          |           | [c][]
+| Brunch Studio  | 2019-  |        |        |          |          |           | [d][]
+| WWFX           | 2019-  |        |        |          |          |           | [e][]
+
+[a]: https://groups.google.com/forum/#!topic/rez-config/GMiof1NEQoo
+[b]: https://groups.google.com/forum/#!searchin/rez-config/advice$20or$20tips$20on$20getting$20latest$20%7Csort:date/rez-config/-fmvH5mv9wM/cCWqh9BlFQAJ
+[c]: https://groups.google.com/forum/#!searchin/rez-config/Proper$20way$20to$20resolve$20an$20environment$20for$20an$20embedded$20python$20environment%7Csort:date/rez-config/2IWclNTJEk0/4B_hGWuxBQAJ
+[d]: https://groups.google.com/forum/#!msg/rez-config/Z7NdidsJNUY/2zYgVKsoEAAJ
+[e]: https://groups.google.com/forum/#!topic/rez-config/j78X0Qv3arM
+[f]: https://github.com/nerdvegas/rez/commit/8ca303d

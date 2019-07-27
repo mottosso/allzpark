@@ -81,6 +81,8 @@ Everything ok?
     pip install --no-deps PySide allzpark allzparkdemo bleeding-rez
     ```
 
+    If that doesn't work, then you can also use an [installer for PyQt4](https://stackoverflow.com/questions/22640640/how-to-install-pyqt4-on-windows-using-pip) or check the package management system of your platform.
+
 ??? quote "Something else happened"
     Oh no! I'd like to know about what happened, please let me know [here](https://github.com/mottosso/allzpark/issues) or send me a private message at [marcus@abstractfactory.io](mailto:marcus@abstractfactory.io).
 

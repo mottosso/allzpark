@@ -4,16 +4,44 @@ This page carries on from a successful 👈 [quickstart](/quickstart) into makin
 
 ### What is Allzpark?
 
-It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers), similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements.
+It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers), similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment within which the applicatuon runs.
 
-??? question "Why is that important?"
-    Remind me to tell you about this.
+??? info "For example..."
+    Let's say you're working on a project using..
 
-??? hint "What are some similar projects?"
-    For perspective, have a look at these projects that solve the same problem.
+    1. Autodesk Maya
+    2. Adobe Photoshop
+    3. Pixologic Zbrush
 
-    - [be](https://github.com/mottosso/be)
+    ![image](https://user-images.githubusercontent.com/2152766/61997103-94d2c480-b094-11e9-81ba-6d8628649bcc.png)
+
+    For Maya, you'd like to use various software libraries, Python script and binary plug-ins such as Arnold and Ziva Dynamics. However, each plug-in need to be of a particular version in order to run on this version of Maya.
+
+    ![image](https://user-images.githubusercontent.com/2152766/61997048-9059dc00-b093-11e9-8b03-ceac786f5785.png)
+
+    Over time, the number of projects grow, as do the individual requirements of each application, and many of the plug-ins and libraries end up sharing dependencies with each other.
+
+    ![image](https://user-images.githubusercontent.com/2152766/61997075-ff373500-b093-11e9-831b-bfa9e8c3c111.png)
+
+    For some perspective on the potential complexity of this kind of network, have a look at these.
+
+    And so to design and manage this network of dependencies, you'll leverage [Rez](https://github.com/mottosso/bleeding-rez) - an industry standard environment management tool used by large and small companies alike.
+
+    - [Studio Anima](studioanima.co.jp)
+    - [Animal Logic](https://www.animallogic.com/)
+    - [Sony Imageworks](https://www.imageworks.com/)
+    - [Moving Picture Company](https://www.moving-picture.com/)
+    - [Mikros Image](http://www.mikrosimage-animation.eu/en/)
+    - And [more](/about/#rez-users)
+
+??? question "What are some similar projects?"
+    Have a look at these, they solve a similar problem to Allzpark.
+
+    - [Shotgun](https://support.shotgunsoftware.com/hc/en-us/articles/219032968-Application-Launcher)
+    - [ftrack](https://www.ftrack.com/en/2019/01/an-introduction-to-ftrack-connect.html)
     - [Mango Software Launcher](https://vimeo.com/126766739)
+
+    So then, why should you choose Allzpark? Odds are you already have most of what these solutions offer and aren't ready for a complete swap. Allzpark integrates with existing pipelines and works standalone. It'll also work the day you decide to transition from e.g. Shotgun to ftrack.
 
 Here's how you would typically use Allzpark.
 
