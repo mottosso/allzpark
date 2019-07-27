@@ -736,19 +736,7 @@ class Commands(AbstractDockWidget):
         model = index.model()
 
         menu = QtWidgets.QMenu(self)
-        kill = QtWidgets.QAction("Kill", menu)
-        copy_command = QtWidgets.QAction("Copy command", menu)
         copy_pid = QtWidgets.QAction("Copy pid", menu)
-
-        def on_kill():
-            name = model.data(index, "cmd")
-            if not model.data(index, "running"):
-                self.message.emit("%s isn't running" % name)
-                return
-
-            self.message.emit("Killing %s" % name)
-            command = model.data(index, "object")
-            command.kill()
 
         def on_copy_pid():
             clipboard = QtWidgets.QApplication.instance().clipboard()
@@ -757,26 +745,10 @@ class Commands(AbstractDockWidget):
             clipboard.setText(pid)
             self.message.emit("Copying %s" % pid)
 
-        def on_copy_command():
-            clipboard = QtWidgets.QApplication.instance().clipboard()
-            cmd = model.data(index, "niceCmd")
-            clipboard.setText(cmd)
-            self.message.emit("Copying %s" % cmd)
-
         if model.data(index, "running") != "killed":
-            kill.triggered.connect(on_kill)
-            copy_command.triggered.connect(on_copy_command)
             copy_pid.triggered.connect(on_copy_pid)
         else:
-            kill.setEnabled(False)
-            copy_command.setEnabled(False)
             copy_pid.setEnabled(False)
-
-        # TODO: This doesn't work on Windows, and possibly not
-        # even Linux, due to what's really being managed here
-        # is the *parent* of a given process, like Maya, as
-        # opposed to the actual Maya process.
-        menu.addAction(kill) if os.name != "nt" else None
 
         menu.addAction(copy_pid)
         menu.move(QtGui.QCursor.pos())
