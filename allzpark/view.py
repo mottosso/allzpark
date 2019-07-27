@@ -785,14 +785,7 @@ class LineEditWithCompleter(QtWidgets.QLineEdit):
         self._completer.setCompletionPrefix(self.text())
 
         suggested = self._completer.currentCompletion()
-
-        if not suggested or suggested == self._current:
-            self.resetText()
-            self.parent().setFocus()
-        else:
-            self.setText(suggested)
-            self.changed.emit(suggested)
-            self._current = suggested
+        self.changed.emit(suggested)
 
 
 class FullCommand(QtWidgets.QWidget):
