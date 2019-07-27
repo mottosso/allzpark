@@ -196,7 +196,6 @@ div.tabs button.active {
 }
 
 div.tabs button {
-  background: #fbfbfb;
   outline: none;
   cursor: pointer;
   position: relative;

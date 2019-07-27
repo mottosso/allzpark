@@ -487,14 +487,14 @@
 <p><br></p>
 <h3 id="quickstart">Quickstart</h3>
 <p>The below commands will install Allzpark and its dependencies, including Rez.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>pip install allzpark -U
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>python -m pip install allzpark -U
 rez <span style="color: #f8f8f2">bind</span> --quickstart
 allzpark --demo
 </pre></div>
 
 <p><br></p>
 <h4 id="troubleshooting">Troubleshooting</h4>
-<p>Did anything go wrong?</p>
+<p>Everything ok?</p>
 <details class="quote"><summary>pip not found</summary><p>It's possible you have <code>pip</code> installed, just not on your <code>PATH</code>. Try this.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>python -m pip install bleeding-rez
 </pre></div>
@@ -512,6 +512,12 @@ python get-pip.py
 <ul>
 <li>CentOS 7 - <code>yum install python-pip</code></li>
 <li>Ubuntu 18 - <code>apt install python3-pip</code></li>
+</ul>
+<p>If that <strong>did</strong> work however, then if <code>pip</code> wasn't found, <strong>Allzpark won't be either</strong>. The <code>pip</code> executable is typically present on your PATH in the same location as Rez and Allzpark, and we need this to be the case.</p>
+<ul>
+<li>On Windows, this path is typically <code>c:\python36\scripts</code> or <code>c:\python27\scripts</code></li>
+<li>On Linux, this path is <code>/usr/bin</code> and is much more likely already on your path</li>
+<li>On MacOS, I'm not sure. <a href="https://github.com/mottosso/allzpark/issues">Let me know!</a></li>
 </ul>
 </details>
 <details class="quote"><summary>Permission denied</summary><p>The above command assumes admin/sudo access to your machine which isn't always the case. If so, you can install Rez using a virtual environment.</p>
@@ -548,7 +554,7 @@ $ allzpark-venv<span style="color: #ae81ff">\S</span>cripts<span style="color: #
 <h3 id="next-steps">Next Steps</h3>
 <p>From here, try launching your favourite application, navigate the interface and make yourself at home. Then have a look at these to learn more.</p>
 <ul>
-<li><a href="/getting-started">Create a new project</a></li>
+<li><a href="/getting-started">Create a new profile</a></li>
 <li><a href="/getting-started/#your-first-application">Create a new application</a></li>
 </ul>
                 

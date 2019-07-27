@@ -288,8 +288,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-is-a-project" title="What is a "project"?" class="md-nav__link">
-    What is a "project"?
+  <a href="#what-is-a-profile" title="What is a "profile"?" class="md-nav__link">
+    What is a "profile"?
   </a>
   
 </li>
@@ -307,8 +307,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#your-first-project" title="Your first project" class="md-nav__link">
-    Your first project
+  <a href="#your-first-profile" title="Your first profile" class="md-nav__link">
+    Your first profile
   </a>
   
     <nav class="md-nav">
@@ -503,8 +503,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#what-is-a-project" title="What is a "project"?" class="md-nav__link">
-    What is a "project"?
+  <a href="#what-is-a-profile" title="What is a "profile"?" class="md-nav__link">
+    What is a "profile"?
   </a>
   
 </li>
@@ -522,8 +522,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#your-first-project" title="Your first project" class="md-nav__link">
-    Your first project
+  <a href="#your-first-profile" title="Your first profile" class="md-nav__link">
+    Your first profile
   </a>
   
     <nav class="md-nav">
@@ -622,39 +622,49 @@
                 <p>This page carries on from a successful 👈 <a href="/quickstart">quickstart</a> into making it relevant to your usecase.</p>
 <p><br></p>
 <h3 id="what-is-allzpark">What is Allzpark?</h3>
-<p>It's an <a href="https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers">application launcher</a>, similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements. An important aspect of any endevour involving multiple stakeholders, especially when requirements involve frequent change.</p>
+<p>It's an <a href="https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers">application launcher</a>, similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements.</p>
+<details class="question"><summary>Why is that important?</summary><p>Remind me to tell you about this.</p>
+</details>
+<details class="hint"><summary>What are some similar projects?</summary><p>For perspective, have a look at these projects that solve the same problem.</p>
+<ul>
+<li><a href="https://github.com/mottosso/be">be</a></li>
+<li><a href="https://vimeo.com/126766739">Mango Software Launcher</a></li>
+</ul>
+</details>
 <p>Here's how you would typically use Allzpark.</p>
 <ol>
 <li>Boot machine</li>
 <li>Boot Allzpark</li>
-<li>Select <a href="#what-is-a-project">project</a></li>
+<li>Select <a href="#what-is-a-profile">profile</a></li>
 <li>Boot <a href="#what-is-an-application">application</a></li>
 </ol>
-<p>For the purposes of this quick walkthrough, I'll assume you are part of a visual effects studio whereby "project" means e.g. Alita and "application" means e.g. Blender.</p>
+<p>For the purposes of this quick walkthrough, I'll assume you are part of a visual effects studio whereby "profile" means e.g. Alita and "application" means e.g. Blender.</p>
 <p><br></p>
-<h4 id="what-is-a-project">What is a "project"?</h4>
-<p>Alita is the name given to a project within which work is performed by multiple stakeholders towards a common goal, also referred to as a "show" or "game" depending on your context. It typically consists of these components.</p>
+<p><br></p>
+<h4 id="what-is-a-profile">What is a "profile"?</h4>
+<p><code>alita</code> is the name given to a profile within which work is performed by multiple stakeholders towards a common goal. It typically consists of these components.</p>
 <ul>
 <li>Name</li>
 <li>Version</li>
-<li>Applications</li>
 <li>Requirements</li>
 <li>Environment</li>
+<li>Applications</li>
 </ul>
-<p>Whereby "applications" are the software used to craft this project, such as Blender, Photoshop and Sublime Text.</p>
-<p>The "requirements" indicate what software or libraries your project depend on, such as <code>python-3</code> or <code>git-2.21</code>.</p>
-<p>The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, <code>PROJECT_NAME=alita</code> is a relevant variable to add, to allow for the application and your software to identify which project an application was launched in.</p>
+<p>Whereby an "application" is the software used within this profile, such as <code>blender</code>, <code>photoshop</code> and <code>sublimetext</code>.</p>
+<p>The "requirements" indicate what software or libraries your profile depend on, such as <code>python-3</code> or <code>git-2.21</code> or <code>arnold-6</code>.</p>
+<p>The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, <code>PROJECT_NAME=alita</code> is a relevant variable to add, to allow for the application and your software to identify which profile an application was launched in.</p>
 <p>As you might have guessed, projects are <em>versioned</em> and we'll get into more about this and "packages" in general a little later.</p>
 <p><br></p>
 <h4 id="what-is-an-application">What is an "application"?</h4>
-<p>Blender is an application within which work is performed.</p>
-<p>In Allzpark, the project dictates which applications are available to the user, in order to faciliate a "data pipeline" being built around a pre-determined set of software and libraries.</p>
-<details class="hint"><summary>Data pipeline?</summary><p>A kind of "codified" workflow. For example, you use the same settings for whenever you export an image from Photoshop to your game engine. Rather than explicitly setting those each time, you make a script to turn the process into a single click. The same then applies for any kind of export and import of data in various applications, to and from various stakeholders in your company.</p>
+<p><code>blender</code> is an application within which work is performed.</p>
+<p>In Allzpark, the profile dictates what applications are available to the user, in order to faciliate a "data pipeline" being built around a pre-determined set of software and libraries.</p>
+<details class="hint"><summary>Data pipeline?</summary><p>A kind of "codified" workflow. For example, you use the same settings for whenever you export an image from Photoshop to your game engine. Rather than explicitly setting those each time, you make a script to turn the process into a single click. The same then applies to any kind of export and import of data in various applications, to and from various stakeholders in your company.</p>
 <p>These are some examples of pre-made "scripts" - in the form of frameworks - suitable for use with Allzpark.</p>
 <ul>
 <li><a href="http://getavalon.github.io">Avalon</a></li>
 <li><a href="https://www.kabaretstudio.com/home">Kabaret</a></li>
 <li><a href="http://www.piperpipeline.com">Piper</a></li>
+<li><a href="https://www.mangopipeline.com/">Mango Pipeline</a></li>
 <li><a href="https://github.com/kiryha/AnimationDNA">AnimationDNA</a></li>
 <li><a href="http://www.ardakutlu.com/tik-manager/">Tik Manager</a></li>
 </ul>
@@ -666,13 +676,13 @@
 <li>Requirements</li>
 <li>Environment</li>
 </ul>
-<p>Notice that it isn't unlike a project, and in fact not unlike any other software you'll encounter later on. These are both "packages" and we'll talk a lot more about what that is as we progress through this guide.</p>
+<p>Notice that it isn't unlike a profile, and in fact not unlike any other software you'll encounter later on. These are both "packages" and we'll talk a lot more about what that is as we progress through this guide.</p>
 <p><br></p>
-<h3 id="your-first-project">Your first project</h3>
-<p>You and I are going to embark on a new project. Let's call it <code>kingkong</code>.</p>
+<h3 id="your-first-profile">Your first profile</h3>
+<p>You and I are going to embark on a new profile. Let's call it <code>kingkong</code></p>
 <p><br></p>
 <h4 id="command-line">Command Line</h4>
-<p>The way we'll establish this project, and packages like it, is going to involve the command-line, so let's get comfortable with how it works.</p>
+<p>The way we'll establish this profile, and packages like it, is going to involve the command-line, so let's get comfortable with how it works.</p>
 <p>I'll provide command-line instructions for both <code>powershell</code> and <code>bash</code>, to cover both Windows, Linux and MacOS users. You can follow along using either of the two flavours, but odds are the one pre-selected is the one you'll want to use.</p>
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
@@ -701,7 +711,7 @@
 </div>
 <p><br></p>
 <h4 id="king-kong">King Kong</h4>
-<p>Each project requires a folder and a file called <code>package.py</code>.</p>
+<p>Each profile requires a folder and a file called <code>package.py</code>.</p>
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
   <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
@@ -729,7 +739,7 @@ rez build --install
 </pre></div>
 
 </div>
-<p>That's it, we've now got a brand new project. Let's add it to Allzpark and see what it looks like.</p>
+<p>That's it, we've now got a brand new profile. Let's add it to Allzpark and see what it looks like.</p>
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
   <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
@@ -760,12 +770,12 @@ allzpark --demo
 <li>We've gotten familiar with the <code>rez</code> command</li>
 <li>We've authored a new Rez package from scratch</li>
 <li>We've used <code>rez build</code>, one of many Rez sub-commands, to build and install a package</li>
-<li>We've made Allzpark aware of this new project package, via the <code>MY_PROJECTS</code> environment variable.</li>
+<li>We've made Allzpark aware of this new profile package, via the <code>MY_PROJECTS</code> environment variable.</li>
 </ol>
-<p>Next we'll have a look at how to add an application to your project, and how to actually make a new application from scratch.</p>
+<p>Next we'll have a look at how to add an application to your profile, and how to actually make a new application from scratch.</p>
 <p><br></p>
 <h3 id="your-first-application">Your first application</h3>
-<p>There isn't much we can do with a project unless we've got an application, so let's add one.</p>
+<p>There isn't much we can do with a profile unless we've got an application, so let's add one.</p>
 <ol>
 <li>Open <code>kingkong/package.py</code> in your favourite text editor</li>
 <li>Edit it as follows.</li>
@@ -780,7 +790,7 @@ allzpark --demo
 </span><span style="background-color: #49483e"><span style="color: #f8f8f2">]</span>
 </span></pre></div>
 
-<p>As you may have guessed, these are the <em>requirements</em> of this project. That little squiggly <code>~</code> character ahead of <code>maya</code> indicates that this is a "weak" reference, which Allzpark interprets as application in this project.</p>
+<p>As you may have guessed, these are the <em>requirements</em> of this profile. That little squiggly <code>~</code> character ahead of <code>maya</code> indicates that this is a "weak" reference, which Allzpark interprets as application in this profile.</p>
 <div class="admonition hint">
 <p class="admonition-title">Protip</p>
 <p>If you're already familiar with Rez and think to yourself "This isn't very flexible", you're right. Looking for applications in the requirements section of a package is a default you can customise later via the <code>allzparkconfig.py:applications_from_package()</code> function.</p>
@@ -798,7 +808,7 @@ allzpark --demo
 </div>
 <p><br></p>
 <h4 id="an-application-package">An application package</h4>
-<p>Ok, but we didn't really create an application so much as just add an existing one to the project. Let's create a new application from your OS and add <em>that</em> to the project too.</p>
+<p>Ok, but we didn't really create an application so much as just add an existing one to the profile. Let's create a new application from your OS and add <em>that</em> to the profile too.</p>
 <p>You can pick any application you'd like, for the purposes of this guide I'll make a package for a text editor.</p>
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
@@ -827,8 +837,8 @@ rez build --install
 </pre></div>
 
 </div>
-<p>You'll notice the similarity to creating a project and that's no coincidence. These are both Rez "packages". But there's something missing.</p>
-<p>Unlike a project, an application must either reference an executable on disk, or encapsulate this executable into the package. We'll get into encapsulating files with a package a little later, for now let's have a look at how to reference a file on disk.</p>
+<p>You'll notice the similarity to creating a profile and that's no coincidence. These are both Rez "packages". But there's something missing.</p>
+<p>Unlike a profile, an application must either reference an executable on disk, or encapsulate this executable into the package. We'll get into encapsulating files with a package a little later, for now let's have a look at how to reference a file on disk.</p>
 <p><strong>texteditor/package.py</strong></p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;texteditor&quot;</span>
 <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.5.1&quot;</span>
@@ -888,13 +898,13 @@ allzpark --demo
 <h4 id="what-weve-learned_1">What we've learned</h4>
 <p>You made it! Let's reflect on what we've learned so far.</p>
 <ol>
-<li>Creating a new application is not unlike creating a new project</li>
+<li>Creating a new application is not unlike creating a new profile</li>
 <li>Packages have a <code>commands()</code> function you can use to "bootstrap" an environment with custom commands</li>
 <li>There's pros and cons to referencing system software, like a text editor.</li>
 </ol>
 <p><br></p>
 <h3 id="your-first-payload">Your first payload</h3>
-<p>We've managed to make a new project, and an application and we're just about ready to start developing the next King Kong movie.</p>
+<p>We've managed to make a new profile, and an application and we're just about ready to start developing the next King Kong movie.</p>
 <p>But there is something else missing. For the purposes of this chapter, I will assume you are developing King Kong using Autodesk Maya, but the same applies to just about any application.</p>
 <div class="admonition hint">
 <p class="admonition-title">In Development</p>
@@ -902,7 +912,7 @@ allzpark --demo
 </div>
 <p><br></p>
 <h3 id="your-first-environment">Your first environment</h3>
-<p>So your project has got some custom data, that's perfect. Now let's add some <em>metadata</em> as well.</p>
+<p>So your profile has got some custom data, that's perfect. Now let's add some <em>metadata</em> as well.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;kingkong&quot;</span>
 <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.2&quot;</span>
 <span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">False</span>
