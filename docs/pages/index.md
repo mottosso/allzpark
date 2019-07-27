@@ -10,7 +10,7 @@ template: landing.html
         <br>
         <div class="container">
             <p id="description">
-                Powerful <b>application launcher</b> with <i>reproducible software environments</i>, for visual effects, feature animation and AAA-games productions.
+                Powerful <b>application launcher</b> with <i>reproducible software environments</i>, for visual effects, feature animation and triple-A game productions.
             </p>
         </div>
         <br>
