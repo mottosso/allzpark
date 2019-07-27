@@ -231,9 +231,6 @@ class Window(QtWidgets.QMainWindow):
         # Setu
         css = "QWidget { border-image: url(%s); }"
         widgets["logo"].setStyleSheet(css % res.find("Logo_64"))
-        widgets["logo"].clicked.connect(self.on_logo_clicked)
-        widgets["projectBtn"].setToolTip("Click to change project")
-        widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
 
         widgets["noappsMessage"].setReadOnly(True)
         widgets["noappsMessage"].setOpenExternalLinks(True)
@@ -241,6 +238,7 @@ class Window(QtWidgets.QMainWindow):
         css = "QWidget { border-image: url(%s); }"
         widgets["projectBtn"].setStyleSheet(css % res.find("Default_Project"))
         widgets["projectBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
+        widgets["projectBtn"].setToolTip("Click to change project")
 
         widgets["logo"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["projectBtn"].setCursor(QtCore.Qt.PointingHandCursor)
@@ -263,6 +261,8 @@ class Window(QtWidgets.QMainWindow):
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
         # Signals
+        widgets["logo"].clicked.connect(self.on_logo_clicked)
+        widgets["projectBtn"].clicked.connect(self.on_projectbtn_pressed)
         widgets["projectName"].changed.connect(self.on_projectname_changed)
         widgets["projectVersion"].changed.connect(
             self.on_projectversion_changed)
@@ -570,7 +570,12 @@ class Window(QtWidgets.QMainWindow):
 
         # Determine aspect ratio
         height = px(32)
-        pixmap = res.pixmap(icon).scaledToHeight(height)
+        pixmap = res.pixmap(icon)
+
+        if pixmap.isNull():
+            pixmap = res.pixmap("Default_Project")
+
+        pixmap = pixmap.scaledToHeight(height)
         width = pixmap.width()
 
         button.setIconSize(QtCore.QSize(width, height))
@@ -606,6 +611,7 @@ class Window(QtWidgets.QMainWindow):
 
         launch_btn = self._docks["app"]._widgets["launchBtn"]
         launch_btn.setText("Launch")
+        launch_btn.setEnabled(True)
 
         for widget in self._docks.values():
             widget.setEnabled(True)
@@ -723,11 +729,9 @@ class Window(QtWidgets.QMainWindow):
             self.restoreState(self._ctrl.state.retrieve("windowState"))
 
     def closeEvent(self, event):
-        self.tell("Storing state..", logging.DEBUG)
         self._ctrl.state.store("geometry", self.saveGeometry())
         self._ctrl.state.store("windowState", self.saveState())
-
-        super(Window, self).closeEvent(event)
+        return super(Window, self).closeEvent(event)
 
 
 class LineEditWithCompleter(QtWidgets.QLineEdit):

@@ -51,7 +51,7 @@ def timings(title, timing=True):
         yield message
     except Exception:
         sys.stdout.write(message["failure"])
-        raise
+        exit(1)
     else:
         sys.stdout.write(message["success"].format(time.time() - t0))
 
@@ -98,15 +98,16 @@ def main():
         # Keep settings from interfering with demo
         opts.clear_settings = True
 
-        with timings("- Loading demo.."):
+        with timings("- Loading demo..") as msg:
             try:
                 import allzparkdemo
             except ImportError:
-                sys.stderr.write(
+                msg["failure"] = (
+                    " fail\n"
                     "ERROR: The --demo flag requires allzparkdemo, "
                     "try running `pip install allzparkdemo`\n"
                 )
-                exit(1)
+                raise
 
             os.environ["REZ_CONFIG_FILE"] = allzparkdemo.rezconfig
             opts.config_file = allzparkdemo.allzparkconfig
