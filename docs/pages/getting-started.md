@@ -4,57 +4,67 @@ This page carries on from a successful 👈 [quickstart](/quickstart) into makin
 
 ### What is Allzpark?
 
-It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers), similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements. An important aspect of any endevour involving multiple stakeholders, especially when requirements involve frequent change.
+It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers), similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements.
+
+??? question "Why is that important?"
+    Remind me to tell you about this.
+
+??? hint "What are some similar projects?"
+    For perspective, have a look at these projects that solve the same problem.
+
+    - [be](https://github.com/mottosso/be)
+    - [Mango Software Launcher](https://vimeo.com/126766739)
 
 Here's how you would typically use Allzpark.
 
 1. Boot machine
 2. Boot Allzpark
-3. Select [project](#what-is-a-project)
+3. Select [profile](#what-is-a-profile)
 2. Boot [application](#what-is-an-application)
 
-For the purposes of this quick walkthrough, I'll assume you are part of a visual effects studio whereby "project" means e.g. Alita and "application" means e.g. Blender.
+For the purposes of this quick walkthrough, I'll assume you are part of a visual effects studio whereby "profile" means e.g. Alita and "application" means e.g. Blender.
 
 <br>
 
-#### What is a "project"?
+<br>
 
-Alita is the name given to a project within which work is performed by multiple stakeholders towards a common goal, also referred to as a "show" or "game" depending on your context. It typically consists of these components.
+#### What is a "profile"?
+
+`alita` is the name given to a profile within which work is performed by multiple stakeholders towards a common goal. It typically consists of these components.
 
 - Name
 - Version
-- Applications
 - Requirements
 - Environment
+- Applications
 
-Whereby "applications" are the software used to craft this project, such as Blender, Photoshop and Sublime Text.
+Whereby an "application" is the software used within this profile, such as `blender`, `photoshop` and `sublimetext`.
 
-The "requirements" indicate what software or libraries your project depend on, such as `python-3` or `git-2.21`.
+The "requirements" indicate what software or libraries your profile depend on, such as `python-3` or `git-2.21` or `arnold-6`.
 
-The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, `PROJECT_NAME=alita` is a relevant variable to add, to allow for the application and your software to identify which project an application was launched in.
+The "environment" are hand-crafted variables stored in the launched application. Variables you can later refer back to in the software you write to run within the context of that application. For example, `PROJECT_NAME=alita` is a relevant variable to add, to allow for the application and your software to identify which profile an application was launched in.
 
 As you might have guessed, projects are *versioned* and we'll get into more about this and "packages" in general a little later.
-
-!!! into "Data pipeline"
-    This refers to a pre-defined system of interconnected components designed to pass data between stakeholders in an organisation, such as from an modeling artist to a character rigger.
-
-    **Examples**
-
-    These are a number of off-the-shelf data pipelines suitable for use with Allzpark.
-
-    - [Avalon](http://getavalon.github.io)
-    - [Kabaret](https://www.kabaretstudio.com/home)
-    - [Piper](http://www.piperpipeline.com)
-    - [AnimationDNA](https://github.com/kiryha/AnimationDNA)
-    - [Tik Manager](http://www.ardakutlu.com/tik-manager/)
 
 <br>
 
 #### What is an "application"?
 
-Blender is an application within which work is performed.
+`blender` is an application within which work is performed.
 
-In Allzpark, the project dictates which applications are available to the user, in order to faciliate a "data pipeline" being built around a pre-determined set of software and libraries.
+In Allzpark, the profile dictates what applications are available to the user, in order to faciliate a "data pipeline" being built around a pre-determined set of software and libraries.
+
+??? hint "Data pipeline?"
+    A kind of "codified" workflow. For example, you use the same settings for whenever you export an image from Photoshop to your game engine. Rather than explicitly setting those each time, you make a script to turn the process into a single click. The same then applies to any kind of export and import of data in various applications, to and from various stakeholders in your company.
+
+    These are some examples of pre-made "scripts" - in the form of frameworks - suitable for use with Allzpark.
+
+    - [Avalon](http://getavalon.github.io)
+    - [Kabaret](https://www.kabaretstudio.com/home)
+    - [Piper](http://www.piperpipeline.com)
+    - [Mango Pipeline](https://www.mangopipeline.com/)
+    - [AnimationDNA](https://github.com/kiryha/AnimationDNA)
+    - [Tik Manager](http://www.ardakutlu.com/tik-manager/)
 
 An application typically consists of these components.
 
@@ -63,19 +73,19 @@ An application typically consists of these components.
 - Requirements
 - Environment
 
-Notice that it isn't unlike a project, and in fact not unlike any other software you'll encounter later on. These are both "packages" and we'll talk a lot more about what that is as we progress through this guide.
+Notice that it isn't unlike a profile, and in fact not unlike any other software you'll encounter later on. These are both "packages" and we'll talk a lot more about what that is as we progress through this guide.
 
 <br>
 
-### Your first project
+### Your first profile
 
-You and I are going to embark on a new project. Let's call it `kingkong`.
+You and I are going to embark on a new profile. Let's call it `kingkong`
 
 <br>
 
 #### Command Line
 
-The way we'll establish this project, and packages like it, is going to involve the command-line, so let's get comfortable with how it works.
+The way we'll establish this profile, and packages like it, is going to involve the command-line, so let's get comfortable with how it works.
 
 I'll provide command-line instructions for both `powershell` and `bash`, to cover both Windows, Linux and MacOS users. You can follow along using either of the two flavours, but odds are the one pre-selected is the one you'll want to use.
 
@@ -114,7 +124,7 @@ Now select a shell of your choice and let's get going.
 
 #### King Kong
 
-Each project requires a folder and a file called `package.py`.
+Each profile requires a folder and a file called `package.py`.
 
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
@@ -149,7 +159,7 @@ rez build --install
 
 </div>
 
-That's it, we've now got a brand new project. Let's add it to Allzpark and see what it looks like.
+That's it, we've now got a brand new profile. Let's add it to Allzpark and see what it looks like.
 
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
@@ -190,15 +200,15 @@ Let's take a moment to reflect on what we've accomplished so far.
 1. We've gotten familiar with the `rez` command
 1. We've authored a new Rez package from scratch
 1. We've used `rez build`, one of many Rez sub-commands, to build and install a package
-1. We've made Allzpark aware of this new project package, via the `MY_PROJECTS` environment variable.
+1. We've made Allzpark aware of this new profile package, via the `MY_PROJECTS` environment variable.
 
-Next we'll have a look at how to add an application to your project, and how to actually make a new application from scratch.
+Next we'll have a look at how to add an application to your profile, and how to actually make a new application from scratch.
 
 <br>
 
 ### Your first application
 
-There isn't much we can do with a project unless we've got an application, so let's add one.
+There isn't much we can do with a profile unless we've got an application, so let's add one.
 
 1. Open `kingkong/package.py` in your favourite text editor
 2. Edit it as follows.
@@ -214,7 +224,7 @@ requires = [
 ]
 ```
 
-As you may have guessed, these are the *requirements* of this project. That little squiggly `~` character ahead of `maya` indicates that this is a "weak" reference, which Allzpark interprets as application in this project.
+As you may have guessed, these are the *requirements* of this profile. That little squiggly `~` character ahead of `maya` indicates that this is a "weak" reference, which Allzpark interprets as application in this profile.
 
 !!! hint "Protip"
     If you're already familiar with Rez and think to yourself "This isn't very flexible", you're right. Looking for applications in the requirements section of a package is a default you can customise later via the `allzparkconfig.py:applications_from_package()` function.
@@ -236,7 +246,7 @@ allzpark --demo
 
 #### An application package
 
-Ok, but we didn't really create an application so much as just add an existing one to the project. Let's create a new application from your OS and add *that* to the project too.
+Ok, but we didn't really create an application so much as just add an existing one to the profile. Let's create a new application from your OS and add *that* to the profile too.
 
 You can pick any application you'd like, for the purposes of this guide I'll make a package for a text editor.
 
@@ -273,9 +283,9 @@ rez build --install
 
 </div>
 
-You'll notice the similarity to creating a project and that's no coincidence. These are both Rez "packages". But there's something missing.
+You'll notice the similarity to creating a profile and that's no coincidence. These are both Rez "packages". But there's something missing.
 
-Unlike a project, an application must either reference an executable on disk, or encapsulate this executable into the package. We'll get into encapsulating files with a package a little later, for now let's have a look at how to reference a file on disk.
+Unlike a profile, an application must either reference an executable on disk, or encapsulate this executable into the package. We'll get into encapsulating files with a package a little later, for now let's have a look at how to reference a file on disk.
 
 **texteditor/package.py**
 
@@ -349,7 +359,7 @@ And presto!
 
 You made it! Let's reflect on what we've learned so far.
 
-1. Creating a new application is not unlike creating a new project
+1. Creating a new application is not unlike creating a new profile
 1. Packages have a `commands()` function you can use to "bootstrap" an environment with custom commands
 2. There's pros and cons to referencing system software, like a text editor.
 
@@ -357,7 +367,7 @@ You made it! Let's reflect on what we've learned so far.
 
 ### Your first payload
 
-We've managed to make a new project, and an application and we're just about ready to start developing the next King Kong movie.
+We've managed to make a new profile, and an application and we're just about ready to start developing the next King Kong movie.
 
 But there is something else missing. For the purposes of this chapter, I will assume you are developing King Kong using Autodesk Maya, but the same applies to just about any application.
 
@@ -369,7 +379,7 @@ But there is something else missing. For the purposes of this chapter, I will as
 
 ### Your first environment
 
-So your project has got some custom data, that's perfect. Now let's add some *metadata* as well.
+So your profile has got some custom data, that's perfect. Now let's add some *metadata* as well.
 
 ```python
 name = "kingkong"

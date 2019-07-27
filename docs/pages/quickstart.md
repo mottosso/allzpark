@@ -7,7 +7,7 @@ This page will get you up and running with Allzpark in less than 2 minutes.
 The below commands will install Allzpark and its dependencies, including Rez.
 
 ```bash
-pip install allzpark -U
+python -m pip install allzpark -U
 rez bind --quickstart
 allzpark --demo
 ```
@@ -16,7 +16,7 @@ allzpark --demo
 
 #### Troubleshooting
 
-Did anything go wrong?
+Everything ok?
 
 ??? quote "pip not found"
     It's possible you have `pip` installed, just not on your `PATH`. Try this.
@@ -40,6 +40,12 @@ Did anything go wrong?
 
     - CentOS 7 - `yum install python-pip`
     - Ubuntu 18 - `apt install python3-pip`
+
+    If that **did** work however, then if `pip` wasn't found, **Allzpark won't be either**. The `pip` executable is typically present on your PATH in the same location as Rez and Allzpark, and we need this to be the case.
+
+    - On Windows, this path is typically `c:\python36\scripts` or `c:\python27\scripts`
+    - On Linux, this path is `/usr/bin` and is much more likely already on your path
+    - On MacOS, I'm not sure. [Let me know!](https://github.com/mottosso/allzpark/issues)
 
 ??? quote "Permission denied"
     The above command assumes admin/sudo access to your machine which isn't always the case. If so, you can install Rez using a virtual environment.
@@ -92,5 +98,5 @@ If everything went well, you should now be presented with this!
 
 From here, try launching your favourite application, navigate the interface and make yourself at home. Then have a look at these to learn more.
 
-- [Create a new project](/getting-started)
+- [Create a new profile](/getting-started)
 - [Create a new application](/getting-started/#your-first-application)
