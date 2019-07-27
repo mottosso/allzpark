@@ -611,7 +611,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-27</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/getting-started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -622,14 +622,36 @@
                 <p>This page carries on from a successful 👈 <a href="/quickstart">quickstart</a> into making it relevant to your usecase.</p>
 <p><br></p>
 <h3 id="what-is-allzpark">What is Allzpark?</h3>
-<p>It's an <a href="https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers">application launcher</a>, similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment with data and requirements.</p>
-<details class="question"><summary>Why is that important?</summary><p>Remind me to tell you about this.</p>
-</details>
-<details class="hint"><summary>What are some similar projects?</summary><p>For perspective, have a look at these projects that solve the same problem.</p>
+<p>It's an <a href="https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers">application launcher</a>, similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment within which the applicatuon runs.</p>
+<details class="info"><summary>For example...</summary><p>Let's say you're working on a project using..</p>
+<ol>
+<li>Autodesk Maya</li>
+<li>Adobe Photoshop</li>
+<li>Pixologic Zbrush</li>
+</ol>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61997103-94d2c480-b094-11e9-81ba-6d8628649bcc.png" /></p>
+<p>For Maya, you'd like to use various software libraries, Python script and binary plug-ins such as Arnold and Ziva Dynamics. However, each plug-in need to be of a particular version in order to run on this version of Maya.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61997048-9059dc00-b093-11e9-8b03-ceac786f5785.png" /></p>
+<p>Over time, the number of projects grow, as do the individual requirements of each application, and many of the plug-ins and libraries end up sharing dependencies with each other.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61997075-ff373500-b093-11e9-831b-bfa9e8c3c111.png" /></p>
+<p>For some perspective on the potential complexity of this kind of network, have a look at these.</p>
+<p>And so to design and manage this network of dependencies, you'll leverage <a href="https://github.com/mottosso/bleeding-rez">Rez</a> - an industry standard environment management tool used by large and small companies alike.</p>
 <ul>
-<li><a href="https://github.com/mottosso/be">be</a></li>
+<li><a href="studioanima.co.jp">Studio Anima</a></li>
+<li><a href="https://www.animallogic.com/">Animal Logic</a></li>
+<li><a href="https://www.imageworks.com/">Sony Imageworks</a></li>
+<li><a href="https://www.moving-picture.com/">Moving Picture Company</a></li>
+<li><a href="http://www.mikrosimage-animation.eu/en/">Mikros Image</a></li>
+<li>And <a href="/about/#rez-users">more</a></li>
+</ul>
+</details>
+<details class="question"><summary>What are some similar projects?</summary><p>Have a look at these, they solve a similar problem to Allzpark.</p>
+<ul>
+<li><a href="https://support.shotgunsoftware.com/hc/en-us/articles/219032968-Application-Launcher">Shotgun</a></li>
+<li><a href="https://www.ftrack.com/en/2019/01/an-introduction-to-ftrack-connect.html">ftrack</a></li>
 <li><a href="https://vimeo.com/126766739">Mango Software Launcher</a></li>
 </ul>
+<p>So then, why should you choose Allzpark? Odds are you already have most of what these solutions offer and aren't ready for a complete swap. Allzpark integrates with existing pipelines and works standalone. It'll also work the day you decide to transition from e.g. Shotgun to ftrack.</p>
 </details>
 <p>Here's how you would typically use Allzpark.</p>
 <ol>

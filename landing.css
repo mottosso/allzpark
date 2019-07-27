@@ -12,6 +12,10 @@
   align-items: flex-start;
 }
 
+#pypiBadge {
+  padding-top: 5px;
+}
+
 .vboxlayout p {
   margin-top: 0;
   font-size: 1.3em;
