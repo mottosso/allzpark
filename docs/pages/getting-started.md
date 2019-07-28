@@ -15,7 +15,7 @@ It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_deskt
 
     ![image](https://user-images.githubusercontent.com/2152766/61997103-94d2c480-b094-11e9-81ba-6d8628649bcc.png)
 
-    For Maya, you'd like to use various software libraries, Python script and binary plug-ins such as Arnold and Ziva Dynamics. However, each plug-in need to be of a particular version in order to run on this version of Maya.
+    For Maya, you'd like to use various software libraries, Python scripts and binary plug-ins like Solid Angle's Arnold and Ziva Dynamics. However, each plug-in need to be of a particular version in order to play ball this version of Maya.
 
     ![image](https://user-images.githubusercontent.com/2152766/61997048-9059dc00-b093-11e9-8b03-ceac786f5785.png)
 
@@ -23,16 +23,18 @@ It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_deskt
 
     ![image](https://user-images.githubusercontent.com/2152766/61997075-ff373500-b093-11e9-831b-bfa9e8c3c111.png)
 
-    For some perspective on the potential complexity of this kind of network, have a look at these.
+    So now you've got a network of interdependencies that all need to work wither each other and wonder "How can I write my own software that run in this environment?". That's where reproducible enironments come in handy, and that's where Rez and Allzpark come in.
 
-    And so to design and manage this network of dependencies, you'll leverage [Rez](https://github.com/mottosso/bleeding-rez) - an industry standard environment management tool used by large and small companies alike.
+    [Rez](https://github.com/mottosso/bleeding-rez) - an industry standard used by studios large and small - is the framwork with which you design this network and Allzpark is the shiny front-end your artists uses interface with it.
+
+    **Studios using Rez**
 
     - [Studio Anima](studioanima.co.jp)
     - [Animal Logic](https://www.animallogic.com/)
     - [Sony Imageworks](https://www.imageworks.com/)
     - [Moving Picture Company](https://www.moving-picture.com/)
     - [Mikros Image](http://www.mikrosimage-animation.eu/en/)
-    - And [more](/about/#rez-users)
+    - And [many more](/about/#rez-users)
 
 ??? question "What are some similar projects?"
     Have a look at these, they solve a similar problem to Allzpark.

@@ -4,10 +4,19 @@ template: landing.html
 
 <div class="hboxlayout" id="landing">
     <div class="vboxlayout">
-        <br>
-        <br>
         <div class="container"><p id="title">Allzpark</p></div>
-        <br>
+        <p>
+            <img src=https://img.shields.io/badge/-Windows-blue>
+            <img src=https://img.shields.io/badge/-Linux-blue>
+            <img src=https://img.shields.io/badge/-MacOS-blue>
+            <img src=https://img.shields.io/badge/-PyQt4-green>
+            <img src=https://img.shields.io/badge/-PyQt5-green>
+            <img src=https://img.shields.io/badge/-PySide-green>
+            <img src=https://img.shields.io/badge/-PySide2-green>
+            <br>
+            <img src=https://img.shields.io/pypi/pyversions/allzpark?color=red>
+            <img src=https://img.shields.io/pypi/v/bleeding-rez?color=red&label=bleeding-rez>
+        </p>
         <div class="container">
             <p id="description">
                 Powerful <b>application launcher</b> with <i>reproducible software environments</i>, for visual effects, feature animation and triple-A game productions.
@@ -45,7 +54,7 @@ template: landing.html
 Libraries, applications, projects.. package everything!
 <br>
 <br>
-Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed <a href=guides/#package-management>"packages"</a>.
+Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed "packages".
 <br>
 <br>
 Establish complex relationships between software, applications and projects with <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>, the underlying framework powering <b>Allzpark</b>.
@@ -53,7 +62,7 @@ Establish complex relationships between software, applications and projects with
 </p>
     </div>
     <div class="smallspace"></div>
-    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60490868-4b62a580-9c9f-11e9-857a-204a5e58ac35.gif>
+    <img class="poster" style="border: none; box-shadow: none; padding: 0" src=https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif>
 </div>
 
 <div class="space"></div>
@@ -114,33 +123,11 @@ Preview the environment, prior to launching an application. Make changes interac
 
 <!-- 
 
-    Process Management
-
--->
-
-<div class="hboxlayout">
-    <div class="vboxlayout">
-        <h2>Process Management</h2>
-<p>
-
-Organise your many running processes in a compact way. Give each instance of Maya a unique name, group them, color them, bring-to-front and mass-kill instances to establish available memory in a hurry.
-
-</p>
-    </div>
-    <div class="smallspace"></div>
-    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493791-82d45080-9ca5-11e9-8f7b-0be30a53d823.gif>
-</div>
-
-<div class="space"></div>
-<div class="space"></div>
-
-<!-- 
-
     Customisation
 
 -->
 
-<div class="hboxlayout justify-left row-reverse">
+<div class="hboxlayout">
     <div class="vboxlayout">
         <h2>Customisation</h2>
         <p>
@@ -151,7 +138,7 @@ Organise your many running processes in a compact way. Give each instance of May
         </p>
     </div>
     <div class="smallspace"></div>
-    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493792-82d45080-9ca5-11e9-8533-ae04803c71e2.gif>
+    <img class="poster" style="border: none; box-shadow: none; padding: 0" src=https://user-images.githubusercontent.com/2152766/61289704-e1c7b880-a7c1-11e9-94ba-20ef7a2ca6bc.gif>
 </div>
 
 
@@ -170,8 +157,8 @@ Organise your many running processes in a compact way. Give each instance of May
         Let's get this show on the road
     </p>
     <div class="hboxlayout justify-center">
-        <a href="guides/#install" class="button blue">Learn more</a>
-        <a href="guides/#install" class="button red">Download</a>
+        <a href="getting-started" class="button blue">Learn more</a>
+        <a href="quickstart" class="button red">Download</a>
     </div>
 </div>
 
