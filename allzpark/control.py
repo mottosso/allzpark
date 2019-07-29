@@ -837,6 +837,7 @@ class Controller(QtCore.QObject):
 
         # Update versions model
         versions = list(filter(None, profile_versions))  # Exclude "Latest"
+        versions.reverse()  # Latest first
         self._models["profileVersions"].setStringList(versions)
 
         self._state.to_loading()
