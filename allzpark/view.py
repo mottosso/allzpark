@@ -241,6 +241,7 @@ class Window(QtWidgets.QMainWindow):
         widgets["profileBtn"].setToolTip("Click to change profile")
 
         widgets["logo"].setCursor(QtCore.Qt.PointingHandCursor)
+        widgets["logo"].setToolTip(allzparkconfig.help_url)
         widgets["profileBtn"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["profileName"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["profileVersion"].setCursor(QtCore.Qt.PointingHandCursor)
@@ -505,11 +506,13 @@ class Window(QtWidgets.QMainWindow):
         pass
 
     def on_profilename_changed(self, profile):
+        """User changed the profile"""
         self._ctrl.select_profile(profile)
         self._ctrl.state.store("startupProfile", profile)
         self.setFocus()
 
     def on_profileversion_changed(self, version):
+        """User changed the profile version"""
         profile = self._ctrl.current_profile
         self._ctrl.select_profile(profile, version)
         self.setFocus()
@@ -527,6 +530,8 @@ class Window(QtWidgets.QMainWindow):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
 
     def on_profile_changed(self, profile, version, refreshed=False):
+        """Profile changed in the controller"""
+
         # Happens when editing requirements
         action = "Refreshing" if refreshed else "Changing"
         icon = res.find("Default_Profile")
