@@ -78,15 +78,16 @@ def timings(title, timing=True):
     except Exception:
         sys.stdout.write(message["failure"])
 
-        if log.level < logging.WARNING:
-            import traceback
-            sys.stdout.write(traceback.format_exc())
-            sys.stdout.write("\n")
+        if not message["ignoreFailure"]:
+            if log.level < logging.WARNING:
+                import traceback
+                sys.stdout.write(traceback.format_exc())
+                sys.stdout.write("\n")
 
-        else:
-            tell("Pass --verbose for details")
+            else:
+                tell("Pass --verbose for details")
 
-        exit(1)
+            exit(1)
     else:
         sys.stdout.write(message["success"].format(time.time() - t0))
 
@@ -198,6 +199,7 @@ def main():
     _patch_allzparkconfig()
 
     with timings("- Loading user config.. ") as msg:
+        msg["ignoreFailure"] = True
         result = _load_userconfig(opts.config_file)
         msg["success"] = "ok {:.2f} (%s)\n" % result
 
