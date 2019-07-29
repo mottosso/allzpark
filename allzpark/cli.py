@@ -130,17 +130,22 @@ def main():
     tell(" allzpark (%s)" % version)
     tell("=" * 30)
 
-    logging.basicConfig(format=(
-        "%(levelname)-8s %(name)s %(message)s" if opts.verbose else
-        "%(message)s"
-    ))
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
 
+    formatter = logging.Formatter(
+        "%(levelname)-8s %(name)s %(message)s"
+        if opts.verbose
+        else "%(message)s"
+    )
+
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
     log.setLevel(logging.DEBUG
                  if opts.verbose >= 2
                  else logging.INFO
                  if opts.verbose == 1
                  else logging.WARNING)
-    log.propagate = True
 
     logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
 

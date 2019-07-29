@@ -1,7 +1,6 @@
 """Orchestrates view.py and model.py"""
 
 import os
-import sys
 import time
 import errno
 import shutil
@@ -312,7 +311,7 @@ class Controller(QtCore.QObject):
             traceback.format_tb(tb) + [str(value)]
         )
         self._state.to_errored()
-        self.debug(self._state["error"])
+        self.error(self._state["error"])
 
         if rez.PackageNotFoundError is type:
             package = value.value.rsplit(": ", 1)[-1]
@@ -737,9 +736,6 @@ class Controller(QtCore.QObject):
     def debug(self, message):
         log.debug(message)
         self.logged.emit(message, logging.DEBUG)
-
-        # Print to console as well
-        sys.stdout.write(message + "\n")
 
     def info(self, message):
         log.info(message)
