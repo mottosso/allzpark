@@ -29,7 +29,7 @@ It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_deskt
 
     **Studios using Rez**
 
-    - [Studio Anima](studioanima.co.jp)
+    - [Studio Anima](https://studioanima.co.jp)
     - [Animal Logic](https://www.animallogic.com/)
     - [Sony Imageworks](https://www.imageworks.com/)
     - [Moving Picture Company](https://www.moving-picture.com/)
