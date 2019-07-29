@@ -71,7 +71,8 @@ def timings(title, timing=True):
     sys.stdout.write(title)
     t0 = time.time()
     message = {"success": "ok - {:.2f}\n" if timing else "ok\n",
-               "failure": "fail\n"}
+               "failure": "fail\n",
+               "ignoreFailure": False}
 
     try:
         yield message
@@ -199,7 +200,10 @@ def main():
     _patch_allzparkconfig()
 
     with timings("- Loading user config.. ") as msg:
+
+        # These are optional
         msg["ignoreFailure"] = True
+
         result = _load_userconfig(opts.config_file)
         msg["success"] = "ok {:.2f} (%s)\n" % result
 
