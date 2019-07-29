@@ -275,7 +275,7 @@ class BrokenPackage(object):
 
     def __init__(self, request):
         request = rez.PackageRequest(request)
-        versions = request.range.to_versions() or ["0"]
+        versions = request.range.to_versions() or [None]
 
         self.name = request.name
         self.version = versions[-1]

@@ -27,6 +27,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 Latest = None  # Enum
+NoVersion = None
 
 
 class State(dict):
@@ -823,10 +824,18 @@ class Controller(QtCore.QObject):
                 self.error("select_profile was passed an empty string")
 
         refreshed = self._state["profileName"] == profile_name
+
+        # TODO: This isn't clear.
+        # We can't pass a native Rez Version object, but we also can't
+        # simply str() that and BrokenPackage.version, as those would
+        # be None, which is the equivalent of a NoVersion object.
+        version_name = active_profile.version
+        version_name = str(version_name) if version_name else NoVersion
+
         self._state["profileName"] = profile_name
         self.profile_changed.emit(
             profile_name,
-            str(active_profile.version),
+            version_name,
             refreshed
         )
 
@@ -1053,8 +1062,6 @@ class Controller(QtCore.QObject):
     def graph(self):
         context = self._state["rezContexts"][self._state["appRequest"]]
         graph_str = context.graph(as_dot=True)
-
-        self.debug("Generating graph from %s" % graph_str)
 
         tempdir = tempfile.mkdtemp()
         fname = os.path.join(tempdir, "graph.png")
