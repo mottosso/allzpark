@@ -611,7 +611,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-28</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-29</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/getting-started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -769,13 +769,13 @@ rez build --install
 </div>
 
 <div class="tab-content powershell">
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$env:MY_PROJECTS=</span><span style="color: #e6db74">&quot;kingkong&quot;</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$env:MY_PROFILES=</span><span style="color: #e6db74">&quot;kingkong&quot;</span>
 <span style="color: #f8f8f2">allzpark</span> <span style="color: #f8f8f2">--demo</span>
 </pre></div>
 
 </div>
 <div class="tab-content bash">
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">export</span> <span style="color: #f8f8f2">MY_PROJECTS</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;kingkong&quot;</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">export</span> <span style="color: #f8f8f2">MY_PROFILES</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;kingkong&quot;</span>
 allzpark --demo
 </pre></div>
 
@@ -783,8 +783,8 @@ allzpark --demo
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61939300-dd05c000-af8a-11e9-8a3d-429ce532e0d6.png" /></p>
 <p>We'll do a lot more of this as we go along, so don't worry if it doesn't quite make sense just yet.</p>
 <div class="admonition note">
-<p class="admonition-title">Regarding <code>MY_PROJECTS</code></p>
-<p>I've programmed this demo to take the environment variable <code>MY_PROJECTS</code> into account, but we'll have a look later at how you can customise how projects are actually discovered either from disk, a production tracking system like Shotgun or arbitrary function you provide.</p>
+<p class="admonition-title">Regarding <code>MY_PROFILES</code></p>
+<p>I've programmed this demo to take the environment variable <code>MY_PROFILES</code> into account, but we'll have a look later at how you can customise how projects are actually discovered either from disk, a production tracking system like Shotgun or arbitrary function you provide.</p>
 </div>
 <p><br></p>
 <h4 id="what-weve-learned">What we've learned</h4>
@@ -793,7 +793,7 @@ allzpark --demo
 <li>We've gotten familiar with the <code>rez</code> command</li>
 <li>We've authored a new Rez package from scratch</li>
 <li>We've used <code>rez build</code>, one of many Rez sub-commands, to build and install a package</li>
-<li>We've made Allzpark aware of this new profile package, via the <code>MY_PROJECTS</code> environment variable.</li>
+<li>We've made Allzpark aware of this new profile package, via the <code>MY_PROFILES</code> environment variable.</li>
 </ol>
 <p>Next we'll have a look at how to add an application to your profile, and how to actually make a new application from scratch.</p>
 <p><br></p>
