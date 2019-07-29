@@ -199,7 +199,7 @@ That's it, we've now got a brand new profile. Let's add it to Allzpark and see w
 <div class="tab-content powershell" markdown="1">
 
 ```powershell
-$env:MY_PROJECTS="kingkong"
+$env:MY_PROFILES="kingkong"
 allzpark --demo
 ```
 
@@ -208,7 +208,7 @@ allzpark --demo
 <div class="tab-content bash" markdown="1">
 
 ```bash
-export MY_PROJECTS="kingkong"
+export MY_PROFILES="kingkong"
 allzpark --demo
 ```
 
@@ -218,8 +218,8 @@ allzpark --demo
 
 We'll do a lot more of this as we go along, so don't worry if it doesn't quite make sense just yet.
 
-!!! note "Regarding `MY_PROJECTS`"
-    I've programmed this demo to take the environment variable `MY_PROJECTS` into account, but we'll have a look later at how you can customise how projects are actually discovered either from disk, a production tracking system like Shotgun or arbitrary function you provide.
+!!! note "Regarding `MY_PROFILES`"
+    I've programmed this demo to take the environment variable `MY_PROFILES` into account, but we'll have a look later at how you can customise how projects are actually discovered either from disk, a production tracking system like Shotgun or arbitrary function you provide.
 
 <br>
 
@@ -230,7 +230,7 @@ Let's take a moment to reflect on what we've accomplished so far.
 1. We've gotten familiar with the `rez` command
 1. We've authored a new Rez package from scratch
 1. We've used `rez build`, one of many Rez sub-commands, to build and install a package
-1. We've made Allzpark aware of this new profile package, via the `MY_PROJECTS` environment variable.
+1. We've made Allzpark aware of this new profile package, via the `MY_PROFILES` environment variable.
 
 Next we'll have a look at how to add an application to your profile, and how to actually make a new application from scratch.
 
