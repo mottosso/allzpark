@@ -35,7 +35,7 @@ class Window(QtWidgets.QMainWindow):
             ("loading", QtWidgets.QWidget()),
             ("errored", QtWidgets.QWidget()),
             ("noapps", QtWidgets.QWidget()),
-            ("noprofile", QtWidgets.QWidget()),
+            ("noprofiles", QtWidgets.QWidget()),
         ))
 
         panels = {
@@ -51,7 +51,7 @@ class Window(QtWidgets.QMainWindow):
             "errorMessage": QtWidgets.QLabel("Uh oh..<br>"
                                              "See Console for details"),
             "noappsMessage": QtWidgets.QTextBrowser(),
-            "noprofileMessage": QtWidgets.QLabel("No profile found"),
+            "noprofileMessage": QtWidgets.QLabel("No profiles was found"),
             "pkgnotfoundMessage": QtWidgets.QLabel(
                 "One or more packages could not be found"
             ),
@@ -137,7 +137,7 @@ class Window(QtWidgets.QMainWindow):
         layout.setSpacing(0)
         layout.addWidget(widgets["noappsMessage"], 0)
 
-        layout = QtWidgets.QVBoxLayout(pages["noprofile"])
+        layout = QtWidgets.QVBoxLayout(pages["noprofiles"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         layout.addWidget(QtWidgets.QWidget(), 1)
@@ -626,12 +626,8 @@ class Window(QtWidgets.QMainWindow):
             self._widgets["profileBtn"].setEnabled(True)
             self._widgets["noappsMessage"].setText(message)
 
-        elif page_name == "noprofile":
+        elif page_name == "noprofiles":
             self._widgets["profileBtn"].setEnabled(True)
-            self._widgets["noprofileMessage"].setText(
-                "No Rez package was found for profile '%s'\n"
-                "Check your REZ_PACKAGES_PATH" % self._ctrl.current_profile
-            )
 
         if state == "launching":
             self._docks["app"].setEnabled(False)

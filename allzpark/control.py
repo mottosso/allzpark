@@ -174,7 +174,7 @@ class Controller(QtCore.QObject):
         _State("errored", help="Something has gone wrong"),
         _State("launching", help="An application is launching"),
         _State("ready", help="Awaiting user input"),
-        _State("noprofile", help="A given profile package was not found"),
+        _State("noprofiles", help="Allzpark did not find any profiles at all"),
         _State("noapps", help="There were no applications to choose from"),
         _State("notresolved", help="Rez couldn't resolve a request"),
         _State("pkgnotfound", help="One or more packages was not found"),
@@ -554,10 +554,6 @@ class Controller(QtCore.QObject):
             if not current_profile:
                 current_profile = default_profile
 
-            # Fallback
-            if not current_profile:
-                current_profile = "no_profile"
-
             self._state["profileName"] = current_profile
             self._state["root"] = root
 
@@ -565,7 +561,13 @@ class Controller(QtCore.QObject):
             self.resetted.emit()
 
         def _on_success():
-            self.select_profile(self._state["profileName"])
+            profile = not self._state["profileName"]
+
+            if profile:
+                self._state.to_noprofiles()
+            else:
+                self.select_profile(profile)
+
             on_success()
 
         def _on_failure(error, trace):
