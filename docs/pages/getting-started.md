@@ -39,11 +39,11 @@ It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_deskt
 ??? question "What are some similar projects?"
     Have a look at these, they solve a similar problem to Allzpark.
 
-    - [Shotgun](https://support.shotgunsoftware.com/hc/en-us/articles/219032968-Application-Launcher)
-    - [ftrack](https://www.ftrack.com/en/2019/01/an-introduction-to-ftrack-connect.html)
+    - [Shotgun Launcher](https://support.shotgunsoftware.com/hc/en-us/articles/219032968-Application-Launcher)
+    - [ftrack Connect](https://www.ftrack.com/en/2019/01/an-introduction-to-ftrack-connect.html)
     - [Mango Software Launcher](https://vimeo.com/126766739)
 
-    So then, why should you choose Allzpark? Odds are you already have most of what these solutions offer and aren't ready for a complete swap. Allzpark integrates with existing pipelines and works standalone. It'll also work the day you decide to transition from e.g. Shotgun to ftrack.
+    So then, why should you choose Allzpark? Odds are you already have most of what these solutions offer and aren't ready for a complete swap. Allzpark integrates with existing pipelines and works standalone. It'll also work the day you decide to transition from e.g. Shotgun to ftrack, safeguarding your investment in each individual component of your pipeline.
 
 Here's how you would typically use Allzpark.
 
@@ -104,6 +104,12 @@ An application typically consists of these components.
 - Environment
 
 Notice that it isn't unlike a profile, and in fact not unlike any other software you'll encounter later on. These are both "packages" and we'll talk a lot more about what that is as we progress through this guide.
+
+<br>
+
+#### What is an "package"?
+
+I've talked a lot about "packages" and how great they are, but what exactly *are* they and why should you care?
 
 <br>
 
