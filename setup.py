@@ -51,7 +51,10 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "allzpark = allzpark.cli:main"
+            "allzpark = allzpark.cli:main",
+
+            # Alias
+            "azp = allzpark.cli:main",
         ]
     },
     classifiers=classifiers,
