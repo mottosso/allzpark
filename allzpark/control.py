@@ -826,7 +826,7 @@ class Controller(QtCore.QObject):
         self._state["profileName"] = profile_name
         self.profile_changed.emit(
             profile_name,
-            version_name,
+            str(active_profile.version),
             refreshed
         )
 
