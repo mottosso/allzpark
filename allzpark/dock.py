@@ -67,12 +67,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
 
 
 class App(AbstractDockWidget):
-    """Info
-
-    Aggregated information about the currently selected
-    profile and application combination.
-
-    """
+    """Aggregated information about the currently selected profile"""
 
     icon = "Alert_Info_32"
 
@@ -100,12 +95,6 @@ class App(AbstractDockWidget):
             "args": qargparse.QArgumentParser([
                 qargparse.Choice("tool", help=(
                     "Which executable within the context of this application"
-                )),
-                qargparse.Boolean("detached", help=(
-                    "Spawn a dedicated console for this executable\n"
-                    "Typically only necessary for console applications. "
-                    "If you find that an executable doesn't provide a window, "
-                    "such as mayapy, then you probably want detached."
                 )),
             ]),
 
@@ -176,7 +165,7 @@ class App(AbstractDockWidget):
         self._ctrl.launch()
 
     def on_arg_changed(self, arg):
-        if arg["name"] not in ("detached", "tool"):
+        if arg["name"] not in ("tool",):
             return
 
         ctrl = self._ctrl
@@ -802,6 +791,17 @@ class EnvironmentEditor(QtWidgets.QWidget):
         self.on_focus_lost()
 
     def from_environment(self, environ):
+        if not environ:
+            return self._widgets["textEdit"].setPlainText("""\
+# Provide your own additional environment variables here
+#
+# MY_VARIABLE=1
+# YOUR_VARIABLE=2
+#
+# NOTE: Variables are applied *before* the context, which
+# means your packages overwrite anything you provide here.
+""")
+
         text = "\n".join([
             "%s=%s" % (key, value)
             for key, value in environ.items()
@@ -1107,6 +1107,83 @@ class SlimTableView(QtWidgets.QTableView):
         finally:
             if event.button() == QtCore.Qt.RightButton:
                 self.customContextMenuRequested.emit(event.pos())
+
+
+class PushButtonWithMenu(QtWidgets.QPushButton):
+    def __init__(self, *args, **kwargs):
+        super(PushButtonWithMenu, self).__init__(*args, **kwargs)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+
+    def mousePressEvent(self, event):
+        """Do request a context menu, but on mouse *press*, not release"""
+
+        # Important, call this first to have the item be selected,
+        # as per default, and *then* ask for a context menu. That
+        # way, the menu and selection aligns.
+        try:
+            return super(PushButtonWithMenu, self).mousePressEvent(event)
+
+        finally:
+            if event.button() == QtCore.Qt.RightButton:
+                self.customContextMenuRequested.emit(event.pos())
+
+
+class LineEditWithCompleter(QtWidgets.QLineEdit):
+    changed = QtCore.Signal(str)
+
+    def __init__(self, parent=None):
+        super(LineEditWithCompleter, self).__init__(parent)
+
+        proxy = QtCore.QSortFilterProxyModel(self)
+        proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+        completer = QtWidgets.QCompleter(proxy, self)
+        completer.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        completer.setCompletionMode(completer.UnfilteredPopupCompletion)
+        completer.setMaxVisibleItems(15)
+
+        self.setCompleter(completer)
+        self.editingFinished.connect(self.onEditingFinished)
+
+        self._completer = completer
+        self._focused = False
+        self._proxy = proxy
+        self._current = None
+
+    def setModel(self, model):
+        self._proxy.setSourceModel(model)
+        self._completer.setModel(self._proxy)
+
+    def setText(self, text):
+
+        # Keep track of a "default" such that we can revert back to
+        # it following a bad completion.
+        self._current = text
+
+        return super(LineEditWithCompleter, self).setText(text)
+
+    def resetText(self):
+        self.setText(self._current)
+
+    def mousePressEvent(self, event):
+        super(LineEditWithCompleter, self).mousePressEvent(event)
+
+        # Automatically show dropdown on select
+        self._completer.complete()
+        self.selectAll()
+
+    def onEditingFinished(self):
+        # For whatever reason, the completion prefix isn't updated
+        # when coming from the user selecting an item from the
+        # completion listview. (Windows 10, PySide2, Python 3.7)
+        self._completer.setCompletionPrefix(self.text())
+
+        suggested = self._completer.currentCompletion()
+
+        if not suggested:
+            return self.resetText()
+
+        self.changed.emit(suggested)
 
 
 class MenuWithTooltip(QtWidgets.QMenu):

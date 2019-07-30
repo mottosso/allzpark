@@ -60,9 +60,9 @@ class Window(QtWidgets.QMainWindow):
             "logo": QtWidgets.QToolButton(),
             "appVersion": QtWidgets.QLabel(version),
 
-            "profileBtn": QtWidgets.QPushButton(),
-            "profileName": LineEditWithCompleter(),
-            "profileVersion": LineEditWithCompleter(),
+            "profileBtn": dock.PushButtonWithMenu(),
+            "profileName": dock.LineEditWithCompleter(),
+            "profileVersion": dock.LineEditWithCompleter(),
 
             "apps": dock.SlimTableView(),
             "fullCommand": FullCommand(ctrl),
@@ -239,7 +239,6 @@ class Window(QtWidgets.QMainWindow):
         widgets["profileBtn"].setToolTip("Click to change profile\n"
                                          "Right-click for options")
         widgets["profileBtn"].setIcon(res.icon("Default_Profile"))
-        widgets["profileBtn"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
         css = "QWidget { border-image: url(%s); }"
 
@@ -762,64 +761,6 @@ class Window(QtWidgets.QMainWindow):
         self._ctrl.state.store("geometry", self.saveGeometry())
         self._ctrl.state.store("windowState", self.saveState())
         return super(Window, self).closeEvent(event)
-
-
-class LineEditWithCompleter(QtWidgets.QLineEdit):
-    changed = QtCore.Signal(str)
-
-    def __init__(self, parent=None):
-        super(LineEditWithCompleter, self).__init__(parent)
-
-        proxy = QtCore.QSortFilterProxyModel(self)
-        proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
-
-        completer = QtWidgets.QCompleter(proxy, self)
-        completer.setCaseSensitivity(QtCore.Qt.CaseInsensitive)
-        completer.setCompletionMode(completer.UnfilteredPopupCompletion)
-        completer.setMaxVisibleItems(15)
-
-        self.setCompleter(completer)
-        self.editingFinished.connect(self.onEditingFinished)
-
-        self._completer = completer
-        self._focused = False
-        self._proxy = proxy
-        self._current = None
-
-    def setModel(self, model):
-        self._proxy.setSourceModel(model)
-        self._completer.setModel(self._proxy)
-
-    def setText(self, text):
-
-        # Keep track of a "default" such that we can revert back to
-        # it following a bad completion.
-        self._current = text
-
-        return super(LineEditWithCompleter, self).setText(text)
-
-    def resetText(self):
-        self.setText(self._current)
-
-    def mousePressEvent(self, event):
-        super(LineEditWithCompleter, self).mousePressEvent(event)
-
-        # Automatically show dropdown on select
-        self._completer.complete()
-        self.selectAll()
-
-    def onEditingFinished(self):
-        # For whatever reason, the completion prefix isn't updated
-        # when coming from the user selecting an item from the
-        # completion listview. (Windows 10, PySide2, Python 3.7)
-        self._completer.setCompletionPrefix(self.text())
-
-        suggested = self._completer.currentCompletion()
-
-        if not suggested:
-            return self.resetText()
-
-        self.changed.emit(suggested)
 
 
 class FullCommand(QtWidgets.QWidget):

@@ -61,6 +61,10 @@ class State(dict):
 
             # Currently loaded Rez contexts
             "rezContexts": {},
+
+            # Cache, for performance only
+            "rezEnvirons": {},
+
             "rezApps": odict(),
             "fullCommand": "rez env",
             "serialisationMode": (
@@ -157,7 +161,7 @@ class _Stream(object):
         self._level = level
 
     def write(self, text):
-        self._stream.write(text) if self._stream else None
+        self._stream.write(text.rstrip()) if self._stream else None
         self._ctrl.logged.emit(text, self._level)
 
     def fileno(self):
@@ -276,12 +280,39 @@ class Controller(QtCore.QObject):
         return self._state["rezContexts"][app_request].to_dict()
 
     def environ(self, app_request):
+        """Fetch the environment of a context
+
+        NOTE: These can get very expensive. They call on every
+              package.py:commands() in a resolved context, which can
+              be in the tens to hundreds. Add to that the fact that
+              these functions can perform any arbitrary task, including
+              writing to disk or performing expensive calculations,
+              such as resolving their own contexts for various reasons.
+
+        TODO: This should be async, the GUI should help the user
+              understand that the environment is loading and is
+              going to be ready soon. They should also only incur
+              cost when the user is actually looking at the
+              environment tab.
+
+        """
+
+        env = self._state["rezEnvirons"]
+        ctx = self._state["rezContexts"]
+
         try:
-            return self._state["rezContexts"][app_request].get_environ()
-        except rez.ResolvedContextError:
-            return {
-                "error": "Failed context"
-            }
+            return env[app_request]
+
+        except KeyError:
+            try:
+                environ = ctx[app_request].get_environ()
+                env[app_request] = environ
+                return environ
+
+            except rez.ResolvedContextError:
+                return {
+                    "error": "Failed context"
+                }
 
     def resolved_packages(self, app_request):
         return self._state["rezContexts"][app_request].resolved_packages
@@ -594,6 +625,7 @@ class Controller(QtCore.QObject):
             raise error
 
         self._state["rezContexts"].clear()
+        self._state["rezEnvirons"].clear()
         self._state["rezApps"].clear()
 
         # Rez stores file listings and more
