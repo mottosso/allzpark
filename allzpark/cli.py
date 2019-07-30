@@ -13,6 +13,7 @@ from . import allzparkconfig
 
 timing = {}
 log = logging.getLogger("allzpark")
+UserError = type("UserError", (Exception,), {})
 
 
 def _load_userconfig(fname=None):
@@ -25,8 +26,15 @@ def _load_userconfig(fname=None):
         "__file__": fname,
     }
 
-    with open(fname) as f:
-        exec(compile(f.read(), f.name, 'exec'), mod)
+    try:
+        with open(fname) as f:
+            exec(compile(f.read(), f.name, 'exec'), mod)
+
+    except IOError:
+        raise
+
+    except Exception:
+        raise UserError("Better double-check your user config")
 
     for key in dir(allzparkconfig):
         if key.startswith("__"):
@@ -76,18 +84,18 @@ def timings(title, timing=True):
 
     try:
         yield message
+
     except Exception:
         tell(message["failure"], 0)
 
-        if not message["ignoreFailure"]:
-            if log.level < logging.WARNING:
-                import traceback
-                tell(traceback.format_exc())
+        if log.level < logging.WARNING:
+            import traceback
+            tell(traceback.format_exc())
 
-            else:
-                tell("Pass --verbose for details")
+        else:
+            tell("Pass --verbose for details")
 
-            exit(1)
+        exit(1)
     else:
         tell(message["success"].format(time.time() - t0), 0)
 
@@ -225,13 +233,13 @@ def main():
 
     _patch_allzparkconfig()
 
-    with timings("- Loading user config.. ") as msg:
+    with timings("- Loading allzparkconfig.. ") as msg:
+        try:
+            result = _load_userconfig(opts.config_file)
+            msg["success"] = "ok {:.2f} (%s)\n" % result
 
-        # These are optional
-        msg["ignoreFailure"] = True
-
-        result = _load_userconfig(opts.config_file)
-        msg["success"] = "ok {:.2f} (%s)\n" % result
+        except IOError:
+            pass
 
     _backwards_compatibility()
 
