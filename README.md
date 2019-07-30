@@ -62,6 +62,12 @@ To see the patch version as you develop, ensure `git` is available on PATH, as i
 
 <br>
 
+### Resources
+
+The current icon set is from [Haiku](https://github.com/darealshinji/haiku-icons).
+
+<br>
+
 ### More Gifs
 
 > "launchapp2" was the internal working title during development at [Studio Anima](http://studioanima.co.jp)
