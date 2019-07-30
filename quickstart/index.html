@@ -498,11 +498,7 @@ allzpark --demo --clean
 <p><br></p>
 <h4 id="troubleshooting">Troubleshooting</h4>
 <p>Everything ok?</p>
-<details class="quote"><summary>pip not found</summary><p>It's possible you have <code>pip</code> installed, just not on your <code>PATH</code>. Try this.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>python -m pip install bleeding-rez
-</pre></div>
-
-<p>If this doesn't work, let's install pip.</p>
+<details class="quote"><summary>No module named pip</summary><p>For this to work, we'll need pip.</p>
 <ul>
 <li><a href="https://pip.pypa.io/en/stable/installing/">Reference</a></li>
 </ul>
@@ -510,17 +506,11 @@ allzpark --demo --clean
 python get-pip.py
 </pre></div>
 
-<p>If that didn't work, you may have to dive deeper into how to install pip for your platform.</p>
+<p>If that didn't work, have a look at to install pip for your platform.</p>
 <p><strong>Examples</strong></p>
 <ul>
 <li>CentOS 7 - <code>yum install python-pip</code></li>
 <li>Ubuntu 18 - <code>apt install python3-pip</code></li>
-</ul>
-<p>If that <strong>did</strong> work however, then if <code>pip</code> wasn't found, <strong>Allzpark won't be either</strong>. The <code>pip</code> executable is typically present on your PATH in the same location as Rez and Allzpark, and we need this to be the case.</p>
-<ul>
-<li>On Windows, this path is typically <code>c:\python36\scripts</code> or <code>c:\python27\scripts</code></li>
-<li>On Linux, this path is <code>/usr/bin</code> and is much more likely already on your path</li>
-<li>On MacOS, I'm not sure. <a href="https://github.com/mottosso/allzpark/issues">Let me know!</a></li>
 </ul>
 </details>
 <details class="quote"><summary>Permission denied</summary><p>The above command assumes admin/sudo access to your machine which isn't always the case. If so, you can install Rez using a virtual environment.</p>
@@ -540,13 +530,6 @@ $ allzpark-venv<span style="color: #ae81ff">\S</span>cripts<span style="color: #
 </details>
 <details class="quote"><summary>rez not found</summary><p>If installation went successfully, but you aren't able to call <code>rez</code> then odds are the Python executable path isn't on your <code>PATH</code>. On Windows, this directory is typically at <code>c:\python37\scripts</code> but may vary depending on how Python was installed, and varies across platforms.</p>
 <p>Following the installation of <code>rez</code>, you should have gotten a message about which path was missing from your <code>PATH</code>, you can either add this yourself, or use the <code>virtualenv</code> method from the above <code>Permission denied</code> box.</p>
-</details>
-<details class="quote"><summary>Could not find ... PySide2</summary><p>The instructions assume Python 3, but Allzpark is written with <a href="https://github.com/mottosso/Qt.py">Qt.py</a> and supports any available binding, for both Python 2 and 3.</p>
-<p>Try installing Allzpark dependencies manually, replacing PySide2 with PySide(1).</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>pip install --no-deps PySide allzpark allzparkdemo bleeding-rez
-</pre></div>
-
-<p>If that doesn't work, then you can also use an <a href="https://stackoverflow.com/questions/22640640/how-to-install-pyqt4-on-windows-using-pip">installer for PyQt4</a> or check the package management system of your platform.</p>
 </details>
 <details class="quote"><summary>Something else happened</summary><p>Oh no! I'd like to know about what happened, please let me know <a href="https://github.com/mottosso/allzpark/issues">here</a> or send me a private message at <a href="mailto:marcus@abstractfactory.io">marcus@abstractfactory.io</a>.</p>
 </details>
