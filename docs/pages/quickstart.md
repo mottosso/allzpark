@@ -9,8 +9,10 @@ The below commands will install Allzpark and its dependencies, including Rez.
 ```bash
 python -m pip install allzpark --upgrade
 rez bind --quickstart
-allzpark --demo
+allzpark --demo --clean
 ```
+
+> Skip the `--clean` flag to preserve preferences, such as window layout, between runs.
 
 <br>
 

@@ -48,17 +48,29 @@ template: landing.html
 -->
 
 <div class="hboxlayout row-reverse">
-    <div class="vboxlayout">
+    <div class="vboxlayout" markdown="1">
         <h2>Package Based</h2>
         <p>
-Libraries, applications, projects.. package everything!
+Works on your machine?
 <br>
 <br>
-Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed "packages".
+Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed "packages". Each coming together to form an environment identical across your development machine and anywhere your software is used.
 <br>
-<br>
-Establish complex relationships between software, applications and projects with <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>, the underlying framework powering <b>Allzpark</b>.
+</p>
 
+```python
+# A package definition
+name = "blender"
+version = "2.80"
+
+def commands():
+    global env
+    env["PATH"].append("{root}/bin")
+    env["PYTHONPATH"].prepend("{root}/python")
+```
+
+<p>
+Establish complex relationships between software, applications and projects with <a href=https://github.com/mottosso/bleeding-rez>bleeding-rez</a>, the underlying framework powering Allzpark.
 </p>
     </div>
     <div class="smallspace"></div>
@@ -78,22 +90,41 @@ Establish complex relationships between software, applications and projects with
 <div class="hboxlayout">
     <div class="vboxlayout">
         <h2>Dual Representation</h2>
-        <p>
 
+<p>
 Allzpark is but a shell.
 
 Anything done via the GUI is available via the command-line, using standard Rez commands.
+</p>
+
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
+```powershell
+PS> rez env alita maya -q
+> PS> echo "Hello Rez!"
+> # Hello Rez!
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
 
 ```bash
 $ rez env alita maya -q
 > $ echo "Hello Rez!"
-Hello Rez!
+# Hello Rez!
 ```
 
-</p>
-    </div>
-    <div class="smallspace"></div>
-    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
+</div>
+
+</div>
+<div class="smallspace"></div>
+<img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
 </div>
 
 <div class="space"></div>
