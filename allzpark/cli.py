@@ -107,7 +107,7 @@ def main():
         "Print additional information about Allzpark during operation"))
     parser.add_argument("--version", action="store_true", help=(
         "Print version and exit"))
-    parser.add_argument("--clear-settings", action="store_true", help=(
+    parser.add_argument("--clean", action="store_true", help=(
         "Start fresh with user preferences"))
     parser.add_argument("--config-file", type=str, help=(
         "Absolute path to allzparkconfig.py, takes precedence "
@@ -150,10 +150,6 @@ def main():
     logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
 
     if opts.demo:
-
-        # Keep settings from interfering with demo
-        opts.clear_settings = True
-
         with timings("- Loading demo..") as msg:
             try:
                 import allzparkdemo
@@ -224,7 +220,7 @@ def main():
                                    QtCore.QSettings.UserScope,
                                    "Allzpark", "preferences")
 
-        if opts.clear_settings:
+        if opts.clean:
             sys.stdout.write("(clean) ")
             storage.clear()
 

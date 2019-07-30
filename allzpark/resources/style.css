@@ -105,10 +105,34 @@ Window #header QComboBox {
     padding: 0;
 }
 
-Window #header #projectBtn {
+Window #header #profileBtn {
     background: transparent;
     border: 1px solid #aaa;
     padding: 0;
+}
+
+Window #header #profileReset {
+
+}
+
+Window QStatusBar #profileReset {
+    max-width: 25px;
+    padding: 0;
+    margin: 0;
+    max-width: 16px;
+    max-height: 16px;
+    border: 5px solid yellow;
+    background: green;
+}
+
+
+Window QStatusBar #profileReset:hover {
+    background: blue;
+}
+
+
+Window QStatusBar #profileReset:pressed {
+    background: yellow;
 }
 
 Window #body {
@@ -195,6 +219,20 @@ QToolBar {
 
 QToolButton {
     min-height: 35px;
+}
+
+Window #header #profileBtn {
+    padding-left: -2px;
+    padding-right: -3px;
+    border: 2px solid #333;
+}
+
+Window #header #profileBtn:hover {
+    border: 2px solid steelblue;
+}
+
+Window #header #profileBtn:pressed {
+    border: 1px solid white;
 }
 
 QTableView {

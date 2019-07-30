@@ -67,6 +67,13 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
 
 
 class App(AbstractDockWidget):
+    """Info
+
+    Aggregated information about the currently selected
+    profile and application combination.
+
+    """
+
     icon = "Alert_Info_32"
 
     def __init__(self, ctrl, parent=None):
@@ -1107,11 +1114,36 @@ class MenuWithTooltip(QtWidgets.QMenu):
 
     def event(self, event):
         if event.type() == QtCore.QEvent.ToolTip and self.activeAction() != 0:
-            QtWidgets.QToolTip.showText(
-                event.globalPos(),
-                self.activeAction().toolTip()
-            )
-        else:
+
+            try:
+                tooltip = self.activeAction().toolTip()
+            except AttributeError:
+                # Can sometimes return None
+                pass
+            else:
+                QtWidgets.QToolTip.showText(
+                    event.globalPos(),
+                    tooltip
+                )
+
+        # Account for QStatusBar queries about tooltip
+        # These typically are only available on hovering
+        # an action for some time, which isn't reflected
+        # in querying the menu itself for a tooltip.
+        elif event.type() == QtCore.QEvent.MouseMove:
+            try:
+                tooltip = self.activeAction().toolTip()
+
+                # Some tooltips are multi-line, and the statusbar
+                # typically ignores newlines and writes it all out
+                # as one long line.
+                tooltip = tooltip.splitlines()[0]
+
+                self.setToolTip(tooltip)
+
+            except (AttributeError, IndexError):
+                pass
+
             QtWidgets.QToolTip.hideText()
 
         return super(MenuWithTooltip, self).event(event)

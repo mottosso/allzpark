@@ -60,7 +60,7 @@ class Window(QtWidgets.QMainWindow):
             "logo": QtWidgets.QToolButton(),
             "appVersion": QtWidgets.QLabel(version),
 
-            "profileBtn": QtWidgets.QToolButton(),
+            "profileBtn": QtWidgets.QPushButton(),
             "profileName": LineEditWithCompleter(),
             "profileVersion": LineEditWithCompleter(),
 
@@ -235,10 +235,13 @@ class Window(QtWidgets.QMainWindow):
         widgets["noappsMessage"].setReadOnly(True)
         widgets["noappsMessage"].setOpenExternalLinks(True)
 
-        css = "QWidget { border-image: url(%s); }"
-        widgets["profileBtn"].setStyleSheet(css % res.find("Default_Profile"))
         widgets["profileBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
-        widgets["profileBtn"].setToolTip("Click to change profile")
+        widgets["profileBtn"].setToolTip("Click to change profile\n"
+                                         "Right-click for options")
+        widgets["profileBtn"].setIcon(res.icon("Default_Profile"))
+        widgets["profileBtn"].setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+
+        css = "QWidget { border-image: url(%s); }"
 
         widgets["logo"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["logo"].setToolTip(allzparkconfig.help_url)
@@ -261,9 +264,10 @@ class Window(QtWidgets.QMainWindow):
 
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
-        # Signals
         widgets["logo"].clicked.connect(self.on_logo_clicked)
         widgets["profileBtn"].clicked.connect(self.on_profilebtn_pressed)
+        widgets["profileBtn"].customContextMenuRequested.connect(
+            self.on_profilebtn_contextmenu)
         widgets["profileName"].changed.connect(self.on_profilename_changed)
         widgets["profileVersion"].changed.connect(
             self.on_profileversion_changed)
@@ -271,7 +275,6 @@ class Window(QtWidgets.QMainWindow):
         widgets["reset"].clicked.connect(self.on_reset_clicked)
         widgets["continue"].clicked.connect(self.on_continue_clicked)
         widgets["apps"].activated.connect(self.on_app_clicked)
-
         widgets["apps"].customContextMenuRequested.connect(
             self.on_app_right_click)
 
@@ -393,7 +396,7 @@ class Window(QtWidgets.QMainWindow):
         model = index.model()
         tools = model.data(index, "tools")
 
-        menu = QtWidgets.QMenu(self)
+        menu = dock.MenuWithTooltip(self)
 
         separator = QtWidgets.QWidgetAction(menu)
         separator.setDefaultWidget(QtWidgets.QLabel("Quick Launch"))
@@ -525,6 +528,27 @@ class Window(QtWidgets.QMainWindow):
         completer = widget.completer()
         completer.complete()
 
+    def on_profilebtn_contextmenu(self):
+        name = self._widgets["profileName"].text()
+
+        menu = dock.MenuWithTooltip(self)
+        separator = QtWidgets.QWidgetAction(menu)
+        separator.setDefaultWidget(QtWidgets.QLabel(name))
+        menu.addAction(separator)
+
+        def on_reset():
+            self.reset()
+
+        reset = QtWidgets.QAction("Reset", menu)
+        reset.triggered.connect(on_reset)
+        reset.setToolTip("Re-scan repository for new Rez packages")
+        menu.addAction(reset)
+
+        menu.addSeparator()
+
+        menu.move(QtGui.QCursor.pos())
+        menu.show()
+
     def on_logo_clicked(self):
         url = allzparkconfig.help_url
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
@@ -564,14 +588,13 @@ class Window(QtWidgets.QMainWindow):
                           % package.uri)
 
         self.tell("%s %s-%s" % (action, profile, version))
-        self.setWindowTitle("%s | %s" % (label, self.title))
+        self.setWindowTitle("%s  |  %s" % (label, self.title))
 
         self._widgets["profileName"].setText(label)
         self._widgets["profileVersion"].setText(version)
 
-        css = "QWidget { border-image: url(%s); }"
         button = self._widgets["profileBtn"]
-        button.setStyleSheet(css % icon)
+        button.setIcon(res.icon(icon))
 
         # Determine aspect ratio
         height = px(32)
@@ -613,6 +636,9 @@ class Window(QtWidgets.QMainWindow):
         page = self._pages.get(str(state), self._pages["home"])
         page_name = page.objectName()
         self._panels["pages"].setCurrentWidget(page)
+        self._widgets["profileName"].setEnabled(True)
+        self._widgets["profileVersion"].setEnabled(True)
+        self._widgets["profileBtn"].setEnabled(True)
 
         launch_btn = self._docks["app"]._widgets["launchBtn"]
         launch_btn.setText("Launch")
@@ -638,6 +664,9 @@ class Window(QtWidgets.QMainWindow):
             self._docks["app"].setEnabled(False)
 
         if state == "loading":
+            self._widgets["profileBtn"].setEnabled(False)
+            self._widgets["profileName"].setEnabled(False)
+            self._widgets["profileVersion"].setEnabled(False)
             for widget in self._docks.values():
                 widget.setEnabled(False)
 
