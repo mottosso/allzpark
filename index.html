@@ -439,17 +439,28 @@ Here we'll strip almost everything, making room for visuals and images
 -->
 
 <div class="hboxlayout row-reverse">
-    <div class="vboxlayout">
+    <div class="vboxlayout" markdown="1">
         <h2>Package Based</h2>
         <p>
-Libraries, applications, projects.. package everything!
+Works on your machine?
 <br>
 <br>
-Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed "packages".
+Allzpark is a package-based launcher, which means that everything related to a project is encapsulated into individual, version controlled and dependency managed "packages". Each coming together to form an environment identical across your development machine and anywhere your software is used.
 <br>
-<br>
-Establish complex relationships between software, applications and projects with <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>, the underlying framework powering <b>Allzpark</b>.
+</p>
 
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># A package definition</span>
+<span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;blender&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;2.80&quot;</span>
+
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">env</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">append(</span><span style="color: #e6db74">&quot;{root}/bin&quot;</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PYTHONPATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">prepend(</span><span style="color: #e6db74">&quot;{root}/python&quot;</span><span style="color: #f8f8f2">)</span>
+</pre></div>
+
+<p>
+Establish complex relationships between software, applications and projects with <a href=https://github.com/mottosso/bleeding-rez>bleeding-rez</a>, the underlying framework powering Allzpark.
 </p>
     </div>
     <div class="smallspace"></div>
@@ -469,21 +480,39 @@ Establish complex relationships between software, applications and projects with
 <div class="hboxlayout">
     <div class="vboxlayout">
         <h2>Dual Representation</h2>
-        <p>
 
+<p>
 Allzpark is but a shell.
 
 Anything done via the GUI is available via the command-line, using standard Rez commands.
+</p>
+
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">alita</span> <span style="color: #f8f8f2">maya</span> <span style="color: #f8f8f2">-q</span>
+<span style="color: #f8f8f2">&gt;</span> <span style="color: #f8f8f2">PS&gt;</span> <span style="color: #f8f8f2">echo </span><span style="color: #e6db74">&quot;Hello Rez!&quot;</span>
+<span style="color: #f8f8f2">&gt;</span> <span style="color: #75715e"># Hello Rez!</span>
+</pre></div>
+
+</div>
+
+<div class="tab-content bash" markdown="1">
 
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ rez env alita maya -q
 &gt; $ <span style="color: #f8f8f2">echo</span> <span style="color: #e6db74">&quot;Hello Rez!&quot;</span>
-Hello Rez!
+<span style="color: #75715e"># Hello Rez!</span>
 </pre></div>
 
-</p>
-    </div>
-    <div class="smallspace"></div>
-    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
+</div>
+
+</div>
+<div class="smallspace"></div>
+<img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
 </div>
 
 <div class="space"></div>

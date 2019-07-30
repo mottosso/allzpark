@@ -475,7 +475,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-27</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-30</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/quickstart.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -489,9 +489,12 @@
 <p>The below commands will install Allzpark and its dependencies, including Rez.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>python -m pip install allzpark --upgrade
 rez <span style="color: #f8f8f2">bind</span> --quickstart
-allzpark --demo
+allzpark --demo --clean
 </pre></div>
 
+<blockquote>
+<p>Skip the <code>--clean</code> flag to preserve preferences, such as window layout, between runs.</p>
+</blockquote>
 <p><br></p>
 <h4 id="troubleshooting">Troubleshooting</h4>
 <p>Everything ok?</p>
