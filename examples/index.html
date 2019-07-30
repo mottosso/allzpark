@@ -555,7 +555,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-30</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/examples.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -592,6 +592,14 @@ rez build --install
 
 <p>Here's how you use it.</p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env pipz -- install six
+</pre></div>
+
+<p>And here's how you install binary packages, specifically for the platform you are on.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env pipz -- install sqlalchemy
+</pre></div>
+
+<p>To install for a particular version of Python, include it in the initial request.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env python-2 pipz -- install sqlalchemy
 </pre></div>
 
 <ul>

@@ -625,7 +625,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-29</i></small>
+<small class="modified-date"><br><i>Updated 2019-07-30</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/getting-started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -637,18 +637,18 @@
 <p><br></p>
 <h3 id="what-is-allzpark">What is Allzpark?</h3>
 <p>It's an <a href="https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers">application launcher</a>, similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment within which the applicatuon runs.</p>
-<details class="info"><summary>For example...</summary><p>Let's say you're working on a project using..</p>
-<ol>
-<li>Autodesk Maya</li>
-<li>Adobe Photoshop</li>
-<li>Pixologic Zbrush</li>
-</ol>
+<details class="info"><summary>For example...</summary><p>Let's say you're working on a project using (1) Autodesk Maya, (2) Adobe Photoshop and (3) Pixologic Zbrush.</p>
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61997103-94d2c480-b094-11e9-81ba-6d8628649bcc.png" /></p>
 <p>For Maya, you'd like to use various software libraries, Python scripts and binary plug-ins like Solid Angle's Arnold and Ziva Dynamics. However, each plug-in need to be of a particular version in order to play ball this version of Maya.</p>
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61997048-9059dc00-b093-11e9-8b03-ceac786f5785.png" /></p>
 <p>Over time, the number of projects grow, as do the individual requirements of each application, and many of the plug-ins and libraries end up sharing dependencies with each other.</p>
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/61997075-ff373500-b093-11e9-831b-bfa9e8c3c111.png" /></p>
-<p>So now you've got a network of interdependencies that all need to work wither each other and wonder "How can I write my own software that run in this environment?". That's where reproducible enironments come in handy, and that's where Rez and Allzpark come in.</p>
+<p>So now you've got a network of interdependencies that all need to work with each other and wonder..</p>
+<ul>
+<li>"How can I write my own software that run in this environment?"</li>
+<li>"How can I make sure my software runs once deployed?"</li>
+</ul>
+<p>That's where reproducible enironments come in handy and Allzpark can do for you.</p>
 <p><a href="https://github.com/mottosso/bleeding-rez">Rez</a> - an industry standard used by studios large and small - is the framwork with which you design this network and Allzpark is the shiny front-end your artists uses interface with it.</p>
 <p><strong>Studios using Rez</strong></p>
 <ul>
@@ -764,7 +764,7 @@
 <span style="color: #e6db74">name = &quot;kingkong&quot;</span>
 <span style="color: #e6db74">version = &quot;1.0.0&quot;</span>
 <span style="color: #e6db74">build_command = False</span>
-<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Out-File</span> <span style="color: #f8f8f2">package.py</span>
+<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">package.py</span>
 <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>
 </pre></div>
 
@@ -862,7 +862,7 @@ allzpark --demo
 <span style="color: #e6db74">name = &quot;texteditor&quot;</span>
 <span style="color: #e6db74">version = &quot;1.5.0&quot;</span>
 <span style="color: #e6db74">build_command = False</span>
-<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Out-File</span> <span style="color: #f8f8f2">package.py</span>
+<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">package.py</span>
 <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>
 </pre></div>
 
