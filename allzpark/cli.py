@@ -25,8 +25,6 @@ def _load_userconfig(fname=None):
         "__file__": fname,
     }
 
-    tell("opening %s.." % fname)
-
     with open(fname) as f:
         exec(compile(f.read(), f.name, 'exec'), mod)
 
@@ -130,14 +128,17 @@ def main():
     opts = parser.parse_args()
 
     if not sys.stdout:
+        import tempfile
+
         # Capture early messages from a console-less session
         # Primarily intended for Windows's pythonw.exe
         # (Handles close automatically on exit)
-        sys.stdout = open("allzpark-stdout.txt", "a")
-        sys.stderr = open("allzpark-stderr.txt", "a")
+        temproot = tempfile.gettempdir()
+        sys.stdout = open(os.path.join(temproot, "allzpark-stdout.txt"), "a")
+        sys.stderr = open(os.path.join(temproot, "allzpark-stderr.txt"), "a")
 
-        # Rez uses these internally
-        sys.stdin = open("allzpark-stdin.txt", "a")
+        # We don't need it, but Rez uses this internally
+        sys.stdin = open(os.path.join(temproot, "allzpark-stdin.txt"), "w")
 
         # Rez references these originals too
         sys.__stdout__ = sys.stdout
