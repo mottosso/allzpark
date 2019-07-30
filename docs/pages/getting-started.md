@@ -177,7 +177,7 @@ cd ~/kingkong
 name = "kingkong"
 version = "1.0.0"
 build_command = False
-"@ | Out-File package.py
+"@ | Add-Content package.py
 rez build --install
 ```
 
@@ -301,7 +301,7 @@ cd ~/texteditor
 name = "texteditor"
 version = "1.5.0"
 build_command = False
-"@ | Out-File package.py
+"@ | Add-Content package.py
 rez build --install
 ```
 

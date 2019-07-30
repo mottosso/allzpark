@@ -62,6 +62,13 @@ Everything ok?
 
     Following the installation of `rez`, you should have gotten a message about which path was missing from your `PATH`, you can either add this yourself, or use the `virtualenv` method from the above `Permission denied` box.
 
+    **Example message**
+
+    ```powershell
+    The script allzpark.exe and azp.exe are installed in 'C:\Python37\Scripts' which is not on PATH
+    Consider adding this directory to PATH
+    ```
+
 ??? quote "Something else happened"
     Oh no! I'd like to know about what happened, please let me know [here](https://github.com/mottosso/allzpark/issues) or send me a private message at [marcus@abstractfactory.io](mailto:marcus@abstractfactory.io).
 
