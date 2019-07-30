@@ -25,6 +25,8 @@ def _load_userconfig(fname=None):
         "__file__": fname,
     }
 
+    tell("opening %s.." % fname)
+
     with open(fname) as f:
         exec(compile(f.read(), f.name, 'exec'), mod)
 
@@ -68,7 +70,7 @@ def _patch_allzparkconfig():
 
 @contextlib.contextmanager
 def timings(title, timing=True):
-    sys.stdout.write(title)
+    tell(title, newlines=0)
     t0 = time.time()
     message = {"success": "ok - {:.2f}\n" if timing else "ok\n",
                "failure": "fail\n",
@@ -77,24 +79,27 @@ def timings(title, timing=True):
     try:
         yield message
     except Exception:
-        sys.stdout.write(message["failure"])
+        tell(message["failure"], 0)
 
         if not message["ignoreFailure"]:
             if log.level < logging.WARNING:
                 import traceback
-                sys.stdout.write(traceback.format_exc())
-                sys.stdout.write("\n")
+                tell(traceback.format_exc())
 
             else:
                 tell("Pass --verbose for details")
 
             exit(1)
     else:
-        sys.stdout.write(message["success"].format(time.time() - t0))
+        tell(message["success"].format(time.time() - t0), 0)
 
 
-def tell(msg):
-    sys.stdout.write("%s\n" % msg)
+def tell(msg, newlines=1):
+    sys.stdout.write(("%s" + "\n" * newlines) % msg)
+
+
+def warn(msg, newlines=1):
+    sys.stderr.write(("%s" + "\n" * newlines) % msg)
 
 
 def main():
@@ -114,6 +119,8 @@ def main():
         "over ALLZPARK_CONFIG_FILE"))
     parser.add_argument("--no-config", action="store_true", help=(
         "Do not load custom allzparkconfig.py"))
+    parser.add_argument("--no-console", action="store_true", help=(
+        "Do not use a console (Windows-only)"))
     parser.add_argument("--demo", action="store_true", help=(
         "Run demo material"))
     parser.add_argument("--root", help=(
@@ -121,6 +128,14 @@ def main():
         "defaults to allzparkconfig.profiles"))
 
     opts = parser.parse_args()
+
+    if not sys.stdout:
+        # Capture early messages from a console-less session
+        # Primarily intended for Windows's pythonw.exe
+        # (Handles close automatically on exit)
+        sys.stdout = open("allzpark-stdout.txt", "a")
+        sys.stderr = open("allzpark-stderr.txt", "a")
+        opts.verbose = 3
 
     if opts.version:
         tell(version)
@@ -221,7 +236,7 @@ def main():
                                    "Allzpark", "preferences")
 
         if opts.clean:
-            sys.stdout.write("(clean) ")
+            tell("(clean) ")
             storage.clear()
 
         defaults = {
@@ -262,8 +277,12 @@ def main():
 
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
-    app = QtWidgets.QApplication(sys.argv)
+    app = QtWidgets.QApplication([])
     ctrl = control.Controller(storage)
+
+    # Handle stdio from within the application
+    sys.stdout = ctrl.stdio(sys.__stdout__, logging.INFO)
+    sys.stderr = ctrl.stdio(sys.__stderr__, logging.ERROR)
 
     def excepthook(type, value, traceback):
         """Try handling these from within the controller"""
@@ -293,7 +312,7 @@ def main():
         try:
             profiles = os.listdir(opts.root)
         except IOError:
-            sys.stderr.write(
+            warn(
                 "ERROR: Could not list directory %s" % opts.root
             )
 
@@ -307,8 +326,8 @@ def main():
         profiles = []
 
         if opts.root:
-            sys.stderr.write("The flag --root has been deprecated, "
-                             "use allzparkconfig.py:profiles.\n")
+            warn("The flag --root has been deprecated, "
+                 "use allzparkconfig.py:profiles.\n")
             profiles = profiles_from_dir(opts.root)
 
         root = profiles or allzparkconfig.profiles

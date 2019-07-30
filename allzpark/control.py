@@ -150,6 +150,17 @@ class _State(transitions.State):
         return not self.__eq__(other)
 
 
+class _Stream(object):
+    def __init__(self, ctrl, stream, level):
+        self._ctrl = ctrl
+        self._stream = stream
+        self._level = level
+
+    def write(self, text):
+        self._stream.write(text)
+        self._ctrl.logged.emit(text, self._level)
+
+
 class Controller(QtCore.QObject):
     state_changed = QtCore.Signal(_State)
     logged = QtCore.Signal(str, int)  # message, level
@@ -181,7 +192,7 @@ class Controller(QtCore.QObject):
         _State("pkgnotfound", help="One or more packages was not found"),
     ]
 
-    def __init__(self, storage, parent=None):
+    def __init__(self, storage, stdio=None, stderr=None, parent=None):
         super(Controller, self).__init__(parent)
 
         state = State(self, storage)
@@ -387,6 +398,9 @@ class Controller(QtCore.QObject):
     # ----------------
     # Methods
     # ----------------
+
+    def stdio(self, stream, level=logging.INFO):
+        return _Stream(self, stream, level)
 
     def find(self, family, range_=None):
         """Find packages, relative Allzpark state
@@ -730,19 +744,15 @@ class Controller(QtCore.QObject):
         return None
 
     def debug(self, message):
-        log.debug(message)
         self.logged.emit(message, logging.DEBUG)
 
     def info(self, message):
-        log.info(message)
         self.logged.emit(message, logging.INFO)
 
     def warning(self, message):
-        log.warning(message)
         self.logged.emit(message, logging.WARNING)
 
     def error(self, message):
-        log.error(message)
         self.logged.emit(str(message), logging.ERROR)
 
     def list_profiles(self, root=None):
