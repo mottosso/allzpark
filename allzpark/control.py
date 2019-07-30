@@ -200,14 +200,10 @@ class Controller(QtCore.QObject):
 
         timers = {
             "commandsPoller": QtCore.QTimer(self),
-            "applicationSelector": QtCore.QTimer(self),
         }
 
         timers["commandsPoller"].timeout.connect(self.on_tasks_polled)
         timers["commandsPoller"].start(500)
-
-        timers["applicationSelector"].setSingleShot(True)
-        timers["applicationSelector"].timeout.connect(self._select_application)
 
         # Initialize the state machine
         self._machine = transitions.Machine(
@@ -861,15 +857,6 @@ class Controller(QtCore.QObject):
         )
 
     def select_application(self, app_request):
-        self.__app_request = app_request
-
-        # Delay acting on application select, to avoid
-        # processing to happen too frequently and affect
-        # the user experience.
-        self._timers["applicationSelector"].start(250)
-
-    def _select_application(self):
-        app_request = self.__app_request
         self._state["appRequest"] = app_request
 
         try:
@@ -954,18 +941,24 @@ class Controller(QtCore.QObject):
 
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
-
-        # Exclude filtered
         package_filter = self._package_filter()
-        for app in apps[:]:
-            if package_filter.excludes(app):
-                apps.remove(app)
+        app_packages = []
 
         contexts = odict()
         with util.timing() as t:
-            for app_package in apps:
+            for app_request in apps:
+                app_request = rez.PackageRequest(app_request)
+                app_package = rez.find_latest(app_request.name,
+                                              range_=app_request.range)
+
+                if package_filter.excludes(app_package):
+                    continue
+
                 variants = list(profile.iter_variants())
                 variant = variants[0]
+
+                # Keep for later
+                app_packages += [app_package]
 
                 if len(variants) > 1:
                     # Unsure of whether this is desirable. It would enable
@@ -1023,7 +1016,9 @@ class Controller(QtCore.QObject):
                 if rez_context.success:
                     self.warning(
                         "This shouldn't have happened, "
-                        "I was expecting a broken context here."
+                        "I was expecting a broken context here. "
+                        "Please report this to "
+                        "https://github.com/mottosso/allzpark/issues/66"
                     )
 
                 self.error(
@@ -1038,26 +1033,17 @@ class Controller(QtCore.QObject):
 
         # Find resolved app version
         # E.g. maya -> maya-2018.0.1
-        app_packages = []
         show_hidden = self._state.retrieve("showHiddenApps")
-        for app_request, context in contexts.items():
-            for package in context.resolved_packages or []:
-                if package.name in [a.name for a in apps]:
-                    break
-            else:
-                package = model.BrokenPackage(app_request)
-
+        for package in app_packages[:]:
             data = allzparkconfig.metadata_from_package(package)
             hidden = data.get("hidden", False)
 
             if hidden and not show_hidden:
                 package.hidden = True
-                continue
+                app_packages.remove(package)
 
             if isinstance(context, model.BrokenContext):
                 package.broken = True
-
-            app_packages += [package]
 
         self._state["rezContexts"] = contexts
         return app_packages

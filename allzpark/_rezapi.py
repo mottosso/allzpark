@@ -29,6 +29,18 @@ def clear_caches():
         repo.clear_caches()
 
 
+def find_one(*args, **kwargs):
+    return next(find(*args, **kwargs))
+
+
+def find_latest(*args, **kwargs):
+    return list(
+        sorted(
+            find(*args, **kwargs), key=lambda pkg: pkg.version
+        )
+    )[-1]
+
+
 try:
     from rez import project
 except ImportError:
@@ -39,6 +51,8 @@ except ImportError:
 __all__ = [
     "env",
     "find",
+    "find_one",
+    "find_latest",
     "config",
     "version",
     "project",

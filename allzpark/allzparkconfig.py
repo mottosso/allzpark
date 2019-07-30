@@ -8,7 +8,6 @@ ALLZPARK_CONFIG_FILE=/path/to/allzparkconfig.py
 """
 
 import os as __os
-import sys as __sys
 
 
 # Load this profile on startup.
@@ -53,7 +52,13 @@ def applications():
 
 
 def applications_from_package(variant):
-    """Return applications relative `variant`"""
+    """Return applications relative `variant`
+
+    Returns:
+        list of strings: E.g. ['appA', 'appB==2019']
+
+    """
+
     from . import _rezapi as rez
 
     # May not be defined
@@ -78,7 +83,13 @@ def applications_from_package(variant):
             range_=request.range,
         )
 
-    return flattened
+    # Return strings
+    apps = list(
+        "%s==%s" % (package.name, package.version)
+        for package in flattened
+    )
+
+    return apps
 
 
 def metadata_from_package(variant):
