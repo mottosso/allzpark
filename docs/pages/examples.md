@@ -50,6 +50,18 @@ Here's how you use it.
 rez env pipz -- install six
 ```
 
+And here's how you install binary packages, specifically for the platform you are on.
+
+```bash
+rez env pipz -- install sqlalchemy
+```
+
+To install for a particular version of Python, include it in the initial request.
+
+```bash
+rez env python-2 pipz -- install sqlalchemy
+```
+
 - See [rez-pipz](https://github.com/mottosso/rez-pipz) for details.
 
 <br>

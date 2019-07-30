@@ -7,11 +7,7 @@ This page carries on from a successful 👈 [quickstart](/quickstart) into makin
 It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers), similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment within which the applicatuon runs.
 
 ??? info "For example..."
-    Let's say you're working on a project using..
-
-    1. Autodesk Maya
-    2. Adobe Photoshop
-    3. Pixologic Zbrush
+    Let's say you're working on a project using (1) Autodesk Maya, (2) Adobe Photoshop and (3) Pixologic Zbrush.
 
     ![image](https://user-images.githubusercontent.com/2152766/61997103-94d2c480-b094-11e9-81ba-6d8628649bcc.png)
 
@@ -23,7 +19,12 @@ It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_deskt
 
     ![image](https://user-images.githubusercontent.com/2152766/61997075-ff373500-b093-11e9-831b-bfa9e8c3c111.png)
 
-    So now you've got a network of interdependencies that all need to work wither each other and wonder "How can I write my own software that run in this environment?". That's where reproducible enironments come in handy, and that's where Rez and Allzpark come in.
+    So now you've got a network of interdependencies that all need to work with each other and wonder..
+
+    - "How can I write my own software that run in this environment?"
+    - "How can I make sure my software runs once deployed?"
+
+    That's where reproducible enironments come in handy and Allzpark can do for you.
 
     [Rez](https://github.com/mottosso/bleeding-rez) - an industry standard used by studios large and small - is the framwork with which you design this network and Allzpark is the shiny front-end your artists uses interface with it.
 

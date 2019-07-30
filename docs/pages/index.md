@@ -14,8 +14,8 @@ template: landing.html
             <img src=https://img.shields.io/badge/-PySide-green>
             <img src=https://img.shields.io/badge/-PySide2-green>
             <br>
-            <img src=https://img.shields.io/pypi/pyversions/allzpark?color=red>
-            <img src=https://img.shields.io/pypi/v/bleeding-rez?color=red&label=bleeding-rez>
+            <img src=https://img.shields.io/pypi/pyversions/allzpark?color=steelblue>
+            <img src=https://img.shields.io/pypi/v/bleeding-rez?color=steelblue&label=bleeding-rez>
         </p>
         <div class="container">
             <p id="description">
