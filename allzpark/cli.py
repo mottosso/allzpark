@@ -135,6 +135,15 @@ def main():
         # (Handles close automatically on exit)
         sys.stdout = open("allzpark-stdout.txt", "a")
         sys.stderr = open("allzpark-stderr.txt", "a")
+
+        # Rez uses these internally
+        sys.stdin = open("allzpark-stdin.txt", "a")
+
+        # Rez references these originals too
+        sys.__stdout__ = sys.stdout
+        sys.__stderr__ = sys.stderr
+        sys.__stdin__ = sys.stdin
+
         opts.verbose = 3
 
     if opts.version:
@@ -281,8 +290,8 @@ def main():
     ctrl = control.Controller(storage)
 
     # Handle stdio from within the application
-    sys.stdout = ctrl.stdio(sys.__stdout__, logging.INFO)
-    sys.stderr = ctrl.stdio(sys.__stderr__, logging.ERROR)
+    sys.stdout = ctrl.stdio(sys.stdout, logging.INFO)
+    sys.stderr = ctrl.stdio(sys.stderr, logging.ERROR)
 
     def excepthook(type, value, traceback):
         """Try handling these from within the controller"""

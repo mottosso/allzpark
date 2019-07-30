@@ -160,6 +160,12 @@ class _Stream(object):
         self._stream.write(text) if self._stream else None
         self._ctrl.logged.emit(text, self._level)
 
+    def fileno(self):
+        return 0
+
+    def close(self):
+        return
+
 
 class Controller(QtCore.QObject):
     state_changed = QtCore.Signal(_State)

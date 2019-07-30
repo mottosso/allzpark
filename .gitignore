@@ -12,3 +12,4 @@ site
 
 *-stdout.txt
 *-stderr.txt
+*-stdin.txt
