@@ -115,7 +115,8 @@ def main():
     ))
 
     parser.add_argument("-v", "--verbose", action="count", default=0, help=(
-        "Print additional information about Allzpark during operation"))
+        "Print additional information about Allzpark during operation. "
+        "Pass -v for info, -vv for info and -vvv for debug messages"))
     parser.add_argument("--version", action="store_true", help=(
         "Print version and exit"))
     parser.add_argument("--clean", action="store_true", help=(
