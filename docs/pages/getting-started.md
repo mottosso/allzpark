@@ -112,6 +112,9 @@ Notice that it isn't unlike a profile, and in fact not unlike any other software
 
 I've talked a lot about "packages" and how great they are, but what exactly *are* they and why should you care?
 
+!!! note "WIP"
+    I just noticed this section was not filled out yet. Stay tuned. :)
+
 <br>
 
 ### Your first profile

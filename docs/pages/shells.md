@@ -210,7 +210,28 @@ Things to be aware of when using Rez with `cmd`.
 
 It isn't quite as simple as that, as there is a limit in the Windows API, another limit in `conhost.exe` and yet another in `cmd.exe`. When using Rez with `cmd.exe`, it is this limit you must take into consideration, and it is the most limiting of them all.
 
-### History
+Why does the `cmd.exe` limit apply? It's because whenever you `execute_shell` or enter into a context using `rez env`, Rez is creating a `.bat` script with a series of commands that look like this.
+
+```bash
+set PATH=c:\some\path;%PATH%
+set PATH=c:\some\other\path;%PATH%
+set PATH=c:\yet\another\path;%PATH%
+...
+```
+
+With one line of `set` for every call to `env` from within your `package.py:commands()` function. And this is where the problem lies, for you see launching `cmd` with a environment containing values longer than 2,000 characters work fine.
+
+```python
+import subprocess
+subprocess.Popen("cmd", env={"a": "really", "long": "environment"})
+# Works
+```
+
+But `cmd.exe` itself has issues handling anything longer than 2,000 characters which is why one of those lines of `set` will eventually stop growing.
+
+<br>
+
+### Command-line history
 
 A normal Rez context generates [a deep process hierarchy](../windows#process-tree).
 
