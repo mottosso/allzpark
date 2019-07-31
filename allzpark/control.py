@@ -532,6 +532,10 @@ class Controller(QtCore.QObject):
         command += ["--", tool]
 
         self._state["fullCommand"] = " ".join(command)
+
+        # Pass on to any child processes
+        os.environ["REZ_USED_COMMAND"] = self._state["fullCommand"]
+
         self.command_changed.emit(self._state["fullCommand"])
 
     def _package_filter(self):
