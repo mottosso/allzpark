@@ -1170,12 +1170,22 @@ class Command(QtCore.QObject):
         self.thread.start()
 
     def _execute(self):
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
         kwargs = {
             "command": self.cmd,
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
-            "detached": self.detached,
             "parent_environ": None,
+
+            # Prevent additional windows from appearing when running
+            # Allzpark without a console, e.g. via pythonw.exe.
+            "startupinfo": (
+                startupinfo
+                if os.name == "nt" and hasattr(allzparkconfig, "__noconsole__")
+                else None
+            )
         }
 
         context = self.context

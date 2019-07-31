@@ -154,6 +154,7 @@ def main():
         sys.__stdin__ = sys.stdin
 
         opts.verbose = 3
+        allzparkconfig.__noconsole__ = True
 
     if opts.version:
         tell(version)
