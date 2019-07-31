@@ -990,7 +990,6 @@ class Controller(QtCore.QObject):
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
         package_filter = self._package_filter()
-        app_packages = []
 
         contexts = odict()
         with util.timing() as t:
@@ -1004,9 +1003,6 @@ class Controller(QtCore.QObject):
 
                 variants = list(profile.iter_variants())
                 variant = variants[0]
-
-                # Keep for later
-                app_packages += [app_package]
 
                 if len(variants) > 1:
                     # Unsure of whether this is desirable. It would enable
@@ -1079,22 +1075,20 @@ class Controller(QtCore.QObject):
 
         self.debug("Resolved all contexts in %.2f seconds" % t.duration)
 
-        # Find resolved app version
-        # E.g. maya -> maya-2018.0.1
+        # Hide hidden
+        visible_apps = []
         show_hidden = self._state.retrieve("showHiddenApps")
-        for package in app_packages[:]:
+        for request, package in self._state["rezApps"].items():
             data = allzparkconfig.metadata_from_package(package)
             hidden = data.get("hidden", False)
 
             if hidden and not show_hidden:
-                package.hidden = True
-                app_packages.remove(package)
+                continue
 
-            if isinstance(context, model.BrokenContext):
-                package.broken = True
+            visible_apps += [package]
 
         self._state["rezContexts"] = contexts
-        return app_packages
+        return visible_apps
 
     def graph(self):
         context = self._state["rezContexts"][self._state["appRequest"]]
