@@ -379,33 +379,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#long-environment-variables" title="Long Environment Variables" class="md-nav__link">
-    Long Environment Variables
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#advanced" title="Advanced" class="md-nav__link">
-    Advanced
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#platform-map" title="Platform map" class="md-nav__link">
-    Platform map
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#process-tree" title="Process Tree" class="md-nav__link">
     Process Tree
   </a>
@@ -484,33 +457,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#long-environment-variables" title="Long Environment Variables" class="md-nav__link">
-    Long Environment Variables
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#advanced" title="Advanced" class="md-nav__link">
-    Advanced
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#platform-map" title="Platform map" class="md-nav__link">
-    Platform map
-  </a>
   
 </li>
       
@@ -628,78 +574,8 @@ c:<span style="color: #ae81ff">\l</span>ong<span style="color: #ae81ff">\p</span
 </pre></div>
 
 <p>This would effectively prepend <code>\\?\</code> to every path "under the hood", solving the issue. But at what cost?</p>
-<p>Let the community know if you encounter any issues by making <a href="https://github.com/mottosso/allzpark/issues/new">an issue</a>.
-<br></p>
-<h2 id="long-environment-variables">Long Environment Variables</h2>
-<p>See <a href="../shells#long-environment-variables">Shells</a> for things to keep an eye on with regards to environment variables.</p>
-<p>To work around this issue, it is recommended that you use PowerShell on Windows.</p>
-<p><strong>Environment variable</strong></p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">REZ_DEFAULT_SHELL=powershell</span>
-</pre></div>
-
-<p><strong>rezconfig.py</strong></p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">default_shell</span> <span style="color: #f8f8f2">=</span> <span style="color: #e6db74">&quot;powershell&quot;</span>
-</pre></div>
-
+<p>Let the community know if you encounter any issues by making <a href="https://github.com/mottosso/allzpark/issues/new">an issue</a>.</p>
 <p><br></p>
-<h4 id="advanced">Advanced</h4>
-<p>Why does the <code>cmd.exe</code> limit apply? It's because whenever you <code>execute_shell</code> or enter into a context using <code>rez env</code>, Rez is creating a <code>.bat</code> script with a series of commands that look like this.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">set</span> <span style="color: #f8f8f2">PATH</span><span style="color: #f92672">=</span>c:<span style="color: #ae81ff">\s</span>ome<span style="color: #ae81ff">\p</span>ath<span style="color: #f8f8f2">;</span>%PATH%
-<span style="color: #f8f8f2">set</span> <span style="color: #f8f8f2">PATH</span><span style="color: #f92672">=</span>c:<span style="color: #ae81ff">\s</span>ome<span style="color: #ae81ff">\o</span>ther<span style="color: #ae81ff">\p</span>ath<span style="color: #f8f8f2">;</span>%PATH%
-<span style="color: #f8f8f2">set</span> <span style="color: #f8f8f2">PATH</span><span style="color: #f92672">=</span>c:<span style="color: #ae81ff">\y</span>et<span style="color: #ae81ff">\a</span>nother<span style="color: #ae81ff">\p</span>ath<span style="color: #f8f8f2">;</span>%PATH%
-...
-</pre></div>
-
-<p>With one line of <code>set</code> for every call to <code>env</code> from within your <code>package.py:commands()</code> function. And this is where the problem lies, for you see launching <code>cmd</code> with a environment containing values longer than 2,000 characters work fine.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">import</span> <span style="color: #f8f8f2">subprocess</span>
-<span style="color: #f8f8f2">subprocess</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">Popen(</span><span style="color: #e6db74">&quot;cmd&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #f8f8f2">env</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">{</span><span style="color: #e6db74">&quot;a&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;really&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;long&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;environment&quot;</span><span style="color: #f8f8f2">})</span>
-<span style="color: #75715e"># Works</span>
-</pre></div>
-
-<p>But <code>cmd.exe</code> itself has issues handling anything longer than 2,000 characters which is why one of those lines of <code>set</code> will eventually stop growing.</p>
-<p><br></p>
-<h2 id="platform-map">Platform map</h2>
-<p>You'll want to use a brutal <a href="https://github.com/mottosso/bleeding-rez/wiki/Configuring-Rez#platform_map"><code>platform_map</code></a> for your Windows setup, because of stunts like this.</p>
-<p><strong>Machine A</strong></p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ C:<span style="color: #ae81ff">\U</span>sers<span style="color: #ae81ff">\m</span>arcus<span style="color: #ae81ff">\D</span>esktop&gt;systeminfo <span style="color: #f8f8f2">|</span> findstr /B /C:<span style="color: #e6db74">&quot;OS Name&quot;</span> /C:<span style="color: #e6db74">&quot;OS Version&quot;</span>
-OS Name:                   Microsoft Windows <span style="color: #ae81ff">10</span> Pro
-OS Version:                <span style="color: #ae81ff">10</span>.0.17134 N/A Build <span style="color: #ae81ff">17134</span>
-$ python
-&gt;&gt;&gt; import platform
-&gt;&gt;&gt; platform.platform<span style="color: #f92672">()</span>
-<span style="color: #e6db74">&#39;Windows-8-6.2.9200&#39;</span>
-&gt;&gt;&gt; from rez.utils.platform_ import platform_
-&gt;&gt;&gt; platform_.os
-<span style="color: #e6db74">&#39;windows-6.2.9200&#39;</span>
-</pre></div>
-
-<p><strong>Machine B</strong></p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>$ C:<span style="color: #ae81ff">\U</span>sers<span style="color: #ae81ff">\m</span>arcus<span style="color: #ae81ff">\D</span>esktop&gt;systeminfo <span style="color: #f8f8f2">|</span> findstr /B /C:<span style="color: #e6db74">&quot;OS Name&quot;</span> /C:<span style="color: #e6db74">&quot;OS Version&quot;</span>
-OS Name:                   Microsoft Windows <span style="color: #ae81ff">10</span> Pro
-OS Version:                <span style="color: #ae81ff">10</span>.0.18362 N/A Build <span style="color: #ae81ff">18362</span>
-$ python
-&gt;&gt;&gt; import platform
-&gt;&gt;&gt; platform.platform<span style="color: #f92672">()</span>
-<span style="color: #e6db74">&#39;Windows-10-10.0.18362&#39;</span>
-&gt;&gt;&gt; from rez.utils.platform_ import platform_
-&gt;&gt;&gt; platform_.os
-<span style="color: #e6db74">&#39;windows-10.0.18362.SP0&#39;</span>
-</pre></div>
-
-<p><strong>rezconfig.py</strong></p>
-<p>For a <code>platform_map</code>, try this. It'll make any modern version of Windows (8-10) look like Windows 10.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">platform_map</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
-    <span style="color: #e6db74">&quot;os&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">{</span>
-        <span style="color: #e6db74">r&quot;windows-6(.*)&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">r&quot;windows-10&quot;</span><span style="color: #f8f8f2">,</span>
-        <span style="color: #e6db74">r&quot;windows-10(.*)&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">r&quot;windows-10&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #f8f8f2">},</span>
-<span style="color: #f8f8f2">}</span>
-</pre></div>
-
-<p>This then applies to <code>rez env</code> and friends whenever the implict <code>~os</code> package is requested. Sadly, this has to happen early in your package repository authoring days, as variants being created also use this value. If a variant has been created using <code>os-windows-10.0.1803</code> then that value will have been made into a physical folder on disk that cannot (or should not) change. If the implicit request is then changed to <code>os-windows-10</code>, then none of your existing packages with this variants will work.</p>
-<ul>
-<li><a href="https://github.com/mottosso/bleeding-rez/issues/61">Related issue</a></li>
-</ul>
 <h2 id="process-tree">Process Tree</h2>
 <p>Virtualenv is one way of using Rez on Windows, and if you do then the <code>rez.exe</code> executable is generated during <code>pip install</code> and works by spawning a <code>python.exe</code> process, also generated by <code>pip</code>, which in turn calls on your system <code>python.exe</code>. Here's what spawning your own Python session from within a Rez context looks like.</p>
 <p><img alt="image" src="https://user-images.githubusercontent.com/2152766/59964221-e6b48780-94f5-11e9-8300-390d0587f5e3.png" /></p>
