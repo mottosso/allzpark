@@ -125,8 +125,6 @@ def main():
         "over ALLZPARK_CONFIG_FILE"))
     parser.add_argument("--no-config", action="store_true", help=(
         "Do not load custom allzparkconfig.py"))
-    parser.add_argument("--no-console", action="store_true", help=(
-        "Do not use a console (Windows-only)"))
     parser.add_argument("--demo", action="store_true", help=(
         "Run demo material"))
     parser.add_argument("--root", help=(
