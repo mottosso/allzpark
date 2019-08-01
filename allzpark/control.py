@@ -161,7 +161,7 @@ class _Stream(object):
         self._level = level
 
     def write(self, text):
-        self._stream.write(text.rstrip()) if self._stream else None
+        self._stream.write(text) if self._stream else None
         self._ctrl.logged.emit(text, self._level)
 
     def fileno(self):
