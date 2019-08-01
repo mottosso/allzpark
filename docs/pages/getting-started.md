@@ -114,7 +114,7 @@ Notice that it isn't unlike a profile, and in fact not unlike any other software
 
 <img class=floating-image src=https://user-images.githubusercontent.com/2152766/62294511-ff07b280-b462-11e9-97ee-917b956e58fc.png>
 
-#### What is an "package"?
+#### What is a "package"?
 
 I've talked a lot about "packages" and how great they are, but what exactly *are* they and why should you care?
 
