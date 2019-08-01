@@ -253,6 +253,17 @@ def main():
                                    QtCore.QSettings.UserScope,
                                    "Allzpark", "preferences")
 
+        try:
+            storage.value("startupApp")
+        except ValueError:
+            # Likely settings stored with a previous version of Python
+            raise ValueError("Your settings could not be read, "
+                             "have they been created using a different "
+                             "version of Python? You can either use "
+                             "the same version or pass "
+                             "--clean to erase your previous settings and "
+                             "start anew")
+
         if opts.clean:
             tell("(clean) ")
             storage.clear()
