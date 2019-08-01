@@ -830,6 +830,10 @@ class Controller(QtCore.QObject):
         self._models["packages"].reset()
         self._models["profileVersions"].setStringList([])
 
+        self._state["rezContexts"].clear()
+        self._state["rezEnvirons"].clear()
+        self._state["rezApps"].clear()
+
         def on_apps_found(apps):
             if not apps:
                 self._state["error"] = """
