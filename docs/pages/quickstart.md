@@ -38,7 +38,7 @@ Everything ok?
     - Ubuntu 18 - `apt install python3-pip`
 
 ??? quote "Permission denied"
-    The above command assumes admin/sudo access to your machine which isn't always the case. If so, you can install Rez using a virtual environment.
+    The above command assumes admin/sudo access to your machine which isn't always the case. If so, you can install Allzpark into a virtual environment.
 
     **Python 3**
 
@@ -70,7 +70,7 @@ Everything ok?
     ```
 
 ??? quote "Something else happened"
-    Oh no! I'd like to know about what happened, please let me know [here](https://github.com/mottosso/allzpark/issues) or send me a private message at [marcus@abstractfactory.io](mailto:marcus@abstractfactory.io).
+    Oh no! I'd like to know about what happened, please let me know [here](https://github.com/mottosso/allzpark/issues).
 
 <br>
 
