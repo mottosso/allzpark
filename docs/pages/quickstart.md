@@ -86,5 +86,7 @@ If everything went well, you should now be presented with this!
 
 From here, try launching your favourite application, navigate the interface and make yourself at home. Then have a look at these to learn more.
 
+> Note that the applications provided are examples and may not work as-is on your system.
+
 - [Create a new profile](/getting-started)
 - [Create a new application](/getting-started/#your-first-application)

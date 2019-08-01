@@ -57,7 +57,7 @@ For the purposes of this quick walkthrough, I'll assume you are part of a visual
 
 <br>
 
-<br>
+<img class=floating-image src=https://user-images.githubusercontent.com/2152766/62294446-d2539b00-b462-11e9-9ae4-110a25d70674.png>
 
 #### What is a "profile"?
 
@@ -79,11 +79,15 @@ As you might have guessed, projects are *versioned* and we'll get into more abou
 
 <br>
 
+<img class=floating-image src=https://user-images.githubusercontent.com/2152766/62295000-11362080-b464-11e9-8c3b-6af4d6b0755e.png>
+
 #### What is an "application"?
 
 `blender` is an application within which work is performed.
 
 In Allzpark, the profile dictates what applications are available to the user, in order to faciliate a "data pipeline" being built around a pre-determined set of software and libraries.
+
+<br>
 
 ??? hint "Data pipeline?"
     A kind of "codified" workflow. For example, you use the same settings for whenever you export an image from Photoshop to your game engine. Rather than explicitly setting those each time, you make a script to turn the process into a single click. The same then applies to any kind of export and import of data in various applications, to and from various stakeholders in your company.
@@ -108,12 +112,28 @@ Notice that it isn't unlike a profile, and in fact not unlike any other software
 
 <br>
 
+<img class=floating-image src=https://user-images.githubusercontent.com/2152766/62294511-ff07b280-b462-11e9-97ee-917b956e58fc.png>
+
 #### What is an "package"?
 
 I've talked a lot about "packages" and how great they are, but what exactly *are* they and why should you care?
 
-!!! note "WIP"
-    I just noticed this section was not filled out yet. Stay tuned. :)
+Without Rez and without Allzpark, software is typically installed "system-wide". That is, your Python install resides somewhere on your system and is automatically added to your system `PATH`, such that when you type..
+
+```bash
+python
+```
+
+From either Bash or PowerShell, this is the version of Python picked up.
+
+A "package" is this, except rather than installing, in this case, Python onto your system, and adding it to your system `PATH`, it is installed into a portable folder which is added to `PATH` only when referenced.
+
+```bash
+rez env python
+> python
+```
+
+A package can contain both files, environment variables but also arbitrary commands that execute whenever the package is referenced, which is how you distribute both applications like Python and libraries and, in the case of Allzpark, profiles.
 
 <br>
 
@@ -368,7 +388,7 @@ This is the equivalent command-line procedure to what Allzpark is doing when you
 
 **kingkong/package.py**
 
-```python hl_lines="2 9"
+```python hl_lines="2 5 6 7 8 9"
 name = "kingkong"
 version = "1.0.2"
 build_command = False
@@ -411,11 +431,103 @@ We've managed to make a new profile, and an application and we're just about rea
 
 But there is something else missing. For the purposes of this chapter, I will assume you are developing King Kong using Autodesk Maya, but the same applies to just about any application.
 
-!!! hint "In Development"
-    Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the [GitHub repo](https://github.com/mottosso/allzpark) for changes as that's where these are coming from.
+Let's start by adding some files to your package.
 
+```
+kingkong/
+    resources/
+        icon.png
+```
+
+I'm going to use this image, but you can use anything you've got lying around, so long as it's a `.png` file of reasonable size and aspect ratio.
+
+![image](https://user-images.githubusercontent.com/2152766/62296147-6d01a900-b466-11e9-9a88-7ac301ee4312.png)
+
+Then I'll update our `package.py` as well.
+
+**package.py**
+
+```python hl_lines="3 5 6 7 8 9 11"
+name = "kingkong"
+version = "1.0.3"
+build_command = "python {root}/install.py"  # 1
+
+_data = {                                   # 2
+    "label": "King Kong",
+    "icon": "{root}/resources/icon.png",
+}
+
+requires = [
+    "python-2.7,<4",                        # 3
+    "~maya==2018.0.6",
+    "~blender==2.80.0",
+    "~texteditor==1.5.1",
+]
+```
+
+Let's walk through these changes.
+
+1. We first update out `build_command` to call on a script, the script we'll use to copy files from your package folder to the `build/` folder which is later installed.
+1. Next we add `_data` which isn't related to Rez, but rather *arbitrary data* provided to a package. You can add any number of variables, but it is good practice to avoid clashing with built-in variables by prefixing it with `_`. In this case, Allzpark is programmed to look for this variable to find `label` and `icon`.
+1. We add `python-2.7,<4` to our list of requirements, without `~` this time.
+
+Here's what the files look like.
+
+**install.py**
+
+```python
+# This script is called on `rez build`
+import os
+import shutil
+
+print("Running install.py...")
+root = os.path.dirname(__file__)
+build_dir = os.environ["REZ_BUILD_PATH"]
+install_dir = os.environ["REZ_BUILD_INSTALL_PATH"]
+
+print("Copying payload to %s.." % build_dir)
+shutil.copytree(
+    os.path.join(root, "resources"),
+    os.path.join(build_dir, "resources"),
+    ignore=shutil.ignore_patterns("*.pyc", "__pycache__")
+)
+
+if int(os.getenv("REZ_BUILD_INSTALL")):
+    # This part is called with `rez build --install`
+    print("Installing payload to %s..." % install_dir)
+    shutil.copytree(
+        os.path.join(build_dir, "resources"),
+        os.path.join(install_dir, "resources"),
+    )
+```
+
+Now let's try and build our package once more.
+
+```bash
+cd kingkong
+rez build --install --clean
+allzpark --demo
+```
+
+> `--clean` will erase any existing `build/` directory, such that you can build over and over and over.
+
+!!! warning "New version"
+    Make sure you increment your version each time you install, or implement the appropriate clean-up functionality in your `install.py` script, as otherwise it may throw an exception about not being able to write into a directory that already has files in it.
+
+    Generally, it's fine to overwrite packages you install locally; we'll talk about how local differs from a "release" a little later, and how you can employ continuous integration and write-protect your public release folder for an additional level of security.
+
+![allzpark_kingkonglabel](https://user-images.githubusercontent.com/2152766/62297806-c28b8500-b469-11e9-9d61-962a2fc7979f.gif)
 
 <br>
+
+#### What we've learned
+
+High five! You've now learnt how to include files with your package, this is what we'll use to distribute software like Python libraries along with profile-specific files like the icon we've seen but also files related to potential applications you use, such as Maya script files or shelves.
+
+But what if you wanted to include a Python library and call that from an application? How can the application be made aware of what you've included in your package? This is where the environment comes in, and we'll have a look at that next.
+
+<br>
+
 
 ### Your first environment
 
