@@ -14,7 +14,7 @@
         <meta name="description" content="The package-based application launcher">
       
       
-        <link rel="canonical" href="https://allzpark.com/workflow/">
+        <link rel="canonical" href="https://allzpark.com/getting-advanced/">
       
       
         <meta name="author" content="mottosso">
@@ -45,7 +45,7 @@
 
     
       
-        <title>Workflow - Allzpark</title>
+        <title>Getting Advanced - Allzpark</title>
       
     
     
@@ -96,7 +96,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#development-workflow" tabindex="1" class="md-skip">
+      <a href="#getting-advanced" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -122,7 +122,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Workflow
+                Getting Advanced
               
             </span>
           
@@ -267,18 +267,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../getting-advanced/" title="Getting Advanced" class="md-nav__link">
-      Getting Advanced
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -288,11 +276,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Workflow
+        Getting Advanced
       </label>
     
-    <a href="./" title="Workflow" class="md-nav__link md-nav__link--active">
-      Workflow
+    <a href="./" title="Getting Advanced" class="md-nav__link md-nav__link--active">
+      Getting Advanced
     </a>
     
       
@@ -304,15 +292,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#development-workflow" title="Development Workflow" class="md-nav__link">
-    Development Workflow
+  <a href="#getting-advanced" title="Getting Advanced" class="md-nav__link">
+    Getting Advanced
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#release-workflow" title="Release Workflow" class="md-nav__link">
-    Release Workflow
+  <a href="#performance" title="Performance" class="md-nav__link">
+    Performance
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#releasing-packages" title="Releasing Packages" class="md-nav__link">
+    Releasing Packages
   </a>
   
 </li>
@@ -325,6 +320,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../workflow/" title="Workflow" class="md-nav__link">
+      Workflow
+    </a>
   </li>
 
     
@@ -431,15 +438,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#development-workflow" title="Development Workflow" class="md-nav__link">
-    Development Workflow
+  <a href="#getting-advanced" title="Getting Advanced" class="md-nav__link">
+    Getting Advanced
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#release-workflow" title="Release Workflow" class="md-nav__link">
-    Release Workflow
+  <a href="#performance" title="Performance" class="md-nav__link">
+    Performance
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#releasing-packages" title="Releasing Packages" class="md-nav__link">
+    Releasing Packages
   </a>
   
 </li>
@@ -459,44 +473,39 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-02</i></small>
 
                 
-                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/workflow.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/getting-advanced.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Workflow</h1>
+                  <h1>Getting Advanced</h1>
                 
-                <p>This page is dedicated to best practices for working with Rez and Allzpark.</p>
+                <p>This page carries on from a successful 👈 <a href="/getting-started">Getting Started</a> into making it relevant for use in VFX and games production.</p>
 <p><br></p>
-<h3 id="development-workflow">Development Workflow</h3>
-<p>Whether you are writing a C++ or Python library, the general workflow goes something like this.</p>
-<ol>
-<li>Edit source </li>
-<li>Call <code>rez build --install</code></li>
-<li>Reload library (e.g. Maya module or plug-in)</li>
-<li>Test the library</li>
-<li>Goto (1) until satisfied</li>
-</ol>
-<p>Where <code>rez build --install</code> operates in two steps.</p>
-<ol>
-<li>Create an internal <code>build\</code> directory with everything going into the installed package</li>
-<li>Copy the <code>build\</code> directory into your <code>REZ_LOCAL_PACKAGES_PATH</code> as the specified version</li>
-</ol>
-<p>This operation is destructive, in that it will overwrite what was already there. This is what allows you to keep rebuilding and testing your package, without having to increment the version for each line of source code changed.</p>
+<h3 id="getting-advanced">Getting Advanced</h3>
+<p>So you've taken Allzpark for a spin and found that it is wonderful, good for you! Here's how you can take it to the next level, by learning about how Allzpark and Rez works in a shared environment.</p>
 <p><br></p>
-<h3 id="release-workflow">Release Workflow</h3>
-<p>One of the strenghts of Rez is that, whilst Git enables you to version control changes to code, Rez enables version control released software onto the floor. Once you're happy with an update or newly created package, it's time to release it.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> my_package
-rez build --install --release
-</pre></div>
-
-<p>This command will perform an identical operation to <code>rez build --install</code>, except packages written to <code>REZ_RELEASE_PACKAGES_PATH</code>.</p>
-<p>Like <code>--install</code>, this operation is destructive, and most of the time you wouldn't want released packages to change. There are at least two methods for preventing that, both of which involve the use of <strong>Git</strong>.</p>
-<ol>
-<li>Limit use of <code>--release</code> to a server-side application, like GitLab. For example, once your changes have been pushed and tagged, a CI pipeline could trigger a call to <code>--release</code> whereby the GitLab runner is the only one with write-access to the <code>REZ_RELEASE_PACKAGES_PATH</code>.</li>
-<li>Use <code>rez release</code> which does something similar, except locally. It creates a tag identical to the proposed package version, pushed it to the currently set up Git remote.</li>
-</ol>
+<h3 id="performance">Performance</h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Memcached and why you need it</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Memcached configuration recommendations</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Work in progress</p>
+<p>Let me know if you would like me to flesh out this section, or if you are already familiar with Rez and <code>memcached</code>, help out by <a href="/contributing">contributing to the project</a>.</p>
+</div>
+<p><br></p>
+<h3 id="releasing-packages">Releasing Packages</h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Shared package repository</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Read/write permissions</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Automatic relase via GitLab CI</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Work in progress</p>
+<p>Let me know if you would like me to flesh out this section, or if you are already familiar with Rez and <code>rez release</code> or <code>rez build --prefix</code>, help out by <a href="/contributing">contributing to the project</a>.</p>
+</div>
                 
                   
                 
@@ -518,7 +527,7 @@ rez build --install --release
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../getting-advanced/" title="Getting Advanced" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../getting-started/" title="Getting Started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -527,19 +536,19 @@ rez build --install --release
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Getting Advanced
+                Getting Started
               </span>
             </div>
           </a>
         
         
-          <a href="../reference/" title="Reference" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../workflow/" title="Workflow" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Reference
+                Workflow
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
