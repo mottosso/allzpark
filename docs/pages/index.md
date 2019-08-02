@@ -15,8 +15,8 @@ template: landing.html
             <img alt=MacOS title="Runs on MacOS" height=16 src=https://user-images.githubusercontent.com/2152766/62287772-b9db8480-b452-11e9-9a88-4560388b97f4.png>
             <br>
             <img src=https://img.shields.io/pypi/pyversions/allzpark?color=steelblue>
-            <img src=https://img.shields.io/pypi/v/bleeding-rez?color=steelblue&label=bleeding-rez>
-            <img src="https://img.shields.io/pypi/v/allzpark">
+            <a href="https://github.com/mottosso/bleeding-rez/"><img src=https://img.shields.io/pypi/v/bleeding-rez?color=steelblue&label=bleeding-rez></a>
+            <a href="https://pypi.org/project/allzpark/"><img src="https://img.shields.io/pypi/v/allzpark"></a>
         </p>
         <div class="container">
             <p id="description">
