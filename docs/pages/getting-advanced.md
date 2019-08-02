@@ -26,3 +26,12 @@ So you've taken Allzpark for a spin and found that it is wonderful, good for you
 
 !!! note "Work in progress"
 	Let me know if you would like me to flesh out this section, or if you are already familiar with Rez and `rez release` or `rez build --prefix`, help out by [contributing to the project](/contributing).
+
+<br>
+
+### Rezifying Allzpark
+
+Learn how to close the loop and make Allzpark into just another Rez package.
+
+!!! note "Work in progress"
+	Let me know if you would like me to flesh out this section, or if you are already familiar with Rez, help out by [contributing to the project](/contributing).

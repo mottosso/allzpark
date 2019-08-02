@@ -802,6 +802,15 @@ Woho! You're a fully certified Rez environment artist!
 
 <br>
 
+### Configuring Allzpark
+
+The `--demo` flag is responsible for determining how and what profiles to visualise in Allzpark, let's have a look at how we can go independent from `--demo` with our won custom [allzparkconfig.py](https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py)
+
+!!! note "Work in progress"
+    Let me know if you would like me to flesh out this section [here](https://github.com/mottosso/allzpark/issues), or help out by [contributing](/contributing) to the project!
+
+<br>
+
 ### What's Next?
 
 From here, you are able to craft packages of any kind, both profiles, applications and libraries along with linking them together via `requires` (and let's not forget `private_build_requires`!). At this point, you're ready to head out into the wild.
