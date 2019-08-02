@@ -47,3 +47,21 @@ Learn how to close the loop and make Allzpark into just another Rez package.
 	[Let me know](https://github.com/mottosso/allzpark/issues) if you would like me to flesh out this section, or if you are already familiar with Rez, help out by [contributing to the project](/contributing).
 
 <br>
+
+### Beta Package
+
+Learn about how to release packages to a smaller test audience without disrupting normal operation, with the `.beta` suffix.
+
+!!! note "Work in progress"
+	[Let me know](https://github.com/mottosso/allzpark/issues) if you would like me to flesh out this section, or if you are already familiar with Rez, help out by [contributing to the project](/contributing).
+
+<br>
+
+### Package Encapsulation
+
+Learn about the importance and utility of keeping packages self-contained and not reference anything outside of its own root directory.
+
+!!! note "Work in progress"
+	[Let me know](https://github.com/mottosso/allzpark/issues) if you would like me to flesh out this section, or if you are already familiar with Rez, help out by [contributing to the project](/contributing).
+
+<br>
