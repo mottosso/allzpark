@@ -15,6 +15,7 @@ nav:
   - Home: index.md
   - Quickstart: quickstart.md
   - Getting Started: getting-started.md
+  - Getting Advanced: getting-advanced.md
   # - Guide: guides.md
   - Workflow: workflow.md
   - Reference: reference.md
@@ -22,6 +23,7 @@ nav:
   - Examples: examples.md
   - Shells: shells.md
   - Windows: windows.md
+  - Contributing: contributing.md
   - About: about.md
 
 docs_dir: pages

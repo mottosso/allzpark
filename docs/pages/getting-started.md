@@ -1,4 +1,4 @@
-This page carries on from a successful 👈 [quickstart](/quickstart) into making it relevant to your usecase.
+This page carries on from a successful 👈 [Quickstart](/quickstart) into making it relevant to your usecase.
 
 <br>
 
@@ -286,7 +286,7 @@ requires = [
 
 As you may have guessed, these are the *requirements* of this profile. That little squiggly `~` character ahead of `maya` indicates that this is a "weak" reference, which Allzpark interprets as application in this profile.
 
-!!! hint "Protip"
+!!! hint "Pro tip"
     If you're already familiar with Rez and think to yourself "This isn't very flexible", you're right. Looking for applications in the requirements section of a package is a default you can customise later via the `allzparkconfig.py:applications_from_package()` function.
 
 We'll talk more about requirements next, let's install this package and launch Allzpark.
@@ -299,7 +299,7 @@ allzpark --demo
 
 ![allzpark_kingkong](https://user-images.githubusercontent.com/2152766/61941483-7e8f1080-af8f-11e9-9192-235b5c139dfb.gif)
 
-!!! hint "Protip"
+!!! hint "Pro tip"
     You'll notice the order in which you specified the applications are respected in the GUI.
 
 <br>
@@ -410,7 +410,7 @@ allzpark --demo
 
 And presto!
 
-!!! hint "Protip"
+!!! hint "Pro tip"
     Notice that our terminal doesn't yet have an icon, and its name is all lowercase and plain. We'll address this next, in the [Payload](#your-first-payload) chapter.
 
 <br>
@@ -433,17 +433,23 @@ But there is something else missing. For the purposes of this chapter, I will as
 
 Let's start by adding some files to your package.
 
+<br>
+
+#### Adding some files
+
 ```
 kingkong/
     resources/
         icon.png
 ```
 
+<img align=right src=https://user-images.githubusercontent.com/2152766/62296147-6d01a900-b466-11e9-9a88-7ac301ee4312.png>
+
 I'm going to use this image, but you can use anything you've got lying around, so long as it's a `.png` file of reasonable size and aspect ratio.
 
-![image](https://user-images.githubusercontent.com/2152766/62296147-6d01a900-b466-11e9-9a88-7ac301ee4312.png)
-
 Then I'll update our `package.py` as well.
+
+<br>
 
 **package.py**
 
@@ -522,23 +528,28 @@ allzpark --demo
 
 #### What we've learned
 
-High five! You've now learnt how to include files with your package, this is what we'll use to distribute software like Python libraries along with profile-specific files like the icon we've seen but also files related to potential applications you use, such as Maya script files or shelves.
+High five! ✋ You've now learnt how to include files with your package, this is what we'll use to distribute software like Python libraries along with profile-specific files like the icon we've seen but also files related to potential applications you use, such as Maya script files or shelves.
 
 But what if you wanted to include a Python library and call that from an application? How can the application be made aware of what you've included in your package? This is where the environment comes in, and we'll have a look at that next.
 
 <br>
 
-
 ### Your first environment
 
 So your profile has got some custom data, that's perfect. Now let's add some *metadata* as well.
 
-```python
+```python hl_lines="17 18 19 20 21 22 23 25"
 name = "kingkong"
-version = "1.0.2"
-build_command = False
+version = "1.0.5"
+build_command = "python {root}/install.py"
+
+_data = {
+    "label": "King Kong",
+    "icon": "{root}/resources/icon.png",
+}
 
 requires = [
+    "python-2.7,<4",
     "~maya==2018.0.6",
     "~blender==2.80.0",
     "~texteditor==1.5.1",
@@ -546,11 +557,264 @@ requires = [
 
 def commands():
     global env
+
     env["PROJECT_ID"] = "12"
     env["PROJECT_NAME"] = "kingkong"
     env["PROJECT_FRAMERATE"] = "25"
     env["PROJECT_TAGS"] = "awesome,great,best"
+
+    env["PYTHONPATH"].prepend("{root}/python")
 ```
 
-!!! hint "In Development"
-    Congratulations, you made it this far! I'm still working on this next bit, so stay tuned to this page for updates, or monitor the [GitHub repo](https://github.com/mottosso/allzpark) for changes as that's where these are coming from.
+The global variable `env` is shared amongst each of your packages, passed from one to the next, in the order they are resolved.
+
+!!! hint "Pro tip"
+    Packages are resolved in the order they are required. That is, if Alita requires Maya, then Maya's `commands()` function is called *first*.
+
+As you've noticed, we can use this as both a dictionary and class with a `.prepend()` member. Prepend automatically treats the variable as a PATH-like variable and `.prepend()` in this case prepends a given value to that variable. There's also `.append()` for the opposite effect. Whether to append or prepend depends on your use case.
+
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
+```powershell
+# Prepend
+PYTHONPATH="c:\packages\alita\1.0\python;c:\packages\maya\2018.0\python"
+
+# Append
+PYTHONPATH="c:\packages\maya\2018.0\python;c:\packages\alita\1.0\python"
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+# Prepend
+PYTHONPATH=/packages/alita/1.0/python:/packages/maya/2018.0/python
+
+# Append
+PYTHONPATH=/packages/maya/2018.0/python:/packages/alita/1.0/python
+```
+
+</div>
+
+Ok, that's great, the package now prepends `"{root}/python"`, let' actually create that folder now.
+
+<br>
+
+#### Adding a new file
+
+```hl_lines="4 5"
+kingkong/
+    resources/
+        icon.png
+    python/
+        kingkong.py
+```
+
+In my file, I'll put something like this.
+
+**kingkong/python/kingkong.py**
+
+```python
+def king():
+    print("kong!")
+```
+
+We'll also need to update our `install.py` to include this file.
+
+<br>
+
+#### Updating our build command
+
+**kingkong/install.py**
+
+```python hl_lines="9 12 14 15 22 24 25"
+# This script is called on `rez build`
+import os
+import shutil
+
+print("Running install.py...")
+root = os.path.dirname(__file__)
+build_dir = os.environ["REZ_BUILD_PATH"]
+install_dir = os.environ["REZ_BUILD_INSTALL_PATH"]
+dirs = ["resources", "python"]
+
+print("Copying payload to %s.." % build_dir)
+for dirname in dirs:
+    shutil.copytree(
+        os.path.join(root, dirname),
+        os.path.join(build_dir, dirname),
+        ignore=shutil.ignore_patterns("*.pyc", "__pycache__")
+    )
+
+if int(os.getenv("REZ_BUILD_INSTALL")):
+    # This part is called with `rez build --install`
+    print("Installing payload to %s..." % install_dir)
+    for dirname in dirs:
+        shutil.copytree(
+            os.path.join(build_dir, dirname),
+            os.path.join(install_dir, dirname),
+        )
+```
+
+Now let's build and run.
+
+```bash
+cd kingkong
+rez build --install --clean
+allzpark --demo
+```
+
+![allzpark_king](https://user-images.githubusercontent.com/2152766/62358941-b48f4000-b50d-11e9-9f60-d5529744a1f7.gif)
+
+<br>
+
+#### Bonus Chapter
+
+As you're learned, writing that `install.py` script is rather tedious, and you'll need one of these for every package you create. Wouldn't it be great if you could make a *generic* install script that you could reuse across each of your projects?
+
+Well, yes, yes you can!
+
+```python hl_lines="3 12"
+name = "kingkong"
+version = "1.0.5"
+build_command = "python -m rezutil {root}"
+
+_data = {
+    "label": "King Kong",
+    "icon": "{root}/resources/icon.png",
+}
+
+requires = [
+    "python-2.7,<4",
+    "rezutil-1",
+    "~maya==2018.0.6",
+    "~blender==2.80.0",
+    "~texteditor==1.5.1",
+]
+
+def commands():
+    global env
+
+    env["PROJECT_ID"] = "12"
+    env["PROJECT_NAME"] = "kingkong"
+    env["PROJECT_FRAMERATE"] = "25"
+    env["PROJECT_TAGS"] = "awesome,great,best"
+
+    env["PYTHONPATH"].prepend("{root}/python")
+```
+
+Notice the addition of `rezutil`, and that I've removed any reference to `install.py`, that you can go ahead and delete. This is an example of using a Rez package to build another Rez package and is a really common technique for situations just like this.
+
+Let's build the project to confirm we're getting the exact same result.
+
+```bash
+cd kingkong
+rez build --install --clean
+```
+
+Et voila!
+
+!!! hint "Pro tip"
+    Also notice that we didn't update the version this time, because built-in to `rezutil` is handling overwrites along with *retries* for when writing to an unreliable network resource.
+
+You can find this mystical `rezutil` package [here](https://github.com/mottosso/allzparkdemo/tree/master/allzparkdemo/dev/rezutil), as well as on your local harddrive found here:
+
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
+```powershell
+start $(allzparkdemo --packages)
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+allzparkdemo --packages
+```
+
+</div>
+
+!!! hint "Pro tip"
+    The source package can be found one level up, in the `dev/` directory.
+
+<br>
+
+#### Bonus Bonus Chapter
+
+One final note about the `rezutil` package; you'll notice that because we've included it as a requirement to the `kingkong` profile, the package is also made visible to any application started from within this profile. In this case however, this package is only really relevant during package build.
+
+We can work around this by making it a *private* requirement.
+
+```python hl_lines="4 12 13"
+name = "kingkong"
+version = "1.0.5"
+build_command = "python -m rezutil {root}"
+private_build_requires = ["rezutil-1"]
+
+_data = {
+    "label": "King Kong",
+    "icon": "{root}/resources/icon.png",
+}
+
+requires = [
+    # "python-2.7,<4",
+    # "rezutil-1",
+    "~maya==2018.0.6",
+    "~blender==2.80.0",
+    "~texteditor==1.5.1",
+]
+
+def commands():
+    global env
+
+    env["PROJECT_ID"] = "12"
+    env["PROJECT_NAME"] = "kingkong"
+    env["PROJECT_FRAMERATE"] = "25"
+    env["PROJECT_TAGS"] = "awesome,great,best"
+
+    env["PYTHONPATH"].prepend("{root}/python")
+```
+
+I also removed the requirement for Python, as this is also only really relevant during build.
+
+<br>
+
+#### What we've learned
+
+Woho! You're a fully certified Rez environment artist!
+
+- A package can modify its environment
+- PATH-like variables have a convenient `prepend` and `append`, more on that [here](https://github.com/mottosso/bleeding-rez/wiki/Package-Commands#variable-appending-and-prepending)
+- Variables have access to special variables, like `{root}`, more about that [here](https://github.com/mottosso/bleeding-rez/wiki/Package-Commands#string-expansion)
+- You can use Rez packages to build Rez packages (neat!)
+
+<br>
+
+### What's Next?
+
+From here, you are able to craft packages of any kind, both profiles, applications and libraries along with linking them together via `requires` (and let's not forget `private_build_requires`!). At this point, you're ready to head out into the wild.
+
+- [Package Examples](https://github.com/mottosso/allzparkdemo/tree/master/allzparkdemo/dev)
+- [Advanced Profile Example](https://github.com/mottosso/allzparkdemo/blob/master/allzparkdemo/dev/alita/package.py)
+- [Allzpark Tutorials](https://allzpark.com/reference)
+- [Rez Wiki](https://github.com/mottosso/bleeding-rez/wiki)
+- [Rez Tutorials](https://allzpark.com/rez)
+- [Rez Chat](https://rez-talk.slack.com/) (Ask for invite on mailing list)
+- [Rez Mailing List](https://groups.google.com/forum/#!forum/rez-config)
+
+Something else on your mind? [Let me know!](https://github.com/mottosso/allzpark/issues)
+
+!!! note "bleeding vs. nerdvegas Rez"
+    In this project we use bleeding-rez which is a flavour of Rez better suited for profiles like the one we've made here, but the two projects are nearly identical. When asking for help, it's safe to assume that any issue you're having is relevant to both projects; however it can be worth mentioning that you are using [bleeding-rez](https://github.com/mottosso/bleeding-rez), rather than [nerdvegas/rez](https://github.com/nerdvegas/rez).
