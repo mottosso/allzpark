@@ -148,6 +148,55 @@ $ rez env alita maya -q
 <div class="hboxlayout justify-left row-reverse">
     <div class="flex-item">
     <div class="vboxlayout">
+        <h2>Localisation</h2>
+<p>
+
+Slow network? Working remotely?
+<br><br>
+Reap optimal performance across the slowest of networks and disks with <b>localisation</b>, by turning any package into a locally accessible resource.
+
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
+```powershell
+PS> rez env localz -- localize python-3 alita maya-2019 bifrost
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+$ rez env localz -- localize python-3 alita maya-2019 bifrost
+```
+
+</div>
+
+</p>
+</div>
+</div>
+    <div class="smallspace"></div>
+<div class="flex-item">
+    <img class="poster" style="border: none; box-shadow: none; padding: 0" src=https://user-images.githubusercontent.com/2152766/61055815-31853900-a3ea-11e9-9a13-fc4f42f9a17f.gif>
+</div>
+</div>
+
+<div class="space"></div>
+<div class="space"></div>
+
+<!-- 
+
+    Environment Management
+
+-->
+
+<div class="hboxlayout justify-left">
+    <div class="flex-item">
+    <div class="vboxlayout">
         <h2>Environment Management</h2>
 <p>
 
@@ -171,7 +220,7 @@ Preview the environment, prior to launching an application. Make changes interac
 
 -->
 
-<div class="hboxlayout">
+<div class="hboxlayout justify-left row-reverse">
     <div class="flex-item">
     <div class="vboxlayout">
         <h2>Customisation</h2>
