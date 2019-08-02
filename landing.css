@@ -50,6 +50,10 @@
     justify-content: center;
 }
 
+.flex-item {
+  flex: 1;
+}
+
 .align-center {
   align-items: center;
 }
