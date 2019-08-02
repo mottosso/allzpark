@@ -48,8 +48,13 @@ template: landing.html
 
 -->
 
-<div class="hboxlayout row-reverse">
-    <div class="vboxlayout" markdown="1">
+<div class="hboxlayout">
+    <div class="flex-item">
+        <img class="poster" style="border: none; box-shadow: none; padding: 0" src=https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif>
+    </div>
+    <div class="smallspace"></div>
+    <div class="flex-item">
+            <div class="vboxlayout" markdown="1">
         <h2>Package Based</h2>
         <p>
 Works on your machine?
@@ -74,8 +79,7 @@ def commands():
 Establish complex relationships between software, applications and projects with <a href=https://github.com/mottosso/bleeding-rez>bleeding-rez</a>, the underlying framework powering Allzpark.
 </p>
     </div>
-    <div class="smallspace"></div>
-    <img class="poster" style="border: none; box-shadow: none; padding: 0" src=https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif>
+    </div>
 </div>
 
 <div class="space"></div>
@@ -89,6 +93,7 @@ Establish complex relationships between software, applications and projects with
 -->
 
 <div class="hboxlayout">
+    <div class="flex-item">
     <div class="vboxlayout">
         <h2>Dual Representation</h2>
 
@@ -124,8 +129,11 @@ $ rez env alita maya -q
 </div>
 
 </div>
+</div>
 <div class="smallspace"></div>
-<img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
+<div class="flex-item">
+    <img class="poster" src=https://user-images.githubusercontent.com/2152766/60496077-fbd5a700-9ca9-11e9-8ff4-09c272326fae.gif>
+</div>
 </div>
 
 <div class="space"></div>
@@ -138,6 +146,7 @@ $ rez env alita maya -q
 -->
 
 <div class="hboxlayout justify-left row-reverse">
+    <div class="flex-item">
     <div class="vboxlayout">
         <h2>Environment Management</h2>
 <p>
@@ -145,9 +154,12 @@ $ rez env alita maya -q
 Preview the environment, prior to launching an application. Make changes interactively as you develop or debug complex dependency chains.
 
 </p>
-    </div>
+</div>
+</div>
     <div class="smallspace"></div>
+<div class="flex-item">
     <img class="poster" src=https://user-images.githubusercontent.com/2152766/60493787-82d45080-9ca5-11e9-9f0a-c5d7497b396f.gif>
+</div>
 </div>
 
 <div class="space"></div>
@@ -160,6 +172,7 @@ Preview the environment, prior to launching an application. Make changes interac
 -->
 
 <div class="hboxlayout">
+    <div class="flex-item">
     <div class="vboxlayout">
         <h2>Customisation</h2>
         <p>
@@ -169,8 +182,11 @@ Preview the environment, prior to launching an application. Make changes interac
             Drag panels around, establish a super-layout with everything visible at once.
         </p>
     </div>
+    </div>    
     <div class="smallspace"></div>
+    <div class="flex-item">
     <img class="poster" style="border: none; box-shadow: none; padding: 0" src=https://user-images.githubusercontent.com/2152766/61289704-e1c7b880-a7c1-11e9-94ba-20ef7a2ca6bc.gif>
+    </div>    
 </div>
 
 
