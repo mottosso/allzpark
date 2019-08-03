@@ -809,7 +809,7 @@ class Controller(QtCore.QObject):
                 profiles = root()
 
             except Exception:
-                if log.level < logging.INFO:
+                if log.level == logging.DEBUG:
                     traceback.print_exc()
 
                 self.error("Could not find profiles in %s" % root)
