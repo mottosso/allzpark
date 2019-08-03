@@ -769,6 +769,7 @@ class EnvironmentEditor(QtWidgets.QWidget):
         font.setPointSize(10)
 
         widgets["textEdit"].setFont(font)
+        widgets["textEdit"].setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -792,15 +793,7 @@ class EnvironmentEditor(QtWidgets.QWidget):
 
     def from_environment(self, environ):
         if not environ:
-            return self._widgets["textEdit"].setPlainText("""\
-# Provide your own additional environment variables here
-#
-# MY_VARIABLE=1
-# YOUR_VARIABLE=2
-#
-# NOTE: Variables are applied *before* the context, which
-# means your packages overwrite anything you provide here.
-""")
+            return
 
         text = "\n".join([
             "%s=%s" % (key, value)
@@ -870,6 +863,7 @@ class CssEditor(QtWidgets.QWidget):
         font.setPointSize(10)
 
         widgets["textEdit"].setFont(font)
+        widgets["textEdit"].setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)

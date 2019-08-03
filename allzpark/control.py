@@ -701,7 +701,6 @@ class Controller(QtCore.QObject):
             def on_error(error):
                 # Forward error from Command()
                 raise error
-                # raise rez.ResolvedContextError(str(error))
 
             cmd = Command(
                 context=rez_context,
