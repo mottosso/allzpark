@@ -14,7 +14,7 @@
         <meta name="description" content="The package-based application launcher">
       
       
-        <link rel="canonical" href="https://allzpark.com/contributing/">
+        <link rel="canonical" href="https://allzpark.com/avalon/">
       
       
         <meta name="author" content="mottosso">
@@ -45,7 +45,7 @@
 
     
       
-        <title>Contributing - Allzpark</title>
+        <title>Avalon - Allzpark</title>
       
     
     
@@ -122,7 +122,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Contributing
+                Avalon
               
             </span>
           
@@ -351,79 +351,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Contributing
-      </label>
-    
-    <a href="./" title="Contributing" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../contributing/" title="Contributing" class="md-nav__link">
       Contributing
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quickstart" title="Quickstart" class="md-nav__link">
-    Quickstart
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#architecture" title="Architecture" class="md-nav__link">
-    Architecture
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#guidelines" title="Guidelines" class="md-nav__link">
-    Guidelines
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation" title="Documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#guidelines_1" title="Guidelines" class="md-nav__link">
-    Guidelines
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -465,36 +397,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#architecture" title="Architecture" class="md-nav__link">
-    Architecture
+  <a href="#core-differences" title="Core Differences" class="md-nav__link">
+    Core Differences
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#guidelines" title="Guidelines" class="md-nav__link">
-    Guidelines
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation" title="Documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#guidelines_1" title="Guidelines" class="md-nav__link">
-    Guidelines
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -516,88 +421,121 @@
 <small class="modified-date"><br><i>Updated 2019-08-03</i></small>
 
                 
-                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/contributing.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/avalon.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Contributing</h1>
+                  <h1>Avalon</h1>
                 
-                <p>Thanks for considering making a contribution to the Allzpark project!</p>
-<p>The goal of Allzpark is making film and games productions more fun to work on, for artists and developers alike. Almost every company with any experience working in this field has felt the pain of managing software and versions when all you really want to do is make great pictures. Allzpark can really help with that, and you can really help Allzpark!</p>
+                <p>This page provides a transition guide from using Avalon's native Launcher to Allzpark.</p>
 <p><br></p>
 <h3 id="quickstart">Quickstart</h3>
-<p>Allzpark works out of the Git repository.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>git clone https://github.com/mottosso/allzpark.git
-<span style="color: #f8f8f2">cd</span> allzpark
-python -m allzpark --demo
-</pre></div>
-
-<p>Get the up-to-date requirements by having a copy of Allzpark already installed.</p>
-<ul>
-<li>See <a href="/quickstart">Quickstart</a> for details</li>
-</ul>
-<p><br></p>
-<h3 id="architecture">Architecture</h3>
-<p>The front-end is written in Python and <a href="https://github.com/mottosso/Qt.py">Qt.py</a>, and the back-end is <a href="https://github.com/mottosso/bleeding-rez">bleeding-rez</a>. You are welcome to contribute to either of these projects.</p>
-<p>Graphically, the interface is written in standard Qt idioms, like MVC to separate between logic and visuals. The window itself is an instance of <code>QMainWindow</code>, whereby each "tab" is a regular <code>QDockWidget</code>, which is how you can move them around and dock them freely.</p>
-<ul>
-<li><a href="https://github.com/mottosso/allzpark/blob/master/allzpark/model.py">model.py</a></li>
-<li><a href="https://github.com/mottosso/allzpark/blob/master/allzpark/view.py">view.py</a></li>
-<li><a href="https://github.com/mottosso/allzpark/blob/master/allzpark/control.py">control.py</a></li>
-</ul>
-<p>User preferences is stored in a <code>QSettings</code> object, including window layout. See <code>view.py:Window.closeEvent()</code> for how that works.</p>
-<p><br></p>
-<h3 id="guidelines">Guidelines</h3>
-<p>There are a few ways you can contribute to this project.</p>
-<ol>
-<li>Use it and report any issues <a href="https://github.com/mottosso/allzpark/issues">here</a></li>
-<li>Submit ideas for improvements or new features <a href="https://github.com/mottosso/allzpark/issues">here</a></li>
-<li>Add or improve <a href="https://github.com/mottosso/allzpark/tree/master/docs">this documentation</a></li>
-<li>Help write tests to avoid regressions and help future contributors spot mistakes</li>
-</ol>
-<p>Any other thoughts on how you would like to contribute? <a href="https://github.com/mottosso/allzpark/issues">Let me know</a>.</p>
-<p><br></p>
-<h3 id="documentation">Documentation</h3>
-<p>The documentation you are reading right now is hosted in the Allzpark git repository on GitHub, and built with a static site-generator called <a href="https://www.mkdocs.org/">mkdocs</a> along with a theme called <a href="https://squidfunk.github.io/mkdocs-material/">mkdocs-material</a>.</p>
-<p>Mkdocs can host the entirety of the website on your local machine, and automatically update whenever you make changes to the Markdown documents. Here's how you can get started.</p>
+<p>This part assumes a successful <a href="/quickstart">Quickstart</a>.</p>
 <div class="tabs">
   <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
   <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
 </div>
 
 <div class="tab-content powershell">
-<p>You can either use Rez and Pipz.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd allzpark\docs</span>
-<span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">pipz</span> <span style="color: #f8f8f2">--</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">-r</span> <span style="color: #f8f8f2">requirements.txt</span>
-<span style="color: #f8f8f2">.</span> <span style="color: #f8f8f2">serve.ps1</span>
-</pre></div>
-
-<p>Or install dependencies into your system-wide Python.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd allzpark\docs</span>
-<span style="color: #f8f8f2">pip</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">-r</span> <span style="color: #f8f8f2">requirements.txt</span>
-<span style="color: #f8f8f2">mkdocs</span> <span style="color: #f8f8f2">serve</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">$env:USERPROFILE/projects</span>
+<span style="color: #f8f8f2">substr</span> <span style="color: #f8f8f2">P</span><span style="color: #960050; background-color: #1e0010">:</span> <span style="color: #f8f8f2">$env:USERPROFILE/projects</span>
+<span style="color: #f8f8f2">$env:REZ_PACKAGES_PATH=</span><span style="color: #e6db74">&quot;~/packages;</span><span style="color: #f8f8f2">$(allzparkdemo</span> <span style="color: #f8f8f2">--packages)</span><span style="color: #e6db74">&quot;</span>
+<span style="color: #f8f8f2">$env:MY_PROFILES=</span><span style="color: #e6db74">&quot;bleed&quot;</span>
 </pre></div>
 
 </div>
 <div class="tab-content bash">
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd</span> allzpark/docs
-rez env pipz -- install -r requirements.txt
-rez env git python mkdocs_material-4.4.0 <span style="color: #f8f8f2">mkdocs_git_revision_date_plugin</span><span style="color: #f92672">==</span><span style="color: #ae81ff">0</span>.1.5 -- mkdocs serve
-</pre></div>
-
-<p>Or install dependencies into your system-wide Python.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd allzpark/docs</span>
-<span style="color: #f8f8f2">pip</span> <span style="color: #f8f8f2">install</span> <span style="color: #f8f8f2">-r</span> <span style="color: #f8f8f2">requirements.txt</span>
-<span style="color: #f8f8f2">mkdocs</span> <span style="color: #f8f8f2">serve</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>mkdir ~/projects
+<span style="color: #f8f8f2">$REZ_PACKAGES_PATH</span><span style="color: #f92672">=</span>~/packages:<span style="color: #66d9ef">$(</span>allzparkdemo --packages<span style="color: #66d9ef">)</span>
+<span style="color: #f8f8f2">$MY_PROFILES</span><span style="color: #f92672">=</span>bleed
 </pre></div>
 
 </div>
-<p>You should see a message about how to browse to the locally hosted documentation in your console.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env pipz -- install avalon colorbleed <span style="color: #f8f8f2">pyqt5</span><span style="color: #f92672">==</span><span style="color: #ae81ff">5</span>.8 pymongo&gt;<span style="color: #f92672">=</span><span style="color: #ae81ff">3</span>.4
+git clone https://github.com/mottosso/bleed.git
+<span style="color: #f8f8f2">cd</span> bleed
+rez build --install
+python -m avalon.inventory --save
+allzpark --demo
+</pre></div>
+
+<details class="question"><summary><code>~/projects</code></summary><p>For the purposes of this demo, the Avalon projects are assumed to be in this directory.</p>
+</details>
+<details class="question"><summary>pipz</summary><p>These are the base requirements for running Avalon</p>
+</details>
+<details class="question"><summary>REZ_PACKAGES_PATH</summary><p>For the purposes of this demo, we'll expose the Allzpark demo packages, primarily <code>maya</code>, <code>blender</code> and <code>rezutil</code> for use when building <code>bleed</code>. We could also have made a <code>maya</code>, <code>blender</code> and <code>rezutil</code> package globally, and skipped this step.</p>
+</details>
+<details class="question"><summary>avalon.inventory</summary><p>We'll also need this project uploaded to Avalon's MongoDB database. I'd like to skip this step, to instead automatically create projects post-launch, based on variables set in the Allzpark profile.</p>
+</details>
 <p><br></p>
-<h4 id="guidelines_1">Guidelines</h4>
-<p>Things to keep in mind as you contribute to the documentation</p>
+<h3 id="core-differences">Core Differences</h3>
+<p><strong>Launcher</strong></p>
 <ul>
-<li><strong>Windows-first</strong> Allzpark is for all platforms, but Windows-users are typically less tech-savvy than Linux and MacOS users and the documentation should reflect that.</li>
+<li>Has all the information related to a project, asset and task</li>
+<li>Creates working directory <em>prior</em> to application launch</li>
 </ul>
+<p>Avalon provides an API for defining an application on disk.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">application_dir</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya&quot;</span>
+<span style="color: #f8f8f2">default_dirs</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;scenes&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;data&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;renderData/shaders&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;images&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;renders&quot;</span>
+<span style="color: #f8f8f2">]</span>
+<span style="color: #f8f8f2">label</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Autodesk Maya 2018&quot;</span>
+<span style="color: #f8f8f2">schema</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;avalon-core:application-1.0&quot;</span>
+<span style="color: #f8f8f2">executable</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya2018&quot;</span>
+<span style="color: #f8f8f2">description</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;&quot;</span>
+<span style="color: #f8f8f2">icon</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;cubes&quot;</span>
+<span style="color: #f8f8f2">color</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;#CCBD14&quot;</span>
+<span style="color: #f8f8f2">order</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">-2</span>
+
+<span style="color: #66d9ef">[copy]</span>
+<span style="color: #e6db74">&quot;{COLORBLEED_CONFIG}/res/workspace.mel&quot;</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;workspace.mel&quot;</span>
+
+<span style="color: #66d9ef">[environment]</span>
+<span style="color: #f8f8f2">FFMPEG_PATH</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;P:/pipeline/dev/apps/ffmpeg/bin/ffmpeg.exe&quot;</span>
+
+<span style="color: #f8f8f2">COLORBLEED_SCRIPTS</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;P:/pipeline/dev/git/cbMayaScripts/cbMayaScripts&quot;</span>
+
+<span style="color: #f8f8f2">MAYA_DISABLE_CLIC_IPM</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>  <span style="color: #75715e"># Disable the AdSSO process</span>
+<span style="color: #f8f8f2">MAYA_DISABLE_CIP</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>  <span style="color: #75715e"># Shorten time to boot</span>
+<span style="color: #f8f8f2">MAYA_DISABLE_CER</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>
+<span style="color: #f8f8f2">PYMEL_SKIP_MEL_INIT</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>
+<span style="color: #f8f8f2">LC_ALL</span><span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;C&quot;</span>  <span style="color: #75715e"># Mute color management warnings</span>
+<span style="color: #f8f8f2">REDSHIFT_DISABLEOUTPUTLOCKFILES</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1&quot;</span> <span style="color: #75715e"># Disable Redshift creating lock files</span>
+
+<span style="color: #f8f8f2">XBMLANGPATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/prefs/icons&quot;</span>
+<span style="color: #f8f8f2">]</span>
+
+<span style="color: #f8f8f2">MAYA_SCRIPT_PATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/scripts&quot;</span>
+<span style="color: #f8f8f2">]</span>
+
+<span style="color: #75715e"># Fix V-ray forcing affinity to 100%</span>
+<span style="color: #f8f8f2">VRAY_USE_THREAD_AFFINITY</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;0&quot;</span>
+
+<span style="color: #f8f8f2">PYTHONPATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/git/Qt.py&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/cvshapeinverter&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;{AVALON_CORE}/setup/maya&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;{PYTHONPATH}&quot;</span>
+<span style="color: #f8f8f2">]</span>
+
+<span style="color: #f8f8f2">MAYA_MODULE_PATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/Yeti-v3.1.9_Maya2018-windows&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/cvshapeinverter&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/brSmoothWeights&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/SHAPES&quot;</span>
+<span style="color: #f8f8f2">]</span>
+<span style="color: #f8f8f2">PATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/Yeti-v3.1.9_Maya2018-windows/bin&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;{PATH}&quot;</span>
+<span style="color: #f8f8f2">]</span>
+</pre></div>
+
+<p>It then let's you reference this definition using its unique identifier, such as <code>maya</code> or <code>nuke</code>.</p>
                 
                   
                 
@@ -615,41 +553,6 @@ rez env git python mkdocs_material-4.4.0 <span style="color: #f8f8f2">mkdocs_git
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../windows/" title="Windows" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
-            </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Windows
-              </span>
-            </div>
-          </a>
-        
-        
-          <a href="../about/" title="About" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                About
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
