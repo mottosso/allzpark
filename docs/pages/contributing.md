@@ -4,6 +4,22 @@ The goal of Allzpark is making film and games productions more fun to work on, f
 
 <br>
 
+### Quickstart
+
+Allzpark works out of the Git repository.
+
+```bash
+git clone https://github.com/mottosso/allzpark.git
+cd allzpark
+python -m allzpark --demo
+```
+
+Get the up-to-date requirements by having a copy of Allzpark already installed.
+
+- See [Quickstart](/quickstart) for details
+
+<br>
+
 ### Architecture
 
 The front-end is written in Python and [Qt.py](https://github.com/mottosso/Qt.py), and the back-end is [bleeding-rez](https://github.com/mottosso/bleeding-rez). You are welcome to contribute to either of these projects.
@@ -81,3 +97,11 @@ mkdocs serve
 </div>
 
 You should see a message about how to browse to the locally hosted documentation in your console.
+
+<br>
+
+#### Guidelines
+
+Things to keep in mind as you contribute to the documentation
+
+- **Windows-first** Allzpark is for all platforms, but Windows-users are typically less tech-savvy than Linux and MacOS users and the documentation should reflect that.
