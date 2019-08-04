@@ -257,11 +257,37 @@ If you got this far, and know more or want more, feel free to submit [an issue](
 
 Once you've created a package, it's often a good idea to version control it.
 
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell" markdown="1">
+
 ```powershell
 mkdir my_package
 cd my_package
-echo "name = `"my_package`"" >> package.py
-echo "version = `"1.0.0`"" >> package.py
+@"
+name = "my_package"
+echo "version = "1.0.0"
+echo "build_command = False"
+"@ | Add-Content package.py
+git init
+git add --all
+git commit -m "Initial version"
+git remote add-url https://gitlab.mycompany.com/username/my_package.git
+git push
+```
+
+</div>
+
+<div class="tab-content bash" markdown="1">
+
+```bash
+mkdir my_package
+cd my_package
+echo "name = "my_package"" >> package.py
+echo "version = "1.0.0"" >> package.py
 echo "build_command = False" >> package.py
 git init
 git add --all
@@ -269,6 +295,9 @@ git commit -m "Initial version"
 git remote add-url https://gitlab.mycompany.com/username/my_package.git
 git push
 ```
+
+</div>
+
 
 Next we'll configure GitLab to release a package alongside a new tag being made.
 
@@ -620,48 +649,11 @@ If you got this far, and know more or want more, feel free to submit [an issue](
 
 <br>
 
-### Opt-out Environment
-
-Per default, the parent environment is inherited by a Rez context, unless one or more packages reference it internally.
-
-```bash
-$env:MY_PATH="path1;path2"
-rez env
-> $env:MY_PATH
-# path1;path2
-```
-
-Note the inheritance there. However, if any package references `MY_PATH` then it will automatically clear itself prior to being re-added by the package.
-
-**package.py**
-
-```python
-name = "my_package"
-version = "1.0"
-
-def commands():
-    env["MY_PATH"].append("path1")  # Clearing existing PATH
-```
-
-If we include this package, the variable now looks like this.
-
-```bash
-rez env my_package
-> $env:MY_PATH
-# path1
-```
-
-This is considered a bug in the underlying bleeding-rez library, and is being addressed here.
-
-- See also https://github.com/mottosso/bleeding-rez/issues/70
-
-<br>
-
 ### Graph
 
 Allzpark is able to visualise a resolved context as a graph.
 
-![]()
+![](https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif)
 
 **Prerequisities**
 
@@ -699,7 +691,7 @@ rez env localz pyside2 python3 bleeding_rez -- python -m allzpark
 
 <br>
 
-### Allzpark Performance Considerations
+### Performance Considerations
 
 Use of the Allzpark can be divided into roughly three parts.
 
@@ -711,3 +703,170 @@ Use of the Allzpark can be divided into roughly three parts.
     - This is the actual Rez resolves taking place. It will vary depending on whether the contexts can be found in memcached or not, which is about 90% of the time.
 
 From there most things are stored in-memory and won't perform many if any IO or CPU intensive calls, with a few exceptions like generating the resolve graph in the Context tab.
+
+<br>
+
+## External Packages
+
+With Rez you can package almost anything, but sometimes there are packages already made for you to benefit from.
+
+<br>
+
+### Install from PyPI
+
+Managing external projects is no fun unless you can benefit from what package authors in neighboring ecosystems have been working on. PyPI is such an ecosystem and you can install any package from PyPI as a Rez package using `rez-pipz`.
+
+```bash
+git clone https://github.com/mottosso/rez-pipz.git
+cd rez-pipz
+rez build --install
+```
+
+Here's how you use it.
+
+```bash
+rez env pipz -- install six
+```
+
+And here's how you install binary packages, specifically for the platform you are on.
+
+```bash
+rez env pipz -- install sqlalchemy
+```
+
+To install for a particular version of Python, include it in the initial request.
+
+```bash
+rez env python-2 pipz -- install sqlalchemy
+```
+
+- See [rez-pipz](https://github.com/mottosso/rez-pipz) for details.
+
+<br>
+
+### Install from Scoop
+
+Scoop is a package manager for Windows. It's akin to [Chocolatey](), except packages are portable and doesn't require adminstrative access, which makes it a perfect fit for Rez.
+
+```bash
+git clone https://github.com/mottosso/rez-scoopz.git
+cd rez-scoopz
+rez build --install
+```
+
+Here's how you use it.
+
+```bash
+rez env scoopz -- install python
+```
+
+- See [rez-scoopz](https://github.com/mottosso/rez-scoopz) for details.
+
+<br>
+
+## Package version and Python
+
+Every package containing a payload typically involves two version numbers.
+
+- Version of the package
+- Version of the payload
+
+Preferably, these would always line up, but how can you expose the version of a package to Python?
+
+**package.py**
+
+```python
+name = "my_library"
+version = "1.0"
+```
+
+**my_library/python/my_library.py**
+
+```python
+version = "?"
+```
+
+### 1. Package to Python
+
+What if Python was the one defining a version, and `package.py` picking this up instead? You certainly can, except it moves complexity away from your library and into your `package.py`, which is generally not a good idea.
+
+**package.py**
+
+Option 1, plain-text
+
+```python
+name = "my_library"
+
+with open("python\my_library.py") as f:
+    for line in f:
+        if line.startswith("version = "):
+            _, version = line.rstrip().split(" = ")
+            break
+```
+
+This works, but makes a few fragile assumptions about how the version is formatted in the file.
+
+Option 2.
+
+```python
+import os
+name = "my_library"
+
+cwd = os.getcwd()
+os.chmod("python")
+import my_library
+version = my_library.version
+```
+
+This is a little ugly, but works. The assumption made is that whatever is being executed in the imported module doesn't have any side effects or negatively impacts performance. Some modules, for example, establish database connections or temporary directories on import.
+
+<br>
+
+### 2. Embedded
+
+This next approach addresses the above concerns in a more compact manner.
+
+In order to use a package, it must first be built. We can leverage this build step to modify a Python library and embed the package version.
+
+**my_library/__init__.py**
+
+```py
+try:
+    from . import __version__
+    version = __version__.version
+except ImportError:
+    version = "dev"
+```
+
+At this point, `version` will read `"dev"` until the module `__version__.py` has been written into the library. We can write this file during build.
+
+**package.py**
+
+```python
+name = "my_library"
+version = "1.0"
+build_command = "python {root}/install.py"
+```
+
+**install.py**
+
+```python
+import os
+import shutil
+
+root = os.path.dirname(__file__)
+build_dir = os.environ["REZ_BUILD_PATH"]
+
+# Copy library
+shutil.copytree(os.path.join(root, "my_library"),
+                os.path.join(build_dir, "my_library"))
+
+# Inject version
+version_fname = os.path.join(build_dir, "my_library", "__version__.py")
+version = os.getenv("REZ_BUILD_PROJECT_VERSION")
+
+with open(version_fname, "w") as f:
+    f.write("version = \"%s\"" % version)
+```
+
+And there you go. Now the version will read `"dev"` unless the package has been built, in which case it would read `"1.0"`.

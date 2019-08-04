@@ -105,3 +105,4 @@ You should see a message about how to browse to the locally hosted documentation
 Things to keep in mind as you contribute to the documentation
 
 - **Windows-first** Allzpark is for all platforms, but Windows-users are typically less tech-savvy than Linux and MacOS users and the documentation should reflect that.
+- **Try-catch** When documenting a series of steps to accomplish a task, start with the minimal ideal case, and then "catch" potential errors afterwards. This helps keep the documentation from branching out too far, and facilitates a cursory skimming of the documentation. See [quickstart](/quickstart) for an example.

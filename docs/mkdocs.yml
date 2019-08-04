@@ -16,11 +16,10 @@ nav:
   - Quickstart: quickstart.md
   - Getting Started: getting-started.md
   - Getting Advanced: getting-advanced.md
+  - Getting Rez'd: rez.md
   # - Guide: guides.md
   - Workflow: workflow.md
   - Reference: reference.md
-  - Packaging: rez.md
-  - Examples: examples.md
   - Shells: shells.md
   - Windows: windows.md
   - Contributing: contributing.md

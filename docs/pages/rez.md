@@ -1,4 +1,4 @@
-Below you'll find a series of tutorials-by-example of increasing complexity, utilising more of Rez's functionality as we go, solving more and more specific problems.
+This page is dedicated to learning Rez by example, utilising more of Rez's functionality as we go.
 
 <br>
 
@@ -26,7 +26,7 @@ cd mypackage                # Rez definition
 name = "mypackage"          # Rez package name
 version = "1.0"             # Rez package version
 build_command = False       # Called when building package
-"@ | Out-File package.py
+"@ | Add-Content package.py
 rez build --install         # Build package
 rez env mypackage           # Use package
 >                           # A new environment with your package
@@ -237,7 +237,7 @@ cd mypackage
 $null >> install.py                        # Additional script for build
 mkdir python                               # Payload directory
 cd python                                  # 
-"print('Hello World!')" | Out-File mymodule.py  # Python payload shipped alongside package
+"print('Hello World!')" | Add-Content mymodule.py  # Python payload shipped alongside package
 ```
 
 </div>
