@@ -281,6 +281,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../rez/" title="Getting Rez'd" class="md-nav__link">
+      Getting Rez'd
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../workflow/" title="Workflow" class="md-nav__link">
       Workflow
     </a>
@@ -295,30 +307,6 @@
   <li class="md-nav__item">
     <a href="../reference/" title="Reference" class="md-nav__link">
       Reference
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../rez/" title="Packaging" class="md-nav__link">
-      Packaging
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../examples/" title="Examples" class="md-nav__link">
-      Examples
     </a>
   </li>
 
@@ -397,8 +385,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#core-differences" title="Core Differences" class="md-nav__link">
-    Core Differences
+  <a href="#bleed-profile" title="Bleed Profile" class="md-nav__link">
+    Bleed Profile
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#differences" title="Differences" class="md-nav__link">
+    Differences
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" title="Todo" class="md-nav__link">
+    Todo
   </a>
   
 </li>
@@ -418,7 +420,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-08-03</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-04</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/avalon.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -426,7 +428,7 @@
                 
                   <h1>Avalon</h1>
                 
-                <p>This page provides a transition guide from using Avalon's native Launcher to Allzpark.</p>
+                <p>This page provides a transition guide from using <a href="https://getavalon.github.io">Avalon</a>'s native Launcher to Allzpark.</p>
 <p><br></p>
 <h3 id="quickstart">Quickstart</h3>
 <p>This part assumes a successful <a href="/quickstart">Quickstart</a>.</p>
@@ -450,11 +452,22 @@
 </pre></div>
 
 </div>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env pipz -- install avalon colorbleed <span style="color: #f8f8f2">pyqt5</span><span style="color: #f92672">==</span><span style="color: #ae81ff">5</span>.8 pymongo&gt;<span style="color: #f92672">=</span><span style="color: #ae81ff">3</span>.4
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># Convert PyPI packages to Rez</span>
+git clone https://github.com/mottosso/rez-pipz.git
+<span style="color: #f8f8f2">cd</span> rez-pipz
+rez build --install
+<span style="color: #f8f8f2">cd</span> ..
+
+<span style="color: #75715e"># Install PyPI dependencies</span>
+rez env pipz -- install avalon-core avalon-colorbleed <span style="color: #f8f8f2">pyqt5</span><span style="color: #f92672">==</span><span style="color: #ae81ff">5</span>.8 pymongo&gt;<span style="color: #f92672">=</span><span style="color: #ae81ff">3</span>.4
+
+<span style="color: #75715e"># Install Avalon demo project</span>
 git clone https://github.com/mottosso/bleed.git
 <span style="color: #f8f8f2">cd</span> bleed
 rez build --install
 python -m avalon.inventory --save
+
+<span style="color: #75715e"># Launch!</span>
 allzpark --demo
 </pre></div>
 
@@ -467,75 +480,121 @@ allzpark --demo
 <details class="question"><summary>avalon.inventory</summary><p>We'll also need this project uploaded to Avalon's MongoDB database. I'd like to skip this step, to instead automatically create projects post-launch, based on variables set in the Allzpark profile.</p>
 </details>
 <p><br></p>
-<h3 id="core-differences">Core Differences</h3>
-<p><strong>Launcher</strong></p>
+<h3 id="bleed-profile">Bleed Profile</h3>
+<p>Let's have a look at how <code>bleed</code> is laid out.</p>
 <ul>
-<li>Has all the information related to a project, asset and task</li>
-<li>Creates working directory <em>prior</em> to application launch</li>
+<li><a href="https://github.com/mottosso/bleed/blob/master/package.py">bleed/package.py</a></li>
 </ul>
-<p>Avalon provides an API for defining an application on disk.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">application_dir</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya&quot;</span>
-<span style="color: #f8f8f2">default_dirs</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
-    <span style="color: #e6db74">&quot;scenes&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;data&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;renderData/shaders&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;images&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;renders&quot;</span>
-<span style="color: #f8f8f2">]</span>
-<span style="color: #f8f8f2">label</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Autodesk Maya 2018&quot;</span>
-<span style="color: #f8f8f2">schema</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;avalon-core:application-1.0&quot;</span>
-<span style="color: #f8f8f2">executable</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;maya2018&quot;</span>
-<span style="color: #f8f8f2">description</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;&quot;</span>
-<span style="color: #f8f8f2">icon</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;cubes&quot;</span>
-<span style="color: #f8f8f2">color</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;#CCBD14&quot;</span>
-<span style="color: #f8f8f2">order</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">-2</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;bleed&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0.15&quot;</span>
+<span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;python -m rezutil build {root}&quot;</span>
+<span style="color: #f8f8f2">private_build_requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;rezutil-1&quot;</span><span style="color: #f8f8f2">]</span>
+</pre></div>
 
-<span style="color: #66d9ef">[copy]</span>
-<span style="color: #e6db74">&quot;{COLORBLEED_CONFIG}/res/workspace.mel&quot;</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;workspace.mel&quot;</span>
+<p>Nothing special here; we're building on the <code>rezutil</code> package from the Allzpark demo library to simplify the installation somewhat, it handles copying of the contained <code>userSetup.py</code>.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">_requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
+    <span style="color: #e6db74">&quot;~blender==2.80.0&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;~maya==2015.0.0|2016.0.2|2017.0.4|2018.0.6&quot;</span><span style="color: #f8f8f2">,</span>
 
-<span style="color: #66d9ef">[environment]</span>
-<span style="color: #f8f8f2">FFMPEG_PATH</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;P:/pipeline/dev/apps/ffmpeg/bin/ffmpeg.exe&quot;</span>
+    <span style="color: #e6db74">&quot;pymongo-3.4+&quot;</span><span style="color: #f8f8f2">,</span>
 
-<span style="color: #f8f8f2">COLORBLEED_SCRIPTS</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;P:/pipeline/dev/git/cbMayaScripts/cbMayaScripts&quot;</span>
-
-<span style="color: #f8f8f2">MAYA_DISABLE_CLIC_IPM</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>  <span style="color: #75715e"># Disable the AdSSO process</span>
-<span style="color: #f8f8f2">MAYA_DISABLE_CIP</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>  <span style="color: #75715e"># Shorten time to boot</span>
-<span style="color: #f8f8f2">MAYA_DISABLE_CER</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>
-<span style="color: #f8f8f2">PYMEL_SKIP_MEL_INIT</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;Yes&quot;</span>
-<span style="color: #f8f8f2">LC_ALL</span><span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;C&quot;</span>  <span style="color: #75715e"># Mute color management warnings</span>
-<span style="color: #f8f8f2">REDSHIFT_DISABLEOUTPUTLOCKFILES</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1&quot;</span> <span style="color: #75715e"># Disable Redshift creating lock files</span>
-
-<span style="color: #f8f8f2">XBMLANGPATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/prefs/icons&quot;</span>
-<span style="color: #f8f8f2">]</span>
-
-<span style="color: #f8f8f2">MAYA_SCRIPT_PATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/scripts&quot;</span>
-<span style="color: #f8f8f2">]</span>
-
-<span style="color: #75715e"># Fix V-ray forcing affinity to 100%</span>
-<span style="color: #f8f8f2">VRAY_USE_THREAD_AFFINITY</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;0&quot;</span>
-
-<span style="color: #f8f8f2">PYTHONPATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/git/Qt.py&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/cvshapeinverter&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;{AVALON_CORE}/setup/maya&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;{PYTHONPATH}&quot;</span>
-<span style="color: #f8f8f2">]</span>
-
-<span style="color: #f8f8f2">MAYA_MODULE_PATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/Yeti-v3.1.9_Maya2018-windows&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/cvshapeinverter&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/brSmoothWeights&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/SHAPES&quot;</span>
-<span style="color: #f8f8f2">]</span>
-<span style="color: #f8f8f2">PATH</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[</span>
-    <span style="color: #e6db74">&quot;P:/pipeline/dev/apps/maya_shared/2018/modules/Yeti-v3.1.9_Maya2018-windows/bin&quot;</span><span style="color: #f8f8f2">,</span>
-    <span style="color: #e6db74">&quot;{PATH}&quot;</span>
+    <span style="color: #e6db74">&quot;avalon_core-5.2+&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #e6db74">&quot;avalon_colorbleed-1&quot;</span><span style="color: #f8f8f2">,</span>
 <span style="color: #f8f8f2">]</span>
 </pre></div>
 
-<p>It then let's you reference this definition using its unique identifier, such as <code>maya</code> or <code>nuke</code>.</p>
+<p>Again we're referencing <code>blender</code> and <code>maya</code> from the demo library, in this case a number of versions of Maya to cover all bases. Allzpark displays every version that matches this pattern, in this case 4 versions of Maya.</p>
+<p><code>pymongo</code> is the only real dependency to Avalon, the others being vendored, due to being the only one that isn't a pure-Python library. Finally, Avalon core and the colorbleed config is added are requirements to this profile.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #a6e22e">@late</span><span style="color: #f8f8f2">()</span>
+<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">requires</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">this</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">request</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">in_context</span>
+
+    <span style="color: #f8f8f2">requires</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">this</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">_requires</span>
+
+    <span style="color: #75715e"># Add request-specific requirements</span>
+    <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">in_context():</span>
+        <span style="color: #66d9ef">if</span> <span style="color: #e6db74">&quot;maya&quot;</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">request:</span>
+            <span style="color: #f8f8f2">requires</span> <span style="color: #f92672">+=</span> <span style="color: #f8f8f2">[</span>
+                <span style="color: #e6db74">&quot;mgear&quot;</span><span style="color: #f8f8f2">,</span>
+            <span style="color: #f8f8f2">]</span>
+
+    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">requires</span>
+</pre></div>
+
+<p>You'll notices the previous <code>_requires = []</code> had an underscore in it, which makes it invisible to Rez. Instead, we use this function <code>requires()</code> with a <code>@late()</code> decorator which makes Rez compute the requirements of this package when called, as opposed to when built.</p>
+<p>If called during built, the previously specified requirements are included. However, when called the <code>in_context()</code> function evaluates to <code>True</code> which in turn queries the request we made, e.g. <code>rez env bleed maya</code>, for whether "maya" was included. If so, then it goes ahead and appends <code>mgear</code> as another requirement for this profile.</p>
+<p>This is how you can specifiy <em>conditional</em> requirements for a given profile, requirements that come into effect only when used in combination with a particular set of requirements, like <code>maya</code>. In this case, <code>mgear</code> is only relevant to Maya, and not Blender.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
+    <span style="color: #f92672">import</span> <span style="color: #f8f8f2">os</span>
+    <span style="color: #f92672">import</span> <span style="color: #f8f8f2">tempfile</span>
+
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">env</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">this</span>
+    <span style="color: #66d9ef">global</span> <span style="color: #f8f8f2">request</span>
+
+    <span style="color: #75715e"># Better suited for a global/studio package</span>
+    <span style="color: #f8f8f2">projects</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">r&quot;p:\projects&quot;</span> <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">==</span> <span style="color: #e6db74">&quot;nt&quot;</span> <span style="color: #66d9ef">else</span> <span style="color: #e6db74">&quot;~/projects&quot;</span>
+
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_PROJECTS&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">projects</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_CONFIG&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;colorbleed&quot;</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_PROJECT&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">this</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_EARLY_ADOPTER&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;yes&quot;</span>
+</pre></div>
+
+<p>Next we give configure Allzpark with the necessary environment variables.</p>
+<ul>
+<li><code>AVALON_PROJECTS</code> is typically a global value for your studio, and better suited for a package required by every profile, like a <code>global</code> or <code>studio</code> package. I've included it here to keep the example self-contained.</li>
+<li><code>AVALON_CONFIG</code> here we reference the <code>avalon_colorbleed</code> requirement</li>
+<li><code>AVALON_PROJECT</code> storing the project name into the environment, referencing the <code>this</code> variable, which is the equivalent of <code>self</code> from within a class; it references the members from outside of the <code>commands()</code> function, in this case the <code>name</code> of the package itself; "bleed"</li>
+<li><code>AVALON_EARLY_ADOPTER</code> finally enabling some of the later features of Avalon</li>
+</ul>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">if</span> <span style="color: #e6db74">&quot;maya&quot;</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">request:</span>
+    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;PYTHONPATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">append(</span><span style="color: #e6db74">&quot;{root}/maya&quot;</span><span style="color: #f8f8f2">)</span>  <span style="color: #75715e"># userSetup.py</span>
+</pre></div>
+
+<p>Another conditional event; the <code>bleed</code> package includes a folder of profile-specific Maya scripts that are added to <code>PYTHONPATH</code> only if <code>maya</code> is part of the request.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_TASK&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;modeling&quot;</span>
+<span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_ASSET&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;hero&quot;</span>
+<span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_SILO&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;asset&quot;</span>
+<span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_WORKDIR&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">tempfile</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">gettempdir()</span>
+</pre></div>
+
+<p>Finally, the members that we need to get rid of from the application launching process of Avalon; these need to happen post-launch.</p>
+<p><br></p>
+<h3 id="differences">Differences</h3>
+<p>Overall, Allzpark and Launcher are very similar.</p>
+<ul>
+<li><strong>All Knowing</strong> Launcher has all the information related to a project, asset and task<ul>
+<li>We'll need to split this responsibility and let Allzpark handle anything related to application startup, but leave assets and tasks to Avalon</li>
+</ul>
+</li>
+<li><strong>Working Directory</strong> Launcher is responsible for creating a working directory, <em>prior</em> to application launch<ul>
+<li>Because is knows all of these things, it's a good fit for creating the initial working directory wherein an application saves data, like Maya's <code>workspace.mel</code> file and associated hierarchy. Because Allzpark isn't concerned with such things, we'll need to let the host deal with this.</li>
+<li>An upside of this is that artists would then be able to switch task/asset/shot without a restart</li>
+</ul>
+</li>
+</ul>
+<p><br></p>
+<h3 id="todo">Todo</h3>
+<ul class="task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>DB</strong> Create Avalon MongoDB project document post-launch</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <strong>Working Directory</strong> Create working directory post-launch<ul>
+<li>E.g. via "Set Context"</li>
+</ul>
+</li>
+<li class="task-list-item"><input type="checkbox" disabled checked/> Create new assets interactively, rather than from .toml<ul>
+<li>I.e. launch "Project Manager" from Allzpark</li>
+</ul>
+</li>
+</ul>
+<p>The above example works, but embeds too much information into the Allzpark profile, notably these:</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_TASK&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;modeling&quot;</span>
+<span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_ASSET&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;hero&quot;</span>
+<span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_SILO&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;asset&quot;</span>
+<span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;AVALON_WORKDIR&quot;</span><span style="color: #f8f8f2">]</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">tempfile</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">gettempdir()</span>
+</pre></div>
                 
                   
                 

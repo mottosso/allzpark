@@ -281,6 +281,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../rez/" title="Getting Rez'd" class="md-nav__link">
+      Getting Rez'd
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
     <a href="../workflow/" title="Workflow" class="md-nav__link">
       Workflow
     </a>
@@ -522,13 +534,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#opt-out-environment" title="Opt-out Environment" class="md-nav__link">
-    Opt-out Environment
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#graph" title="Graph" class="md-nav__link">
     Graph
   </a>
@@ -543,9 +548,63 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#allzpark-performance-considerations" title="Allzpark Performance Considerations" class="md-nav__link">
-    Allzpark Performance Considerations
+  <a href="#performance-considerations" title="Performance Considerations" class="md-nav__link">
+    Performance Considerations
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-packages" title="External Packages" class="md-nav__link">
+    External Packages
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-from-pypi" title="Install from PyPI" class="md-nav__link">
+    Install from PyPI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-from-scoop" title="Install from Scoop" class="md-nav__link">
+    Install from Scoop
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#package-version-and-python" title="Package version and Python" class="md-nav__link">
+    Package version and Python
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-package-to-python" title="1. Package to Python" class="md-nav__link">
+    1. Package to Python
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-embedded" title="2. Embedded" class="md-nav__link">
+    2. Embedded
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -557,30 +616,6 @@
   
 </nav>
     
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../rez/" title="Packaging" class="md-nav__link">
-      Packaging
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../examples/" title="Examples" class="md-nav__link">
-      Examples
-    </a>
   </li>
 
     
@@ -857,13 +892,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#opt-out-environment" title="Opt-out Environment" class="md-nav__link">
-    Opt-out Environment
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#graph" title="Graph" class="md-nav__link">
     Graph
   </a>
@@ -878,9 +906,63 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#allzpark-performance-considerations" title="Allzpark Performance Considerations" class="md-nav__link">
-    Allzpark Performance Considerations
+  <a href="#performance-considerations" title="Performance Considerations" class="md-nav__link">
+    Performance Considerations
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-packages" title="External Packages" class="md-nav__link">
+    External Packages
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-from-pypi" title="Install from PyPI" class="md-nav__link">
+    Install from PyPI
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-from-scoop" title="Install from Scoop" class="md-nav__link">
+    Install from Scoop
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#package-version-and-python" title="Package version and Python" class="md-nav__link">
+    Package version and Python
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-package-to-python" title="1. Package to Python" class="md-nav__link">
+    1. Package to Python
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-embedded" title="2. Embedded" class="md-nav__link">
+    2. Embedded
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -899,7 +981,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-04</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/reference.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -1105,11 +1187,19 @@ Python ?.?.?
 <p><br></p>
 <h3 id="release-with-gitlab">Release with GitLab</h3>
 <p>Once you've created a package, it's often a good idea to version control it.</p>
+<div class="tabs">
+  <button class="tab powershell " onclick="setTab(event, 'powershell')"><p>powershell</p><div class="tab-gap"></div></button>
+  <button class="tab bash " onclick="setTab(event, 'bash')"><p>bash</p><div class="tab-gap"></div></button>
+</div>
+
+<div class="tab-content powershell">
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">my_package</span>
 <span style="color: #f8f8f2">cd my_package</span>
-<span style="color: #f8f8f2">echo </span><span style="color: #e6db74">&quot;name = </span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">my_package</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">&quot;</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">package.py</span>
-<span style="color: #f8f8f2">echo </span><span style="color: #e6db74">&quot;version = </span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">1.0.0</span><span style="color: #ae81ff">`&quot;</span><span style="color: #e6db74">&quot;</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">package.py</span>
-<span style="color: #f8f8f2">echo </span><span style="color: #e6db74">&quot;build_command = False&quot;</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">package.py</span>
+<span style="color: #e6db74">@&quot;</span>
+<span style="color: #e6db74">name = &quot;my_package&quot;</span>
+<span style="color: #e6db74">echo &quot;version = &quot;1.0.0&quot;</span>
+<span style="color: #e6db74">echo &quot;build_command = False&quot;</span>
+<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">package.py</span>
 <span style="color: #f8f8f2">git</span> <span style="color: #f8f8f2">init</span>
 <span style="color: #f8f8f2">git</span> <span style="color: #f8f8f2">add</span> <span style="color: #f8f8f2">--all</span>
 <span style="color: #f8f8f2">git</span> <span style="color: #f8f8f2">commit</span> <span style="color: #f8f8f2">-m</span> <span style="color: #e6db74">&quot;Initial version&quot;</span>
@@ -1117,6 +1207,21 @@ Python ?.?.?
 <span style="color: #f8f8f2">git</span> <span style="color: #f8f8f2">push</span>
 </pre></div>
 
+</div>
+<div class="tab-content bash">
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>mkdir my_package
+<span style="color: #f8f8f2">cd</span> my_package
+<span style="color: #f8f8f2">echo</span> <span style="color: #e6db74">&quot;name = &quot;</span>my_package<span style="color: #e6db74">&quot;&quot;</span> &gt;&gt; package.py
+<span style="color: #f8f8f2">echo</span> <span style="color: #e6db74">&quot;version = &quot;</span><span style="color: #ae81ff">1</span>.0.0<span style="color: #e6db74">&quot;&quot;</span> &gt;&gt; package.py
+<span style="color: #f8f8f2">echo</span> <span style="color: #e6db74">&quot;build_command = False&quot;</span> &gt;&gt; package.py
+git init
+git add --all
+git commit -m <span style="color: #e6db74">&quot;Initial version&quot;</span>
+git remote add-url https://gitlab.mycompany.com/username/my_package.git
+git push
+</pre></div>
+
+</div>
 <p>Next we'll configure GitLab to release a package alongside a new tag being made.</p>
 <p><strong>.gitlab-ci.yml</strong></p>
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>release:
@@ -1370,37 +1475,9 @@ nosetests2
 </blockquote>
 <p>If you got this far, and know more or want more, feel free to submit <a href="https://github.com/mottosso/allzpark/issues">an issue</a>.</p>
 <p><br></p>
-<h3 id="opt-out-environment">Opt-out Environment</h3>
-<p>Per default, the parent environment is inherited by a Rez context, unless one or more packages reference it internally.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">$env</span>:MY_PATH<span style="color: #f92672">=</span><span style="color: #e6db74">&quot;path1;path2&quot;</span>
-rez env
-&gt; <span style="color: #f8f8f2">$env</span>:MY_PATH
-<span style="color: #75715e"># path1;path2</span>
-</pre></div>
-
-<p>Note the inheritance there. However, if any package references <code>MY_PATH</code> then it will automatically clear itself prior to being re-added by the package.</p>
-<p><strong>package.py</strong></p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_package&quot;</span>
-<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
-
-<span style="color: #66d9ef">def</span> <span style="color: #a6e22e">commands</span><span style="color: #f8f8f2">():</span>
-    <span style="color: #f8f8f2">env[</span><span style="color: #e6db74">&quot;MY_PATH&quot;</span><span style="color: #f8f8f2">]</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">append(</span><span style="color: #e6db74">&quot;path1&quot;</span><span style="color: #f8f8f2">)</span>  <span style="color: #75715e"># Clearing existing PATH</span>
-</pre></div>
-
-<p>If we include this package, the variable now looks like this.</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env my_package
-&gt; <span style="color: #f8f8f2">$env</span>:MY_PATH
-<span style="color: #75715e"># path1</span>
-</pre></div>
-
-<p>This is considered a bug in the underlying bleeding-rez library, and is being addressed here.</p>
-<ul>
-<li>See also <a href="https://github.com/mottosso/bleeding-rez/issues/70">https://github.com/mottosso/bleeding-rez/issues/70</a></li>
-</ul>
-<p><br></p>
 <h3 id="graph">Graph</h3>
 <p>Allzpark is able to visualise a resolved context as a graph.</p>
-<p><img alt="" src="" /></p>
+<p><img alt="" src="https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif" /></p>
 <p><strong>Prerequisities</strong></p>
 <p>In order to enable graph drawing, you need the following package(s).</p>
 <ul>
@@ -1425,7 +1502,7 @@ rez env
 </pre></div>
 
 <p><br></p>
-<h3 id="allzpark-performance-considerations">Allzpark Performance Considerations</h3>
+<h3 id="performance-considerations">Performance Considerations</h3>
 <p>Use of the Allzpark can be divided into roughly three parts.</p>
 <ol>
 <li>Time taken to load libraries such as PySide2 - you should be seeing timings in the console<ul>
@@ -1442,6 +1519,128 @@ rez env
 </li>
 </ol>
 <p>From there most things are stored in-memory and won't perform many if any IO or CPU intensive calls, with a few exceptions like generating the resolve graph in the Context tab.</p>
+<p><br></p>
+<h2 id="external-packages">External Packages</h2>
+<p>With Rez you can package almost anything, but sometimes there are packages already made for you to benefit from.</p>
+<p><br></p>
+<h3 id="install-from-pypi">Install from PyPI</h3>
+<p>Managing external projects is no fun unless you can benefit from what package authors in neighboring ecosystems have been working on. PyPI is such an ecosystem and you can install any package from PyPI as a Rez package using <code>rez-pipz</code>.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>git clone https://github.com/mottosso/rez-pipz.git
+<span style="color: #f8f8f2">cd</span> rez-pipz
+rez build --install
+</pre></div>
+
+<p>Here's how you use it.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env pipz -- install six
+</pre></div>
+
+<p>And here's how you install binary packages, specifically for the platform you are on.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env pipz -- install sqlalchemy
+</pre></div>
+
+<p>To install for a particular version of Python, include it in the initial request.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env python-2 pipz -- install sqlalchemy
+</pre></div>
+
+<ul>
+<li>See <a href="https://github.com/mottosso/rez-pipz">rez-pipz</a> for details.</li>
+</ul>
+<p><br></p>
+<h3 id="install-from-scoop">Install from Scoop</h3>
+<p>Scoop is a package manager for Windows. It's akin to <a href="">Chocolatey</a>, except packages are portable and doesn't require adminstrative access, which makes it a perfect fit for Rez.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>git clone https://github.com/mottosso/rez-scoopz.git
+<span style="color: #f8f8f2">cd</span> rez-scoopz
+rez build --install
+</pre></div>
+
+<p>Here's how you use it.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env scoopz -- install python
+</pre></div>
+
+<ul>
+<li>See <a href="https://github.com/mottosso/rez-scoopz">rez-scoopz</a> for details.</li>
+</ul>
+<p><br></p>
+<h2 id="package-version-and-python">Package version and Python</h2>
+<p>Every package containing a payload typically involves two version numbers.</p>
+<ul>
+<li>Version of the package</li>
+<li>Version of the payload</li>
+</ul>
+<p>Preferably, these would always line up, but how can you expose the version of a package to Python?</p>
+<p><strong>package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+</pre></div>
+
+<p><strong>my_library/python/my_library.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;?&quot;</span>
+</pre></div>
+
+<h3 id="1-package-to-python">1. Package to Python</h3>
+<p>What if Python was the one defining a version, and <code>package.py</code> picking this up instead? You certainly can, except it moves complexity away from your library and into your <code>package.py</code>, which is generally not a good idea.</p>
+<p><strong>package.py</strong></p>
+<p>Option 1, plain-text</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+
+<span style="color: #66d9ef">with</span> <span style="color: #f8f8f2">open(</span><span style="color: #e6db74">&quot;python\my_library.py&quot;</span><span style="color: #f8f8f2">)</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">f:</span>
+    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">line</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">f:</span>
+        <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">line</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">startswith(</span><span style="color: #e6db74">&quot;version = &quot;</span><span style="color: #f8f8f2">):</span>
+            <span style="color: #f8f8f2">_,</span> <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">line</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">rstrip()</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">split(</span><span style="color: #e6db74">&quot; = &quot;</span><span style="color: #f8f8f2">)</span>
+            <span style="color: #66d9ef">break</span>
+</pre></div>
+
+<p>This works, but makes a few fragile assumptions about how the version is formatted in the file.</p>
+<p>Option 2.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">import</span> <span style="color: #f8f8f2">os</span>
+<span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+
+<span style="color: #f8f8f2">cwd</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">getcwd()</span>
+<span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">chmod(</span><span style="color: #e6db74">&quot;python&quot;</span><span style="color: #f8f8f2">)</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">my_library</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">my_library</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version</span>
+</pre></div>
+
+<p>This is a little ugly, but works. The assumption made is that whatever is being executed in the imported module doesn't have any side effects or negatively impacts performance. Some modules, for example, establish database connections or temporary directories on import.</p>
+<p><br></p>
+<h3 id="2-embedded">2. Embedded</h3>
+<p>This next approach addresses the above concerns in a more compact manner.</p>
+<p>In order to use a package, it must first be built. We can leverage this build step to modify a Python library and embed the package version.</p>
+<p><strong>my_library/<strong>init</strong>.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+    <span style="color: #f92672">from</span> <span style="color: #f8f8f2">.</span> <span style="color: #f92672">import</span> <span style="color: #f8f8f2">__version__</span>
+    <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">__version__</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version</span>
+<span style="color: #66d9ef">except</span> <span style="color: #a6e22e">ImportError</span><span style="color: #f8f8f2">:</span>
+    <span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;dev&quot;</span>
+</pre></div>
+
+<p>At this point, <code>version</code> will read <code>"dev"</code> until the module <code>__version__.py</code> has been written into the library. We can write this file during build.</p>
+<p><strong>package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;my_library&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+<span style="color: #f8f8f2">build_command</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;python {root}/install.py&quot;</span>
+</pre></div>
+
+<p><strong>install.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">import</span> <span style="color: #f8f8f2">os</span>
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">shutil</span>
+
+<span style="color: #f8f8f2">root</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">dirname(__file__)</span>
+<span style="color: #f8f8f2">build_dir</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">environ[</span><span style="color: #e6db74">&quot;REZ_BUILD_PATH&quot;</span><span style="color: #f8f8f2">]</span>
+
+<span style="color: #75715e"># Copy library</span>
+<span style="color: #f8f8f2">shutil</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">copytree(os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join(root,</span> <span style="color: #e6db74">&quot;my_library&quot;</span><span style="color: #f8f8f2">),</span>
+                <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join(build_dir,</span> <span style="color: #e6db74">&quot;my_library&quot;</span><span style="color: #f8f8f2">))</span>
+
+<span style="color: #75715e"># Inject version</span>
+<span style="color: #f8f8f2">version_fname</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">path</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">join(build_dir,</span> <span style="color: #e6db74">&quot;my_library&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;__version__.py&quot;</span><span style="color: #f8f8f2">)</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">os</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">getenv(</span><span style="color: #e6db74">&quot;REZ_BUILD_PROJECT_VERSION&quot;</span><span style="color: #f8f8f2">)</span>
+
+<span style="color: #66d9ef">with</span> <span style="color: #f8f8f2">open(version_fname,</span> <span style="color: #e6db74">&quot;w&quot;</span><span style="color: #f8f8f2">)</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">f:</span>
+    <span style="color: #f8f8f2">f</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">write(</span><span style="color: #e6db74">&quot;version = </span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">%s</span><span style="color: #ae81ff">\&quot;</span><span style="color: #e6db74">&quot;</span> <span style="color: #f92672">%</span> <span style="color: #f8f8f2">version)</span>
+</pre></div>
+
+<p>And there you go. Now the version will read <code>"dev"</code> unless the package has been built, in which case it would read <code>"1.0"</code>.</p>
                 
                   
                 
@@ -1478,13 +1677,13 @@ rez env
           </a>
         
         
-          <a href="../rez/" title="Packaging" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../shells/" title="Shells" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Packaging
+                Shells
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

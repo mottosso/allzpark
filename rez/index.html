@@ -45,7 +45,7 @@
 
     
       
-        <title>Packaging - Allzpark</title>
+        <title>Getting Rez'd - Allzpark</title>
       
     
     
@@ -122,7 +122,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Packaging
+                Getting Rez'd
               
             </span>
           
@@ -279,30 +279,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../workflow/" title="Workflow" class="md-nav__link">
-      Workflow
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../reference/" title="Reference" class="md-nav__link">
-      Reference
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -312,11 +288,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Packaging
+        Getting Rez'd
       </label>
     
-    <a href="./" title="Packaging" class="md-nav__link md-nav__link--active">
-      Packaging
+    <a href="./" title="Getting Rez'd" class="md-nav__link md-nav__link--active">
+      Getting Rez'd
     </a>
     
       
@@ -392,8 +368,20 @@
 
 
   <li class="md-nav__item">
-    <a href="../examples/" title="Examples" class="md-nav__link">
-      Examples
+    <a href="../workflow/" title="Workflow" class="md-nav__link">
+      Workflow
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../reference/" title="Reference" class="md-nav__link">
+      Reference
     </a>
   </li>
 
@@ -527,15 +515,15 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-07-26</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-04</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/rez.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Packaging</h1>
+                  <h1>Getting Rez'd</h1>
                 
-                <p>Below you'll find a series of tutorials-by-example of increasing complexity, utilising more of Rez's functionality as we go, solving more and more specific problems.</p>
+                <p>This page is dedicated to learning Rez by example, utilising more of Rez's functionality as we go.</p>
 <p><br></p>
 <h2 id="basics">Basics</h2>
 <p>Let's start with the basics.</p>
@@ -554,7 +542,7 @@
 <span style="color: #e6db74">name = &quot;mypackage&quot;          # Rez package name</span>
 <span style="color: #e6db74">version = &quot;1.0&quot;             # Rez package version</span>
 <span style="color: #e6db74">build_command = False       # Called when building package</span>
-<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Out-File</span> <span style="color: #f8f8f2">package.py</span>
+<span style="color: #e6db74">&quot;@</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">package.py</span>
 <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">build</span> <span style="color: #f8f8f2">--install</span>         <span style="color: #75715e"># Build package</span>
 <span style="color: #f8f8f2">rez</span> <span style="color: #f8f8f2">env</span> <span style="color: #f8f8f2">mypackage</span>           <span style="color: #75715e"># Use package</span>
 <span style="color: #f8f8f2">&gt;</span>                           <span style="color: #75715e"># A new environment with your package</span>
@@ -722,7 +710,7 @@ rez env mypackage2
 <span style="color: #f8f8f2">$null</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">install.py</span>                        <span style="color: #75715e"># Additional script for build</span>
 <span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">python</span>                               <span style="color: #75715e"># Payload directory</span>
 <span style="color: #f8f8f2">cd python</span>                                  <span style="color: #75715e"># </span>
-<span style="color: #e6db74">&quot;print(&#39;Hello World!&#39;)&quot;</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Out-File</span> <span style="color: #f8f8f2">mymodule.py</span>  <span style="color: #75715e"># Python payload shipped alongside package</span>
+<span style="color: #e6db74">&quot;print(&#39;Hello World!&#39;)&quot;</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">mymodule.py</span>  <span style="color: #75715e"># Python payload shipped alongside package</span>
 </pre></div>
 
 </div>
@@ -799,7 +787,7 @@ rez env mypackage
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../reference/" title="Reference" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../getting-advanced/" title="Getting Advanced" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -808,19 +796,19 @@ rez env mypackage
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Reference
+                Getting Advanced
               </span>
             </div>
           </a>
         
         
-          <a href="../examples/" title="Examples" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../workflow/" title="Workflow" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Examples
+                Workflow
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
