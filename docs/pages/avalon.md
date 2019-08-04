@@ -40,7 +40,7 @@ rez build --install
 cd ..
 
 # Install PyPI dependencies
-rez env pipz -- install avalon-core avalon-colorbleed pyqt5==5.8 pymongo>=3.4
+rez env pipz -- install avalon-core avalon-colorbleed pymongo>=3.4
 
 # Install Avalon demo project
 git clone https://github.com/mottosso/bleed.git
