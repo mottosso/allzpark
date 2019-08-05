@@ -6,6 +6,12 @@ This page carries on from a successful 👈 [Quickstart](/quickstart) into makin
 
 It's an [application launcher](https://en.wikipedia.org/wiki/Comparison_of_desktop_application_launchers), similar to the one on the home screen of your phone or in the Start menu on Windows. The difference is that before actually launching the application, you are able to tailor the associated environment within which the applicatuon runs.
 
+**Target Audience**
+
+- Visual Effects
+- Games
+- Software Development
+
 ??? info "For example..."
     Let's say you're working on a project using (1) Autodesk Maya, (2) Adobe Photoshop and (3) Pixologic Zbrush.
 
