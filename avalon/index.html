@@ -420,7 +420,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-08-04</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-05</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/avalon.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -439,7 +439,7 @@
 
 <div class="tab-content powershell">
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">$env:USERPROFILE/projects</span>
-<span style="color: #f8f8f2">substr</span> <span style="color: #f8f8f2">P</span><span style="color: #960050; background-color: #1e0010">:</span> <span style="color: #f8f8f2">$env:USERPROFILE/projects</span>
+<span style="color: #f8f8f2">subst</span> <span style="color: #f8f8f2">P</span><span style="color: #960050; background-color: #1e0010">:</span> <span style="color: #f8f8f2">$env:USERPROFILE/projects</span>
 <span style="color: #f8f8f2">$env:REZ_PACKAGES_PATH=</span><span style="color: #e6db74">&quot;~/packages;</span><span style="color: #f8f8f2">$(allzparkdemo</span> <span style="color: #f8f8f2">--packages)</span><span style="color: #e6db74">&quot;</span>
 <span style="color: #f8f8f2">$env:MY_PROFILES=</span><span style="color: #e6db74">&quot;bleed&quot;</span>
 </pre></div>
@@ -459,7 +459,7 @@ rez build --install
 <span style="color: #f8f8f2">cd</span> ..
 
 <span style="color: #75715e"># Install PyPI dependencies</span>
-rez env pipz -- install avalon-core avalon-colorbleed pymongo&gt;<span style="color: #f92672">=</span><span style="color: #ae81ff">3</span>.4
+rez env pipz -- install avalon-core avalon-colorbleed
 
 <span style="color: #75715e"># Install Avalon demo project</span>
 git clone https://github.com/mottosso/bleed.git
