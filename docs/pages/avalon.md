@@ -47,6 +47,7 @@ cd ..
 
 # Install PyPI dependencies
 rez env pipz -- install avalon-core avalon-colorbleed
+rez env pipz -- install pyqt5==5.8  # Any PyQt5 would do, this one requires Python 3
 
 # Install Avalon demo project
 git clone https://github.com/mottosso/bleed.git
