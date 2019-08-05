@@ -2,6 +2,12 @@ This page provides a transition guide from using [Avalon](https://getavalon.gith
 
 <br>
 
+### Walkthrough
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/5BkQL6TG1-A" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<br>
+
 ### Quickstart
 
 This part assumes a successful [Quickstart](/quickstart).
