@@ -15,7 +15,7 @@ This part assumes a successful [Quickstart](/quickstart).
 
 ```powershell
 mkdir $env:USERPROFILE/projects
-substr P: $env:USERPROFILE/projects
+subst P: $env:USERPROFILE/projects
 $env:REZ_PACKAGES_PATH="~/packages;$(allzparkdemo --packages)"
 $env:MY_PROFILES="bleed"
 ```
@@ -40,7 +40,7 @@ rez build --install
 cd ..
 
 # Install PyPI dependencies
-rez env pipz -- install avalon-core avalon-colorbleed pymongo>=3.4
+rez env pipz -- install avalon-core avalon-colorbleed
 
 # Install Avalon demo project
 git clone https://github.com/mottosso/bleed.git
