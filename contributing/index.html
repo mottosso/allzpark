@@ -378,6 +378,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#development" title="Development" class="md-nav__link">
+    Development
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#versioning" title="Versioning" class="md-nav__link">
+    Versioning
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" title="Resources" class="md-nav__link">
+    Resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#guidelines" title="Guidelines" class="md-nav__link">
     Guidelines
   </a>
@@ -460,6 +481,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#development" title="Development" class="md-nav__link">
+    Development
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#versioning" title="Versioning" class="md-nav__link">
+    Versioning
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resources" title="Resources" class="md-nav__link">
+    Resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#guidelines" title="Guidelines" class="md-nav__link">
     Guidelines
   </a>
@@ -501,7 +543,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-08-04</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-06</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/contributing.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -533,6 +575,31 @@ python -m allzpark --demo
 <li><a href="https://github.com/mottosso/allzpark/blob/master/allzpark/control.py">control.py</a></li>
 </ul>
 <p>User preferences is stored in a <code>QSettings</code> object, including window layout. See <code>view.py:Window.closeEvent()</code> for how that works.</p>
+<p><br></p>
+<h3 id="development">Development</h3>
+<p>To make changes and/or contribute to Allzpark, here's how to run it from its Git repository.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>git clone https://github.com/mottosso/allzpark.git
+<span style="color: #f8f8f2">cd</span> allzpark
+python -m allzpark
+</pre></div>
+
+<p>From here, Python picks up the <code>allzpark</code> package from the current working directory, and everything is set to go. For use with Rez, try this.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e"># powershell</span>
+git clone https://github.com/mottosso/allzpark.git
+<span style="color: #f8f8f2">cd</span> allzpark
+. env.ps1
+&gt; python -m allzpark
+</pre></div>
+
+<p>This will ensure a reproducible environment via Rez packages.</p>
+<p><br></p>
+<h3 id="versioning">Versioning</h3>
+<p>You typically won't have to manually increment the version of this project.</p>
+<p>Major and minor versions are incremented for breaking and new changes respectively, the patch version however is special. It is incremented automatically in correspondance with the current commit number. E.g. commit number 200 yields a patch number of 200. See <code>allzpark/version.py</code> for details.</p>
+<p>To see the patch version as you develop, ensure <code>git</code> is available on PATH, as it is used to detect the commit number at launch. Once built and distributed to PyPI, this number is then embedded into the resulting package. See <code>setup.py</code> for details.</p>
+<p><br></p>
+<h3 id="resources">Resources</h3>
+<p>The current icon set is from <a href="https://github.com/darealshinji/haiku-icons">Haiku</a>.</p>
 <p><br></p>
 <h3 id="guidelines">Guidelines</h3>
 <p>There are a few ways you can contribute to this project.</p>
