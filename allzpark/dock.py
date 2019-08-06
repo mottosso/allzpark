@@ -746,9 +746,10 @@ class Commands(AbstractDockWidget):
         else:
             copy_pid.setEnabled(False)
 
-        menu.addAction(copy_pid)
-        menu.move(QtGui.QCursor.pos())
+        # See https://github.com/mottosso/allzpark/issues/88
+        # menu.addAction(copy_pid)
 
+        menu.move(QtGui.QCursor.pos())
         menu.show()
 
 
