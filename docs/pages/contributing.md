@@ -34,6 +34,46 @@ User preferences is stored in a `QSettings` object, including window layout. See
 
 <br>
 
+### Development
+
+To make changes and/or contribute to Allzpark, here's how to run it from its Git repository.
+
+```bash
+git clone https://github.com/mottosso/allzpark.git
+cd allzpark
+python -m allzpark
+```
+
+From here, Python picks up the `allzpark` package from the current working directory, and everything is set to go. For use with Rez, try this.
+
+```bash
+# powershell
+git clone https://github.com/mottosso/allzpark.git
+cd allzpark
+. env.ps1
+> python -m allzpark
+```
+
+This will ensure a reproducible environment via Rez packages.
+
+<br>
+
+### Versioning
+
+You typically won't have to manually increment the version of this project.
+
+Major and minor versions are incremented for breaking and new changes respectively, the patch version however is special. It is incremented automatically in correspondance with the current commit number. E.g. commit number 200 yields a patch number of 200. See `allzpark/version.py` for details.
+
+To see the patch version as you develop, ensure `git` is available on PATH, as it is used to detect the commit number at launch. Once built and distributed to PyPI, this number is then embedded into the resulting package. See `setup.py` for details.
+
+<br>
+
+### Resources
+
+The current icon set is from [Haiku](https://github.com/darealshinji/haiku-icons).
+
+<br>
+
 ### Guidelines
 
 There are a few ways you can contribute to this project.
