@@ -70,25 +70,6 @@ def applications_from_package(variant):
         if req.weak
     )
 
-    # Strip the "weak" property of the request, else iter_packages
-    # isn't able to find the requested versions.
-    apps = [rez.PackageRequest(req.strip("~")) for req in apps]
-
-    # Expand versions into their full range
-    # E.g. maya-2018|2019 == ["maya-2018", "maya-2019"]
-    flattened = list()
-    for request in apps:
-        flattened += rez.find(
-            request.name,
-            range_=request.range,
-        )
-
-    # Return strings
-    apps = list(
-        "%s==%s" % (package.name, package.version)
-        for package in flattened
-    )
-
     return apps
 
 
