@@ -309,9 +309,14 @@ def main():
     app = QtWidgets.QApplication([])
     ctrl = control.Controller(storage)
 
-    # Handle stdio from within the application
-    sys.stdout = ctrl.stdio(sys.stdout, logging.INFO)
-    sys.stderr = ctrl.stdio(sys.stderr, logging.ERROR)
+    # Handle stdio from within the application if necessary
+    if hasattr(allzparkconfig, "__noconsole__"):
+        sys.stdout = ctrl.stdio(sys.stdout, logging.INFO)
+        sys.stderr = ctrl.stdio(sys.stderr, logging.ERROR)
+
+        # TODO: This isn't fool proof. There are logging mechanisms
+        # in control.py that must either print to stdio or not and
+        # there's currently some duplication.
 
     def excepthook(type, value, traceback):
         """Try handling these from within the controller"""
