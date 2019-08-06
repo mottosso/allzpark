@@ -29,16 +29,20 @@ def clear_caches():
         repo.clear_caches()
 
 
-def find_one(*args, **kwargs):
-    return next(find(*args, **kwargs))
+def find_one(name, range_=None, paths=None):
+    return next(find(name, range_, paths))
 
 
-def find_latest(*args, **kwargs):
-    return list(
-        sorted(
-            find(*args, **kwargs), key=lambda pkg: pkg.version
+def find_latest(name, range_=None, paths=None):
+    it = find(name, range_)
+    it = sorted(it, key=lambda pkg: pkg.version)
+
+    try:
+        return list(it)[-1]
+    except IndexError:
+        raise PackageNotFoundError(
+            "package family not found: %s" % name
         )
-    )[-1]
 
 
 try:
