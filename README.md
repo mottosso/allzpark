@@ -1,78 +1,55 @@
-### Allzpark
+<div align=center>
+	<a href=https://allzpark.com><img src=https://user-images.githubusercontent.com/2152766/62561970-28b44580-b878-11e9-86df-2b2081a12809.png></a>
+	<br>
+	<p align=center><b>Application launcher</b> and <i>environment management</i><br>for 21st century games and digital post-production,<br>built with <a href=https://github.com/mottosso/bleeding-rez>bleeding-rez</a></p>
+	<a href=https://mottosso.visualstudio.com/allzpark/_build/latest?definitionId=2&branchName=master><img src=https://mottosso.visualstudio.com/allzpark/_apis/build/status/mottosso.allzpark?branchName=master></a> <a href=https://pypi.org/project/allzpark/>
+	<img src=https://badge.fury.io/py/allzpark.svg></a>
+    <br>
+    <img src=https://img.shields.io/badge/-PyQt4-green>
+    <img src=https://img.shields.io/badge/-PyQt5-green>
+    <img src=https://img.shields.io/badge/-PySide-green>
+    <img src=https://img.shields.io/badge/-PySide2-green>
+    <img alt=Windows title="Runs on Windows" height=16 src=https://user-images.githubusercontent.com/2152766/62287773-ba741b00-b452-11e9-8ad7-9a5152488de7.png>
+    <img alt=Linux title="Runs on Linux" height=16 src=https://user-images.githubusercontent.com/2152766/62287771-b9db8480-b452-11e9-9bf1-45b40465ed54.png>
+    <img alt=MacOS title="Runs on MacOS" height=16 src=https://user-images.githubusercontent.com/2152766/62287772-b9db8480-b452-11e9-9a88-4560388b97f4.png>
+    <br>
+    <img src=https://img.shields.io/pypi/pyversions/allzpark?color=steelblue>
+    <a href="https://github.com/mottosso/bleeding-rez/"><img src=https://img.shields.io/pypi/v/bleeding-rez?color=steelblue&label=bleeding-rez></a>
+</div>
 
-[![Build Status](https://mottosso.visualstudio.com/allzpark/_apis/build/status/mottosso.allzpark?branchName=master)](https://mottosso.visualstudio.com/allzpark/_build/latest?definitionId=2&branchName=master) [![](https://badge.fury.io/py/allzpark.svg)](https://pypi.org/project/allzpark/)
+<br>
 
-Application launcher and environment management tool for games and digital post-production, built on [Rez](https://github.com/mottosso/allzpark).
+#### News
+
+| Date        | Release | Notes
+|:------------|:--------|:----------
+| August 2019 | 1.2 | First official release 
+
+<br>
+
+### What is it?
+
+It's an application launcher, for when you need control over what software and which versions of software belong to a given project. It builds on the self-hosted package manager and environment management framework [bleeding-rez](https://github.com/mottosso/bleeding-rez), providing both a visual and textual interface for launching software in a reproducible way.
+
+![](https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif)
 
 <br>
 
 ### Usage
 
-> In early development. Stay tuned for a release.
-
-Press the **Watch** icon top-right for notifications.
-
-![image](https://user-images.githubusercontent.com/2152766/60902299-4dac9d00-a267-11e9-893d-b3801fa422e9.png)
-
-![ALLZPARK_1](https://user-images.githubusercontent.com/2152766/58943971-bee4c600-8778-11e9-8117-f50fe260cee0.gif)
-
-<br>
-
-### Rez Integration
-
-For production, Allzpark should be deployed as a Rez package, so as to facilitate running independent versions across multiple projects. Deploy Allzpark as a Rez package with [`rez-pipz`](https://github.com/mottosso/rez-pipz).
+Allzpark runs on Windows, Linux and MacOS, using Python 2 or 3 and any binding of Qt, and is available via `pip`.
 
 ```bash
-git clone https://github.com/mottosso/allzpark.git
-cd allzpark
-rez env pipz -- install . --prefix /path/to/packages
+pip install allzpark
 ```
 
-<br>
+See [Quickstart](https://allzpark.com/quickstart) for more details and tutorials.
 
-### Development
+**Some Table of Contents**
 
-To make changes and/or contribute to Allzpark, here's how to run it from its Git repository.
-
-```bash
-git clone https://github.com/mottosso/allzpark.git
-cd allzpark
-python -m allzpark
-```
-
-From here, Python picks up the `allzpark` package from the current working directory, and everything is set to go. For use with Rez, try this.
-
-```bash
-# powershell
-git clone https://github.com/mottosso/allzpark.git
-cd allzpark
-. env.ps1
-> python -m allzpark
-```
-
-This will ensure a reproducible environment via Rez packages.
-
-#### Versioning
-
-You typically won't have to manually increment the version of this project.
-
-Major and minor versions are incremented for breaking and new changes respectively, the patch version however is special. It is incremented automatically in correspondance with the current commit number. E.g. commit number 200 yields a patch number of 200. See `allzpark/version.py` for details.
-
-To see the patch version as you develop, ensure `git` is available on PATH, as it is used to detect the commit number at launch. Once built and distributed to PyPI, this number is then embedded into the resulting package. See `setup.py` for details.
-
-<br>
-
-### Resources
-
-The current icon set is from [Haiku](https://github.com/darealshinji/haiku-icons).
-
-<br>
-
-### More Gifs
-
-> "launchapp2" was the internal working title during development at [Studio Anima](http://studioanima.co.jp)
-
-![ALLZPARK_2](https://user-images.githubusercontent.com/2152766/58943970-be4c2f80-8778-11e9-9344-66007ba5cb5b.gif)
-![ALLZPARK_3](https://user-images.githubusercontent.com/2152766/58943973-bee4c600-8778-11e9-809a-cf2aaf7c94c0.gif)
-![ALLZPARK_4](https://user-images.githubusercontent.com/2152766/58946617-3cf79b80-877e-11e9-8887-df9a92cb1851.gif)
-![ALLZPARK_8](https://user-images.githubusercontent.com/2152766/58959026-16485d80-879c-11e9-8964-e277490dbf5f.gif)
+- [Landing Page](https://allzpark.com)
+- [Getting Started](https://allzpark.com/getting-started)
+- [Getting Advanced](https://allzpark.com/getting-advanced)
+- [Getting Rez'd](https://allzpark.com/rez)
+- [Contributing](https://allzpark.com/contributing)
+- [...](https://allzpark.com)
