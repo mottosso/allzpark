@@ -538,11 +538,28 @@ class CommandsModel(AbstractTableModel):
 
 
 class JsonModel(qjsonmodel.QJsonModel):
+    def setData(self, index, value, role):
+        # Support copy/paste, but prevent edits
+        return False
+
     def flags(self, index):
-        return (
-            QtCore.Qt.ItemIsEnabled |
-            QtCore.Qt.ItemIsSelectable
-        )
+        flags = super(JsonModel, self).flags(index)
+        return QtCore.Qt.ItemIsEditable | flags
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        item = index.internalPointer()
+
+        if role in (QtCore.Qt.DisplayRole, QtCore.Qt.EditRole):
+            if index.column() == 0:
+                return item.key
+
+            if index.column() == 1:
+                return item.value
+
+        return super(JsonModel, self).data(index, role)
 
 
 class EnvironmentModel(JsonModel):

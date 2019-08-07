@@ -125,6 +125,8 @@ class QJsonTreeItem(object):
 
 
 class QJsonModel(QtCore.QAbstractItemModel):
+    JsonRole = QtCore.Qt.UserRole + 1
+
     def __init__(self, parent=None):
         super(QJsonModel, self).__init__(parent)
 
@@ -187,6 +189,9 @@ class QJsonModel(QtCore.QAbstractItemModel):
         elif role == QtCore.Qt.EditRole:
             if index.column() == 1:
                 return item.value
+
+        if role == QJsonModel.JsonRole:
+            return self.json(item)
 
     def setData(self, index, value, role):
         if role == QtCore.Qt.EditRole:

@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import json
 import logging
 import collections
 from itertools import chain
@@ -525,7 +526,7 @@ class Context(AbstractDockWidget):
         }
 
         widgets = {
-            "view": QtWidgets.QTreeView(),
+            "view": JsonView(),
             "graph": QtImageViewer.QtImageViewer(),
             "generateGraph": QtWidgets.QPushButton("Update"),
             "graphHotkeys": QtWidgets.QLabel(),
@@ -627,19 +628,19 @@ class Environment(AbstractDockWidget):
         }
 
         pages = {
-            "environment": QtWidgets.QTreeView(),
+            "environment": QtWidgets.QWidget(),
             "editor": EnvironmentEditor(),
         }
 
         widgets = {
+            "view": JsonView(),
         }
 
-        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout = QtWidgets.QVBoxLayout(pages["environment"])
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.addWidget(pages["environment"])
+        layout.addWidget(widgets["view"])
 
-        pages["environment"].setSortingEnabled(True)
-        self.setWidget(panels["central"])
+        widgets["view"].setSortingEnabled(True)
 
         pages["editor"].applied.connect(self.on_env_applied)
 
@@ -650,6 +651,8 @@ class Environment(AbstractDockWidget):
         pages["editor"].from_environment(user_env)
         pages["editor"].warning.connect(self.on_env_warning)
 
+        self.setWidget(panels["central"])
+
         self._ctrl = ctrl
         self._panels = panels
         self._pages = pages
@@ -658,7 +661,7 @@ class Environment(AbstractDockWidget):
     def set_model(self, model_):
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(model_)
-        self._pages["environment"].setModel(proxy_model)
+        self._widgets["view"].setModel(proxy_model)
 
     def on_env_applied(self, env):
         self._ctrl.state.store("userEnv", env)
@@ -666,6 +669,50 @@ class Environment(AbstractDockWidget):
 
     def on_env_warning(self, message):
         self._ctrl.warning(message)
+
+
+class JsonView(QtWidgets.QTreeView):
+    def __init__(self, parent=None):
+        super(JsonView, self).__init__(parent)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.on_right_click)
+
+    def on_right_click(self, position):
+        index = self.indexAt(position)
+
+        if not index.isValid():
+            # Clicked outside any item
+            return
+
+        model_ = index.model()
+        menu = MenuWithTooltip(self)
+        copy = QtWidgets.QAction("Copy JSON", menu)
+        copy_full = QtWidgets.QAction("Copy full JSON", menu)
+
+        menu.addAction(copy)
+        menu.addAction(copy_full)
+        menu.addSeparator()
+
+        def on_copy():
+            text = str(model_.data(index, model.JsonModel.JsonRole))
+            app = QtWidgets.QApplication.instance()
+            app.clipboard().setText(text)
+
+        def on_copy_full():
+            if isinstance(model_, QtCore.QSortFilterProxyModel):
+                data = model_.sourceModel().json()
+            else:
+                data = model_.json()
+
+            text = str(data)
+            app = QtWidgets.QApplication.instance()
+            app.clipboard().setText(text)
+
+        copy.triggered.connect(on_copy)
+        copy_full.triggered.connect(on_copy_full)
+
+        menu.move(QtGui.QCursor.pos())
+        menu.show()
 
 
 class TextEditWithFocus(QtWidgets.QTextEdit):
