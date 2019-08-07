@@ -20,7 +20,7 @@ Create and use a new package from scratch in under 40 seconds.
 <div class="tab-content powershell" markdown="1">
 
 ```powershell
-mkdir mypackage             # Name of your Git project
+ni mypackage                # Name of your Git project
 cd mypackage                # Rez definition
 @"
 name = "mypackage"          # Rez package name
@@ -171,7 +171,7 @@ Most packages will depend on another package.
 ```powershell
 cd mypackage
 cd ..
-mkdir mypackage2
+ni mypackage2
 $null >> mypackage2/package.py
 ```
 
@@ -235,7 +235,7 @@ Most packages will have additional files, such as Python modules. This is where 
 ```powershell
 cd mypackage
 $null >> install.py                        # Additional script for build
-mkdir python                               # Payload directory
+ni python                                  # Payload directory
 cd python                                  # 
 "print('Hello World!')" | Add-Content mymodule.py  # Python payload shipped alongside package
 ```

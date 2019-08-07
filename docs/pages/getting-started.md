@@ -200,7 +200,7 @@ Each profile requires a folder and a file called `package.py`.
 <div class="tab-content powershell" markdown="1">
 
 ```powershell
-mkdir ~/kingkong
+ni ~/kingkong
 cd ~/kingkong
 @"
 name = "kingkong"
@@ -324,7 +324,7 @@ You can pick any application you'd like, for the purposes of this guide I'll mak
 <div class="tab-content powershell" markdown="1">
 
 ```powershell
-mkdir ~/texteditor
+ni ~/texteditor
 cd ~/texteditor
 @"
 name = "texteditor"
