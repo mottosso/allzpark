@@ -998,7 +998,7 @@ class Controller(QtCore.QObject):
         contexts = odict()
         with util.timing() as t:
             for app_request in apps:
-                app_request = rez.PackageRequest(app_request)
+                app_request = rez.PackageRequest(app_request.strip("~"))
                 app_package = rez.find_latest(app_request.name,
                                               range_=app_request.range)
 
