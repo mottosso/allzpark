@@ -1,7 +1,7 @@
 <div align=center>
 	<a href=https://allzpark.com><img src=https://user-images.githubusercontent.com/2152766/62561970-28b44580-b878-11e9-86df-2b2081a12809.png></a>
 	<br>
-	<p align=center><b>Application launcher</b> and <i>environment management</i><br>for 21st century games and digital post-production,<br>built with <a href=https://github.com/mottosso/bleeding-rez>bleeding-rez</a></p>
+	<p align=center><b>Application launcher</b> and <i>environment management</i><br>for 21st century games and digital post-production,<br>built with <a href=https://github.com/mottosso/bleeding-rez>bleeding-rez</a> and <a href=https://github.com/mottosso/Qt.py>Qt.py</a></p>
 	<a href=https://mottosso.visualstudio.com/allzpark/_build/latest?definitionId=2&branchName=master><img src=https://mottosso.visualstudio.com/allzpark/_apis/build/status/mottosso.allzpark?branchName=master></a> <a href=https://pypi.org/project/allzpark/>
 	<img src=https://badge.fury.io/py/allzpark.svg></a>
     <br>
