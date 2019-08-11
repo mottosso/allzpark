@@ -101,3 +101,17 @@ def applications_from_package(package):
         # alternative reference, with a "_" prefix.
         return _applications_from_package(package)
 ```
+
+And as a side-note, here you can also return multiple versions of a given application.
+
+```py
+name = "alita"
+version = "1.0"
+_data = {
+    "apps": [
+        "maya-2018",
+        "maya-2019",
+        "maya-2020",
+    ]
+}
+```
