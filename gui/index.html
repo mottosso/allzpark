@@ -329,6 +329,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#applications-from-data" title="Applications from Data" class="md-nav__link">
+    Applications from Data
+  </a>
+  
+</li>
+      
       
       
       
@@ -444,6 +451,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#applications-from-data" title="Applications from Data" class="md-nav__link">
+    Applications from Data
+  </a>
+  
+</li>
+      
       
       
       
@@ -523,6 +537,31 @@
     <span style="color: #f8f8f2">)</span>
 
     <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">apps</span>
+</pre></div>
+
+<p><br></p>
+<h3 id="applications-from-data">Applications from Data</h3>
+<p>In addition to the above, you could also specify applications explicitly in your profile data.</p>
+<p><strong>Alita/package.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;alita&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+<span style="color: #f8f8f2">_data</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #e6db74">&quot;apps&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">[</span><span style="color: #e6db74">&quot;maya-2018&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;vs-2019&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;zbrush&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;mudbox&quot;</span><span style="color: #f8f8f2">]</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
+
+<p><strong>allzparkconfig.py</strong></p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">applications_from_package</span><span style="color: #f8f8f2">(package):</span>
+    <span style="color: #66d9ef">try</span><span style="color: #f8f8f2">:</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">package</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">_data[</span><span style="color: #e6db74">&quot;apps&quot;</span><span style="color: #f8f8f2">]</span>
+
+    <span style="color: #66d9ef">except</span> <span style="color: #f8f8f2">(</span><span style="color: #a6e22e">AttributeError</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">KeyError</span><span style="color: #f8f8f2">):</span>
+        <span style="color: #75715e"># If there isn&#39;t any data, just do what you normally do</span>
+        <span style="color: #f92672">from</span> <span style="color: #f8f8f2">allzpark.allzparkconfig</span> <span style="color: #f92672">import</span> <span style="color: #f8f8f2">_applications_from_package</span>
+
+        <span style="color: #75715e"># Every variable and function from allzparkconfig has this hidden</span>
+        <span style="color: #75715e"># alternative reference, with a &quot;_&quot; prefix.</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">_applications_from_package(package)</span>
 </pre></div>
                 
                   

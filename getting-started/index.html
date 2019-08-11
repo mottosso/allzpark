@@ -450,6 +450,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#debugging" title="Debugging" class="md-nav__link">
+    Debugging
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuring-allzpark" title="Configuring Allzpark" class="md-nav__link">
     Configuring Allzpark
   </a>
@@ -771,6 +778,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#debugging" title="Debugging" class="md-nav__link">
+    Debugging
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#configuring-allzpark" title="Configuring Allzpark" class="md-nav__link">
     Configuring Allzpark
   </a>
@@ -799,7 +813,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-08-07</i></small>
+<small class="modified-date"><br><i>Updated 2019-08-11</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/getting-started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -1442,6 +1456,32 @@ rez build --install --clean
 <li>Variables have access to special variables, like <code>{root}</code>, more about that <a href="https://github.com/mottosso/bleeding-rez/wiki/Package-Commands#string-expansion">here</a></li>
 <li>You can use Rez packages to build Rez packages (neat!)</li>
 </ul>
+<p><br></p>
+<h3 id="debugging">Debugging</h3>
+<p>As you author packages and configure your profile, you'll run into issues; either from Rez or Allzpark itself.</p>
+<p>When an error occurs, either:</p>
+<ol>
+<li>Inspect the Console tab for clues</li>
+<li>Replicate the problem in the command-line</li>
+</ol>
+<p>The Console does its best for forward issues coming from Rez, such as syntax errors in your package, unreferenced environment variables, mismatching requirements and so on. But the command-line gives you one superior advantage.</p>
+<ul>
+<li>Isolating a context</li>
+</ul>
+<p>By isolating, I mean that you can establish a context using just a handful - or even a single - request.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env my_broken_package
+<span style="color: #75715e"># Error here</span>
+</pre></div>
+
+<p>This is how you can narrow down whether an error is due to a particular package, or a package in combination with others.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span>rez env packageA -- <span style="color: #f8f8f2">exit</span>  <span style="color: #75715e"># No error</span>
+rez env packageB -- <span style="color: #f8f8f2">exit</span>  <span style="color: #75715e"># No error</span>
+rez env packageA packageB -- <span style="color: #f8f8f2">exit</span>
+<span style="color: #75715e"># Error</span>
+</pre></div>
+
+<p>With <a href="https://allzpark.com/gui/#advanced-controls">Advanced Controls</a> visible, you can find the <em>complete</em> command Allzpark uses to establish a context visually at the bottom of the applications view.</p>
+<p><img alt="image" src="https://user-images.githubusercontent.com/2152766/62832807-42fd7300-bc2c-11e9-8a7b-7b19a56f80ee.png" /></p>
 <p><br></p>
 <h3 id="configuring-allzpark">Configuring Allzpark</h3>
 <p>The <code>--demo</code> flag is responsible for determining how and what profiles to visualise in Allzpark, let's have a look at how we can go independent from <code>--demo</code> with our won custom <a href="https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py">allzparkconfig.py</a></p>
