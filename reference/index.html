@@ -603,13 +603,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#multiple-application-versions_1" title="Multiple Application Versions" class="md-nav__link">
-    Multiple Application Versions
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -964,13 +957,6 @@
           <li class="md-nav__item">
   <a href="#2-embedded" title="2. Embedded" class="md-nav__link">
     2. Embedded
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#multiple-application-versions_1" title="Multiple Application Versions" class="md-nav__link">
-    Multiple Application Versions
   </a>
   
 </li>
@@ -1655,43 +1641,6 @@ rez build --install
 </pre></div>
 
 <p>And there you go. Now the version will read <code>"dev"</code> unless the package has been built, in which case it would read <code>"1.0"</code>.</p>
-<p><br></p>
-<h3 id="multiple-application-versions_1">Multiple Application Versions</h3>
-<p>Sometimes you need multiple versions of a single application accessible via the same profile. Per default, Allzpark only displays the latest version of the versions available. Here's how you can override that mechanism.</p>
-<p><strong>allzparkconfig.py</strong></p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">def</span> <span style="color: #a6e22e">applications_from_package</span><span style="color: #f8f8f2">(variant):</span>
-    <span style="color: #f92672">from</span> <span style="color: #f8f8f2">allzpark</span> <span style="color: #f92672">import</span> <span style="color: #f8f8f2">_rezapi</span> <span style="color: #66d9ef">as</span> <span style="color: #f8f8f2">rez</span>
-
-    <span style="color: #75715e"># May not be defined</span>
-    <span style="color: #f8f8f2">requirements</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">variant</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">requires</span> <span style="color: #f92672">or</span> <span style="color: #f8f8f2">[]</span>
-
-    <span style="color: #f8f8f2">apps</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">list(</span>
-        <span style="color: #f8f8f2">str(req)</span>
-        <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">req</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">requirements</span>
-        <span style="color: #66d9ef">if</span> <span style="color: #f8f8f2">req</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">weak</span>
-    <span style="color: #f8f8f2">)</span>
-
-    <span style="color: #75715e"># Strip the &quot;weak&quot; property of the request, else iter_packages</span>
-    <span style="color: #75715e"># isn&#39;t able to find the requested versions.</span>
-    <span style="color: #f8f8f2">apps</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">[rez</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">PackageRequest(req</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">strip(</span><span style="color: #e6db74">&quot;~&quot;</span><span style="color: #f8f8f2">))</span> <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">req</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">apps]</span>
-
-    <span style="color: #75715e"># Expand versions into their full range</span>
-    <span style="color: #75715e"># E.g. maya-2018|2019 == [&quot;maya-2018&quot;, &quot;maya-2019&quot;]</span>
-    <span style="color: #f8f8f2">flattened</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">list()</span>
-    <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">request</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">apps:</span>
-        <span style="color: #f8f8f2">flattened</span> <span style="color: #f92672">+=</span> <span style="color: #f8f8f2">rez</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">find(</span>
-            <span style="color: #f8f8f2">request</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name,</span>
-            <span style="color: #f8f8f2">range_</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">request</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">range,</span>
-        <span style="color: #f8f8f2">)</span>
-
-    <span style="color: #75715e"># Return strings</span>
-    <span style="color: #f8f8f2">apps</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">list(</span>
-        <span style="color: #e6db74">&quot;%s==%s&quot;</span> <span style="color: #f92672">%</span> <span style="color: #f8f8f2">(package</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">name,</span> <span style="color: #f8f8f2">package</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">version)</span>
-        <span style="color: #66d9ef">for</span> <span style="color: #f8f8f2">package</span> <span style="color: #f92672">in</span> <span style="color: #f8f8f2">flattened</span>
-    <span style="color: #f8f8f2">)</span>
-
-    <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">apps</span>
-</pre></div>
                 
                   
                 
