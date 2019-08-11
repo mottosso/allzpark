@@ -563,6 +563,18 @@
         <span style="color: #75715e"># alternative reference, with a &quot;_&quot; prefix.</span>
         <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">_applications_from_package(package)</span>
 </pre></div>
+
+<p>And as a side-note, here you can also return multiple versions of a given application.</p>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">name</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;alita&quot;</span>
+<span style="color: #f8f8f2">version</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;1.0&quot;</span>
+<span style="color: #f8f8f2">_data</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #e6db74">&quot;apps&quot;</span><span style="color: #f8f8f2">:</span> <span style="color: #f8f8f2">[</span>
+        <span style="color: #e6db74">&quot;maya-2018&quot;</span><span style="color: #f8f8f2">,</span>
+        <span style="color: #e6db74">&quot;maya-2019&quot;</span><span style="color: #f8f8f2">,</span>
+        <span style="color: #e6db74">&quot;maya-2020&quot;</span><span style="color: #f8f8f2">,</span>
+    <span style="color: #f8f8f2">]</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
                 
                   
                 
