@@ -69,3 +69,35 @@ def applications_from_package(variant):
 
     return apps
 ```
+
+<br>
+
+### Applications from Data
+
+In addition to the above, you could also specify applications explicitly in your profile data.
+
+**Alita/package.py**
+
+```py
+name = "alita"
+version = "1.0"
+_data = {
+    "apps": ["maya-2018", "vs-2019", "zbrush", "mudbox"]
+}
+```
+
+**allzparkconfig.py**
+
+```py
+def applications_from_package(package):
+    try:
+        return package._data["apps"]
+
+    except (AttributeError, KeyError):
+        # If there isn't any data, just do what you normally do
+        from allzpark.allzparkconfig import _applications_from_package
+
+        # Every variable and function from allzparkconfig has this hidden
+        # alternative reference, with a "_" prefix.
+        return _applications_from_package(package)
+```

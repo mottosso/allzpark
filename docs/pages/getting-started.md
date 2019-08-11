@@ -808,6 +808,41 @@ Woho! You're a fully certified Rez environment artist!
 
 <br>
 
+### Debugging
+
+As you author packages and configure your profile, you'll run into issues; either from Rez or Allzpark itself.
+
+When an error occurs, either:
+
+1. Inspect the Console tab for clues
+2. Replicate the problem in the command-line
+
+The Console does its best for forward issues coming from Rez, such as syntax errors in your package, unreferenced environment variables, mismatching requirements and so on. But the command-line gives you one superior advantage.
+
+- Isolating a context
+
+By isolating, I mean that you can establish a context using just a handful - or even a single - request.
+
+```bash
+rez env my_broken_package
+# Error here
+```
+
+This is how you can narrow down whether an error is due to a particular package, or a package in combination with others.
+
+```bash
+rez env packageA -- exit  # No error
+rez env packageB -- exit  # No error
+rez env packageA packageB -- exit
+# Error
+```
+
+With [Advanced Controls](https://allzpark.com/gui/#advanced-controls) visible, you can find the *complete* command Allzpark uses to establish a context visually at the bottom of the applications view.
+
+![image](https://user-images.githubusercontent.com/2152766/62832807-42fd7300-bc2c-11e9-8a7b-7b19a56f80ee.png)
+
+<br>
+
 ### Configuring Allzpark
 
 The `--demo` flag is responsible for determining how and what profiles to visualise in Allzpark, let's have a look at how we can go independent from `--demo` with our won custom [allzparkconfig.py](https://github.com/mottosso/allzpark/blob/master/allzpark/allzparkconfig.py)
