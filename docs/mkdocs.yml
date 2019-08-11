@@ -17,7 +17,7 @@ nav:
   - Getting Started: getting-started.md
   - Getting Advanced: getting-advanced.md
   - Getting Rez'd: rez.md
-  # - Guide: guides.md
+  - User Interface: gui.md
   - Workflow: workflow.md
   - Reference: reference.md
   - Shells: shells.md
