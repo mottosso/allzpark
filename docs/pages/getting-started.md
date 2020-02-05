@@ -200,7 +200,7 @@ Each profile requires a folder and a file called `package.py`.
 <div class="tab-content powershell" markdown="1">
 
 ```powershell
-ni ~/kingkong
+ni ~/kingkong -itemtype directory
 cd ~/kingkong
 @"
 name = "kingkong"
@@ -324,7 +324,7 @@ You can pick any application you'd like, for the purposes of this guide I'll mak
 <div class="tab-content powershell" markdown="1">
 
 ```powershell
-ni ~/texteditor
+ni ~/texteditor -itemtype directory
 cd ~/texteditor
 @"
 name = "texteditor"
@@ -689,7 +689,7 @@ Well, yes, yes you can!
 ```python hl_lines="3 12"
 name = "kingkong"
 version = "1.0.5"
-build_command = "python -m rezutil {root}"
+build_command = "python -m rezutil build {root}"
 
 _data = {
     "label": "King Kong",
