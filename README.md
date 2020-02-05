@@ -53,3 +53,16 @@ See [Quickstart](https://allzpark.com/quickstart) for more details and tutorials
 - [Getting Rez'd](https://allzpark.com/rez)
 - [Contributing](https://allzpark.com/contributing)
 - [...](https://allzpark.com)
+
+<br>
+
+### Updating the Docs
+
+I'd like for this to happen during CI, but till then there's a `deploy.ps1` in the `docs/` directory.
+
+```bash
+cd allzpark\docs
+. deploy.ps1
+```
+
+This will build the docs and deploy it onto the `gh-pages` branch, which is reflected live after about 1 min.
