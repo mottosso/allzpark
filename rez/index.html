@@ -527,7 +527,7 @@
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-<small class="modified-date"><br><i>Updated 2019-08-07</i></small>
+<small class="modified-date"><br><i>Updated 2020-02-05</i></small>
 
                 
                   <a href="https://github.com/mottosso/allzpark/edit/master/docs/pages/rez.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
@@ -548,7 +548,7 @@
 </div>
 
 <div class="tab-content powershell">
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">ni mypackage</span>                <span style="color: #75715e"># Name of your Git project</span>
+<div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">mypackage</span>                <span style="color: #75715e"># Name of your Git project</span>
 <span style="color: #f8f8f2">cd mypackage</span>                <span style="color: #75715e"># Rez definition</span>
 <span style="color: #e6db74">@&quot;</span>
 <span style="color: #e6db74">name = &quot;mypackage&quot;          # Rez package name</span>
@@ -669,7 +669,7 @@ rez env mypackage
 <div class="tab-content powershell">
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd mypackage</span>
 <span style="color: #f8f8f2">cd ..</span>
-<span style="color: #f8f8f2">ni mypackage2</span>
+<span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">mypackage2</span>
 <span style="color: #f8f8f2">$null</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">mypackage2/package.py</span>
 </pre></div>
 
@@ -720,7 +720,7 @@ rez env mypackage2
 <div class="tab-content powershell">
 <div class="codehilite" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f8f8f2">cd mypackage</span>
 <span style="color: #f8f8f2">$null</span> <span style="color: #f8f8f2">&gt;&gt;</span> <span style="color: #f8f8f2">install.py</span>                        <span style="color: #75715e"># Additional script for build</span>
-<span style="color: #f8f8f2">ni python</span>                                  <span style="color: #75715e"># Payload directory</span>
+<span style="color: #f8f8f2">mkdir</span> <span style="color: #f8f8f2">python</span>                                  <span style="color: #75715e"># Payload directory</span>
 <span style="color: #f8f8f2">cd python</span>                                  <span style="color: #75715e"># </span>
 <span style="color: #e6db74">&quot;print(&#39;Hello World!&#39;)&quot;</span> <span style="color: #f8f8f2">|</span> <span style="color: #f8f8f2">Add-Content</span> <span style="color: #f8f8f2">mymodule.py</span>  <span style="color: #75715e"># Python payload shipped alongside package</span>
 </pre></div>
