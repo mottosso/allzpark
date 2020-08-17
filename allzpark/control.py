@@ -50,6 +50,9 @@ class State(dict):
             # list or callable, returning list of profile names
             "root": None,
 
+            # Specific paths for finding profile packages
+            "profilePaths": None,
+
             # Current error, if any
             "error": None,
 
@@ -439,17 +442,18 @@ class Controller(QtCore.QObject):
     def stdio(self, stream, level=logging.INFO):
         return _Stream(self, stream, level)
 
-    def find(self, family, range_=None):
+    def find(self, family, range_=None, paths=None):
         """Find packages, relative Allzpark state
 
         Arguments:
             family (str): Name of package
             range_ (str): Range, e.g. "1" or "==0.3.13"
+            paths (list): Designated package paths to search
 
         """
 
         package_filter = self._package_filter()
-        paths = self._package_paths()
+        paths = paths or self._package_paths()
         it = rez.find(family, range_, paths=paths)
         it = sorted(
             it,
@@ -545,7 +549,7 @@ class Controller(QtCore.QObject):
         return package_filter
 
     @util.async_
-    def reset(self, root=None, on_success=lambda: None):
+    def reset(self, root=None, paths=None, on_success=lambda: None):
         """Initialise controller with `root`
 
         Profiles are listed at `root` and matched
@@ -554,12 +558,17 @@ class Controller(QtCore.QObject):
         Arguments:
             root (list, callable): A list of profile names, or a callable
                 returning names of profiles.
+            paths (list): List of package path where profiles being installed,
+                useful if you have specific paths only for profile packages.
+                If this given, other paths (e.g. rez.config.packages_path)
+                will be ignored.
             on_success (callable): Callback on reset completed.
 
         """
 
         self.info("Resetting..")
         root = root or self._state["root"]
+        paths = paths or self._state["profilePaths"]
         assert root, "Tried resetting without a root, this is a bug"
 
         def do():
@@ -570,7 +579,7 @@ class Controller(QtCore.QObject):
 
                 # Find profile package
                 package = None
-                for package in self.find(name):
+                for package in self.find(name, paths=paths):
 
                     if name not in profiles:
                         profiles[name] = dict()
@@ -609,6 +618,7 @@ class Controller(QtCore.QObject):
 
             self._state["profileName"] = current_profile
             self._state["root"] = root
+            self._state["profilePaths"] = paths
 
             self._state.to_ready()
             self.resetted.emit()

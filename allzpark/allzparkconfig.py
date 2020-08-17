@@ -24,6 +24,12 @@ exclude_filter = "*.beta"
 # Where to go when clicking the logo
 help_url = "https://allzpark.com"
 
+# A list of paths for finding profile packages
+# This is useful if you have specific paths only for profile packages.
+# Caveat: If this given, other paths (e.g. rez.config.packages_path)
+# will be ignored.
+profile_paths = None
+
 
 def profiles():
     """Return list of profiles

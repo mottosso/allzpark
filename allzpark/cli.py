@@ -365,7 +365,8 @@ def main():
             profiles = profiles_from_dir(opts.root)
 
         root = profiles or allzparkconfig.profiles
-        ctrl.reset(root, on_success=measure)
+        paths = allzparkconfig.profile_paths
+        ctrl.reset(root, paths=paths, on_success=measure)
 
     def measure():
         duration = time.time() - timing["beforeReset"]
