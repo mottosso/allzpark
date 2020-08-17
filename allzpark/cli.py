@@ -365,7 +365,7 @@ def main():
             profiles = profiles_from_dir(opts.root)
 
         root = profiles or allzparkconfig.profiles
-        paths = allzparkconfig.profile_paths
+        paths = allzparkconfig.profiles_path
         ctrl.reset(root, paths=paths, on_success=measure)
 
     def measure():
