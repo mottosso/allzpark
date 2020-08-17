@@ -946,7 +946,7 @@ class Controller(QtCore.QObject):
     def _package_paths(self):
         """Return all package paths, relative the current state of the world"""
 
-        paths = util.normpaths(*rez.config.packages_path)
+        paths = rez.config.packages_path[:]
 
         # Optional development packages
         if not self._state.retrieve("useDevelopmentPackages"):
