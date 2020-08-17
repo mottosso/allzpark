@@ -245,6 +245,8 @@ class Console(AbstractDockWidget):
             logging.CRITICAL: "<font color=\"red\">",
         }.get(level, "<font color=\"#222\">")
 
+        line = line.replace(" ", "&nbsp;")
+        line = line.replace("\n", "<br>")
         line = "%s%s</font><br>" % (color, line)
 
         cursor = self._widgets["text"].textCursor()

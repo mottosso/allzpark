@@ -388,7 +388,7 @@ class Controller(QtCore.QObject):
             # package family not found: occoc (searched: C:\)
             _, package, paths = value.value.split(": ", 2)
             package = package.split(" (", 1)[0]
-            paths = paths.rstrip(")").split(os.pathsep)
+            paths = paths.rstrip(")").split("; ")  # Hard-coded pathsep in Rez
 
             message = """
                 <h2><font color=\"red\">:(</font></h2>
