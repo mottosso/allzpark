@@ -47,7 +47,7 @@ class State(dict):
             "profileName": storage.value("startupProfile"),
             "appRequest": storage.value("startupApplication"),
 
-            # String or callable, returning list of profile names
+            # list or callable, returning list of profile names
             "root": None,
 
             # Current error, if any
@@ -444,7 +444,7 @@ class Controller(QtCore.QObject):
 
         Arguments:
             family (str): Name of package
-            range (str): Range, e.g. "1" or "==0.3.13"
+            range_ (str): Range, e.g. "1" or "==0.3.13"
 
         """
 
@@ -552,8 +552,9 @@ class Controller(QtCore.QObject):
         with its corresponding Rez package.
 
         Arguments:
-            root (str): Absolute path to profiles on disk, or callable
-                returning names of profiles
+            root (list, callable): A list of profile names, or a callable
+                returning names of profiles.
+            on_success (callable): Callback on reset completed.
 
         """
 
@@ -810,6 +811,10 @@ class Controller(QtCore.QObject):
 
                 self.error("Could not find profiles in %s" % root)
                 profiles = []
+
+        else:
+            raise TypeError("Argument 'root' should be either list type or "
+                            "callable.")
 
         # Facilitate accidental empty family names, e.g. None or ''
         profiles = list(filter(None, profiles))
