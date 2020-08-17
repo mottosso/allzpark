@@ -482,6 +482,7 @@ class Controller(QtCore.QObject):
 
         package_filter = self._package_filter()
         paths = self._package_paths()
+        paths += self._state["profilesPath"] or []
 
         return rez.env(
             request,
