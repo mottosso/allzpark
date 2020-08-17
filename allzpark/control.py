@@ -51,7 +51,7 @@ class State(dict):
             "root": None,
 
             # Specific paths for finding profile packages
-            "profilePaths": None,
+            "profilesPath": None,
 
             # Current error, if any
             "error": None,
@@ -568,7 +568,7 @@ class Controller(QtCore.QObject):
 
         self.info("Resetting..")
         root = root or self._state["root"]
-        paths = paths or self._state["profilePaths"]
+        paths = paths or self._state["profilesPath"]
         assert root, "Tried resetting without a root, this is a bug"
 
         def do():
@@ -618,7 +618,7 @@ class Controller(QtCore.QObject):
 
             self._state["profileName"] = current_profile
             self._state["root"] = root
-            self._state["profilePaths"] = paths
+            self._state["profilesPath"] = paths
 
             self._state.to_ready()
             self.resetted.emit()
