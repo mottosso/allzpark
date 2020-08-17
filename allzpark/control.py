@@ -962,10 +962,6 @@ class Controller(QtCore.QObject):
                 # It may not be part of the path
                 pass
 
-        # Optional setup for profile packages specific paths
-        if allzparkconfig.profiles_path:
-            paths += allzparkconfig.profiles_path
-
         return paths
 
     def _list_apps(self, profile):
