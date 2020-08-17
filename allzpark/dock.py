@@ -1025,6 +1025,7 @@ class Preferences(AbstractDockWidget):
         qargparse.InfoList("rezPackagesPath"),
         qargparse.InfoList("rezLocalPath"),
         qargparse.InfoList("rezReleasePath"),
+        qargparse.InfoList("profilesPath"),
         qargparse.Info("settingsPath"),
     ]
 

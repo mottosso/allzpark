@@ -293,6 +293,9 @@ def main():
         if allzparkconfig.startup_application:
             storage.setValue("startupApp", allzparkconfig.startup_application)
 
+        if allzparkconfig.profiles_path:
+            storage.setValue("profilesPath", allzparkconfig.profiles_path)
+
         if opts.demo:
             # Normally unsafe, but for the purposes of a demo
             # a convenient location for installed packages
