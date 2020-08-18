@@ -14,6 +14,7 @@ from collections import OrderedDict as odict
 
 from .vendor.Qt import QtCore, QtGui
 from .vendor import transitions
+from .vendor.six import PY3
 from . import model, util, allzparkconfig
 
 # Third-party dependencies
@@ -1196,7 +1197,7 @@ class Command(QtCore.QObject):
         if self.environ:
             # Inject user environment
             #
-            # NOTE: Rez takes precendence on environment, so a user
+            # NOTE: Rez takes precedence on environment, so a user
             # cannot edit the environment in such a way that packages break.
             # However it also means it cannot edit variables also edited
             # by a package. Win some lose some
@@ -1224,10 +1225,21 @@ class Command(QtCore.QObject):
     def listen_on_stdout(self):
         self._running = True
         for line in iter(self.popen.stdout.readline, ""):
+            if not line:
+                continue
+            if PY3:
+                line = line.decode()
+
             self.stdout.emit(line.rstrip())
+
         self._running = False
         self.killed.emit()
 
     def listen_on_stderr(self):
         for line in iter(self.popen.stderr.readline, ""):
+            if not line:
+                continue
+            if PY3:
+                line = line.decode()
+
             self.stderr.emit(line.rstrip())
