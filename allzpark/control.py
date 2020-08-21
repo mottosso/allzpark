@@ -1011,6 +1011,34 @@ class Controller(QtCore.QObject):
         # Each app has a unique context relative the current profile
         # Find it, and keep track of it.
 
+        # Resolve profile
+
+        with util.timing() as t:
+            variants = list(profile.iter_variants())
+            profile_variant = variants[0]
+
+            if len(variants) > 1:
+                # Unsure of whether this is desirable. It would enable
+                # a profile per platform, or potentially other kinds
+                # of special-purpose situations. If you see this,
+                # and want this, submit an issue with your use case!
+                self.warning(
+                    "Profiles with multiple variants are unsupported. "
+                    "Using first found: %s" % profile_variant
+                )
+
+            qualified_profile_name = profile_variant.qualified_package_name
+            profile_request = [qualified_profile_name]
+            self.debug("Resolving request: %s" % qualified_profile_name)
+
+            # Before resolving apps, need to know whether this profile can
+            # be resolved or not.
+            self.env(profile_request)
+
+        self.debug("Resolved profile context in %.2f seconds" % t.duration)
+
+        # Resolve app with profile
+
         apps = []
         _apps = allzparkconfig.applications
 
@@ -1053,23 +1081,10 @@ class Controller(QtCore.QObject):
                 if package_filter.excludes(app_package):
                     continue
 
-                variants = list(profile.iter_variants())
-                variant = variants[0]
-
-                if len(variants) > 1:
-                    # Unsure of whether this is desirable. It would enable
-                    # a profile per platform, or potentially other kinds
-                    # of special-purpose situations. If you see this,
-                    # and want this, submit an issue with your use case!
-                    self.warning(
-                        "Profiles with multiple variants are unsupported. "
-                        "Using first found: %s" % variant
-                    )
-
                 app_request = "%s==%s" % (app_package.name,
                                           app_package.version)
 
-                request = [variant.qualified_package_name, app_request]
+                request = [qualified_profile_name, app_request]
                 self.debug("Resolving request: %s" % " ".join(request))
 
                 context = self.env(request)
