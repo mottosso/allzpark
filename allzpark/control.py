@@ -1087,17 +1087,28 @@ class Controller(QtCore.QObject):
                 request = [qualified_profile_name, app_request]
                 self.debug("Resolving request: %s" % " ".join(request))
 
-                context = self.env(request)
+                try:
+                    context = self.env(request)
+                except rez.PackageFamilyNotFoundError as err:
+                    self.error("Resolve failed: %s" % str(err))
+                    context = model.BrokenContext(app_package.name,
+                                                  request)
 
                 if context.success and patch:
-                    self.debug("Patching request: %s" % " ".join(request))
+                    self.debug("Patching request: %s" % " ".join(patch))
                     request = context.get_patched_request(patch)
-                    context = self.env(
-                        request,
-                        use_filter=self._state.retrieve(
-                            "patchWithFilter", False
+
+                    try:
+                        context = self.env(
+                            request,
+                            use_filter=self._state.retrieve(
+                                "patchWithFilter", False
+                            )
                         )
-                    )
+                    except rez.PackageFamilyNotFoundError as err:
+                        self.error("Patch failed: %s" % str(err))
+                        context = model.BrokenContext(app_package.name,
+                                                      request)
 
                 contexts[app_request] = context
 
