@@ -465,13 +465,15 @@ class Packages(AbstractDockWidget):
 
         def on_openfile():
             package = model_.data(index, "package")
-            fname = os.path.join(package.root, "package.py")
+            pkg_uri = os.path.dirname(package.uri)
+            fname = os.path.join(pkg_uri, "package.py")
             util.open_file_location(fname)
             self.message.emit("Opened %s" % fname)
 
         def on_copyfile():
             package = model_.data(index, "package")
-            fname = os.path.join(package.root, "package.py")
+            pkg_uri = os.path.dirname(package.uri)
+            fname = os.path.join(pkg_uri, "package.py")
             clipboard = QtWidgets.QApplication.instance().clipboard()
             clipboard.setText(fname)
             self.message.emit("Copied %s" % fname)
