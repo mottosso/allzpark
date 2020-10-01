@@ -29,7 +29,7 @@
 
 ### What is it?
 
-It's an application launcher, for when you need control over what software and which versions of software belong to a given project. It builds on the self-hosted package manager and environment management framework [bleeding-rez](https://github.com/mottosso/bleeding-rez), providing both a visual and textual interface for launching software in a reproducible way.
+It's an application launcher, for whenever you need control over what software and which versions of software belong to a given project. It is built on the self-hosted package manager and environment management framework [bleeding-rez](https://github.com/mottosso/bleeding-rez), providing both a visual and textual interface for launching software in a reproducible way.
 
 ![](https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif)
 
@@ -37,7 +37,7 @@ It's an application launcher, for when you need control over what software and w
 
 ### Usage
 
-Allzpark runs on Windows, Linux and MacOS, using Python 2 or 3 and any binding of Qt, and is available via `pip`.
+Allzpark runs on Windows, Linux and MacOS, using Python 2 or 3 and any binding of Qt and is available via `pip`.
 
 ```bash
 pip install allzpark
@@ -65,4 +65,4 @@ cd allzpark\docs
 . deploy.ps1
 ```
 
-This will build the docs and deploy it onto the `gh-pages` branch, which is reflected live after about 1 min.
+This will build the docs and deploy them onto the `gh-pages` branch, which will reflecte live after about 1 min.
