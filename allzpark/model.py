@@ -187,7 +187,7 @@ class ApplicationModel(AbstractTableModel):
         self.items[:] = []
 
         for app in applications:
-            root = os.path.dirname(app.uri)
+            root = app.root
 
             data = allzparkconfig.metadata_from_package(app)
             tools = getattr(app, "tools", None) or [app.name]
@@ -362,7 +362,7 @@ class PackagesModel(AbstractTableModel):
         paths = self._ctrl._package_paths()
 
         for pkg in packages:
-            root = os.path.dirname(pkg.uri)
+            root = pkg.root
             data = allzparkconfig.metadata_from_package(pkg)
             state = (
                 "(dev)" if is_local(pkg) else
