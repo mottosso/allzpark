@@ -992,7 +992,7 @@ class Preferences(AbstractDockWidget):
             "such as *.beta packages, with every other package still \n"
             "qualifying for that filter."
         )),
-        qargparse.Integer("clearCacheTimeout", minimum=1, default=10, help=(
+        qargparse.Integer("clearCacheTimeout", min=1, default=10, help=(
             "Clear package repository cache at this interval, in seconds. \n\n"
 
             "Default 10. (Requires restart)\n\n"

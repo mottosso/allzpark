@@ -2,9 +2,9 @@ import re
 import logging
 
 from collections import OrderedDict as odict
-from Qt import QtCore, QtWidgets
+from Qt import QtCore, QtWidgets, QtGui
 
-__version__ = "0.5.1"
+__version__ = "0.5.3"
 _log = logging.getLogger(__name__)
 _type = type  # used as argument
 
@@ -63,7 +63,8 @@ class QArgumentParser(QtWidgets.QWidget):
         self._row = 1
         self._storage = storage
         self._arguments = odict()
-        self._desciption = description
+        self._resets = dict()
+        self._description = description
 
         for arg in arguments or []:
             self._addArgument(arg)
@@ -71,7 +72,8 @@ class QArgumentParser(QtWidgets.QWidget):
         self.setStyleSheet(style)
 
     def setDescription(self, text):
-        self._desciption.setText(text)
+        # (TODO) This won't work.
+        self._description.setText(text)
 
     def addArgument(self, name, type=None, default=None, **kwargs):
         # Infer type from default
@@ -120,23 +122,21 @@ class QArgumentParser(QtWidgets.QWidget):
                         "true": QtCore.Qt.Checked,
                     }.get(default))
 
+                if isinstance(arg, Number):
+                    if isinstance(arg, Float):
+                        default = float(default)
+                    else:
+                        default = int(default)
+
                 arg["default"] = default
 
-        arg.changed.connect(lambda: self.on_changed(arg))
-
+        # Argument label and editor widget
         label = (
             QtWidgets.QLabel(arg["label"])
             if arg.label
             else QtWidgets.QLabel()
         )
         widget = arg.create()
-        reset = QtWidgets.QPushButton("")  # default
-        reset.setToolTip("Reset")
-        reset.setProperty("type", "reset")
-        reset.clicked.connect(lambda: self.on_reset(arg))
-
-        # Shown on edit
-        reset.hide()
 
         for widget in (label, widget):
             widget.setToolTip(arg["help"])
@@ -145,19 +145,36 @@ class QArgumentParser(QtWidgets.QWidget):
             widget.setAttribute(QtCore.Qt.WA_StyledBackground)
             widget.setEnabled(arg["enabled"])
 
+        # Reset btn widget
+        reset_container = QtWidgets.QWidget()
+        reset_container.setProperty("type", "QArgparse:reset")
+        reset = QtWidgets.QPushButton("")  # default
+        reset.setToolTip("Reset")
+        reset.hide()  # shown on edit
+
+        # Align label on top of row if widget is over two times higher
+        height = (lambda w: w.sizeHint().height())
+        label_on_top = height(label) * 2 < height(widget)
+        alignment = (QtCore.Qt.AlignTop,) if label_on_top else ()
+
+        # Layout
+        layout = QtWidgets.QVBoxLayout(reset_container)
+        layout.addWidget(reset)
+        layout.setContentsMargins(0, 0, 0, 0)
+
         layout = self.layout()
-        layout.addWidget(label, self._row, 0, QtCore.Qt.AlignTop)
+        layout.addWidget(label, self._row, 0, *alignment)
         layout.addWidget(widget, self._row, 1)
-        layout.addWidget(reset, self._row, 2, QtCore.Qt.AlignTop)
+        layout.addWidget(reset_container, self._row, 2, *alignment)
         layout.setColumnStretch(1, 1)
 
-        def on_changed(*_):
-            reset.setVisible(arg["edited"])
-
-        arg.changed.connect(on_changed)
+        # Signals
+        reset.clicked.connect(lambda: arg.write(arg["default"]))
+        arg.changed.connect(lambda: self.on_changed(arg))
 
         self._row += 1
         self._arguments[arg["name"]] = arg
+        self._resets[arg["name"]] = reset
 
     def clear(self):
         assert self._storage, "Cannot clear without persistent storage"
@@ -167,11 +184,13 @@ class QArgumentParser(QtWidgets.QWidget):
     def find(self, name):
         return self._arguments[name]
 
-    def on_reset(self, arg):
-        arg.write(arg["default"])
-
     def on_changed(self, arg):
-        arg["edited"] = arg.read() != arg["default"]
+        is_edited = arg.read() != arg["default"]
+
+        reset = self._resets[arg["name"]]
+        reset.setVisible(is_edited)
+
+        arg["edited"] = is_edited
         self.changed.emit(arg)
 
     # Optional PEP08 syntax
@@ -179,17 +198,21 @@ class QArgumentParser(QtWidgets.QWidget):
 
 
 class QArgument(QtCore.QObject):
+    """Base class of argument user interface
+    """
     changed = QtCore.Signal()
 
     # Provide a left-hand side label for this argument
     label = True
+    # For defining default value for each argument type
+    default = None
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, default=None, **kwargs):
         super(QArgument, self).__init__(kwargs.pop("parent", None))
 
         kwargs["name"] = name
         kwargs["label"] = kwargs.get("label", camel_to_title(name))
-        kwargs["default"] = kwargs.get("default", None)
+        kwargs["default"] = self.default if default is None else default
         kwargs["help"] = kwargs.get("help", "")
         kwargs["read"] = kwargs.get("read")
         kwargs["write"] = kwargs.get("write")
@@ -230,6 +253,18 @@ class QArgument(QtCore.QObject):
 
 
 class Boolean(QArgument):
+    """Boolean type user interface
+
+    Presented by `QtWidgets.QCheckBox`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (bool, optional): Argument's default value, default None
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
     def create(self):
         widget = QtWidgets.QCheckBox()
         widget.clicked.connect(self.changed.emit)
@@ -275,46 +310,142 @@ class Boolean(QArgument):
 
 
 class Tristate(QArgument):
-    pass
+    """Not implemented"""
 
 
 class Number(QArgument):
+    """Base class of numeric type user interface"""
+    default = 0
+
     def create(self):
         if isinstance(self, Float):
             widget = QtWidgets.QDoubleSpinBox()
+            widget.setMinimum(self._data.get("min", 0.0))
+            widget.setMaximum(self._data.get("max", 99.99))
         else:
             widget = QtWidgets.QSpinBox()
-
-        if self._data.get("minimum"):
-            widget.setMinimum(self._data.get("minimum"))
-
-        if self._data.get("maximum"):
-            widget.setMaximum(self._data.get("maximum"))
+            widget.setMinimum(self._data.get("min", 0))
+            widget.setMaximum(self._data.get("max", 99))
 
         widget.editingFinished.connect(self.changed.emit)
-
         self._read = lambda: widget.value()
-        self._write = lambda value: widget.setValue(float(value))
+        self._write = lambda value: widget.setValue(value)
 
-        if self["default"] is not None:
+        if self["default"] != self.default:
             self._write(self["default"])
 
         return widget
 
 
 class Integer(Number):
-    pass
+    """Integer type user interface
+
+    A subclass of `qargparse.Number`, presented by `QtWidgets.QSpinBox`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (int, optional): Argument's default value, default 0
+        min (int, optional): Argument's minimum value, default 0
+        max (int, optional): Argument's maximum value, default 99
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
 
 
 class Float(Number):
-    pass
+    """Float type user interface
+
+    A subclass of `qargparse.Number`, presented by `QtWidgets.QDoubleSpinBox`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (float, optional): Argument's default value, default 0.0
+        min (float, optional): Argument's minimum value, default 0.0
+        max (float, optional): Argument's maximum value, default 99.99
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
 
 
 class Range(Number):
-    pass
+    """Range type user interface
+
+    A subclass of `qargparse.Number`, not production ready.
+
+    """
+
+
+class Double3(QArgument):
+    """Double3 type user interface
+
+    Presented by three `QtWidgets.QLineEdit` widget with `QDoubleValidator`
+    installed.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (tuple or list, optional): Default (0, 0, 0).
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
+    default = (0, 0, 0)
+
+    def create(self):
+        widget = QtWidgets.QWidget()
+        layout = QtWidgets.QHBoxLayout(widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        x, y, z = (self.child_arg(layout, i) for i in range(3))
+
+        self._read = lambda: (
+            float(x.text()), float(y.text()), float(z.text()))
+        self._write = lambda value: [
+            w.setText(str(float(v))) for w, v in zip([x, y, z], value)]
+
+        if self["default"] != self.default:
+            self._write(self["default"])
+
+        return widget
+
+    def child_arg(self, layout, index):
+        widget = QtWidgets.QLineEdit()
+        widget.setValidator(QtGui.QDoubleValidator())
+
+        default = str(float(self["default"][index]))
+        widget.setText(default)
+
+        def focusOutEvent(event):
+            if not widget.text():
+                widget.setText(default)  # Ensure value exists for `_read`
+            QtWidgets.QLineEdit.focusOutEvent(widget, event)
+        widget.focusOutEvent = focusOutEvent
+
+        widget.editingFinished.connect(self.changed.emit)
+        widget.returnPressed.connect(widget.editingFinished.emit)
+
+        layout.addWidget(widget)
+
+        return widget
 
 
 class String(QArgument):
+    """String type user interface
+
+    Presented by `QtWidgets.QLineEdit`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (str, optional): Argument's default value, default None
+        placeholder (str, optional): Placeholder message for the widget
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
     def __init__(self, *args, **kwargs):
         super(String, self).__init__(*args, **kwargs)
         self._previous = None
@@ -328,6 +459,7 @@ class String(QArgument):
 
         if isinstance(self, Info):
             widget.setReadOnly(True)
+        widget.setPlaceholderText(self._data.get("placeholder", ""))
 
         if self["default"] is not None:
             self._write(self["default"])
@@ -342,20 +474,43 @@ class String(QArgument):
             self.changed.emit()
             self._previous = current
 
-        else:
-            # Clarify to the user that his command was acknowledged
-            self.sender().clearFocus()
-
 
 class Info(String):
-    pass
+    """String type user interface but read-only
+
+    A subclass of `qargparse.String`, presented by `QtWidgets.QLineEdit`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (str, optional): Argument's default value, default None
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
 
 
 class Color(String):
-    pass
+    """Color type user interface
+
+    A subclass of `qargparse.String`, not production ready.
+
+    """
 
 
 class Button(QArgument):
+    """Button type user interface
+
+    Presented by `QtWidgets.QPushButton`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (bool, optional): Argument's default value, default None
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
     label = False
 
     def create(self):
@@ -384,10 +539,26 @@ class Button(QArgument):
 
 
 class Toggle(Button):
-    pass
+    """Checkable `Button` type user interface
+
+    Presented by `QtWidgets.QPushButton`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        default (bool, optional): Argument's default value, default None
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
 
 
 class InfoList(QArgument):
+    """String list type user interface
+
+    Presented by `QtWidgets.QListView`, not production ready.
+
+    """
     def __init__(self, name, **kwargs):
         kwargs["default"] = kwargs.pop("default", ["Empty"])
         super(InfoList, self).__init__(name, **kwargs)
@@ -409,6 +580,20 @@ class InfoList(QArgument):
 
 
 class Choice(QArgument):
+    """Argument user interface for selecting one from list
+
+    Presented by `QtWidgets.QListView`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        items (list, optional): List of strings for select, default `["Empty"]`
+        default (str, optional): Default item in `items`, use first of `items`
+            if not given.
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
     def __init__(self, name, **kwargs):
         kwargs["items"] = kwargs.get("items", ["Empty"])
         kwargs["default"] = kwargs.pop("default", kwargs["items"][0])
@@ -493,6 +678,20 @@ class Separator(QArgument):
 
 
 class Enum(QArgument):
+    """Argument user interface for selecting one from dropdown list
+
+    Presented by `QtWidgets.QComboBox`.
+
+    Arguments:
+        name (str): The name of argument
+        label (str, optional): Display name, convert from `name` if not given
+        help (str, optional): Tool tip message of this argument
+        items (list, optional): List of strings for select, default `[]`
+        default (int, optional): Index of default item, use first of `items`
+            if not given.
+        enabled (bool, optional): Whether to enable this widget, default True
+
+    """
     def __init__(self, name, **kwargs):
         kwargs["default"] = kwargs.pop("default", 0)
         kwargs["items"] = kwargs.get("items", [])
@@ -538,9 +737,16 @@ QLabel[type="Separator"] {
     text-decoration: underline;
 }
 
-QPushButton[type="reset"] {
+QWidget[type="QArgparse:reset"] {
+    /* Ensure size fixed */
     max-width: 11px;
     max-height: 11px;
+    min-width: 11px;
+    min-height: 11px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 """
@@ -584,7 +790,7 @@ def _demo():
     parser.add_argument("age", default=33, help="Your age")
     parser.add_argument("height", default=1.87, help="Your height")
     parser.add_argument("alive", default=True, help="Your state")
-    parser.add_argument("class", type=Enum, items=[
+    parser.add_argument("class", type=Enum, items=[  # (TODO) Reset not hidden
         "Ranger",
         "Warrior",
         "Sorcerer",
@@ -592,12 +798,13 @@ def _demo():
     ], default=2, help="Your class")
 
     parser.add_argument("options", type=Separator)
-    parser.add_argument("paths", type=InfoList, items=[
+    parser.add_argument("paths", type=InfoList, items=[  # (TODO) Doesn't work
         "Value A",
         "Value B",
         "Some other value",
         "And finally, value C",
     ])
+    parser.add_argument("location", type=Double3)
 
     parser.show()
     app.exec_()
