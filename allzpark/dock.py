@@ -68,7 +68,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
 
 
 class App(AbstractDockWidget):
-    """Aggregated information about the currently selected profile"""
+    """Aggregated information about the currently selected application"""
 
     icon = "Alert_Info_32"
 
