@@ -1375,3 +1375,265 @@ class CssHighlighter(QtGui.QSyntaxHighlighter):
             )
             startIndex = self.comment_start_exp.indexIn(
                 text, startIndex + commentLength)
+
+
+class ProfileView(QtWidgets.QTreeView):
+
+    activated = QtCore.Signal(str)
+
+    def __init__(self, parent=None):
+        super(ProfileView, self).__init__(parent)
+
+        self.setHeaderHidden(True)
+        self.setSortingEnabled(True)
+        self.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+
+        self.customContextMenuRequested.connect(self.on_context_menu)
+
+    def on_context_menu(self, position):
+        index = self.indexAt(position)
+
+        if not index.isValid():
+            # Clicked outside any item
+            return
+
+        model_ = index.model()
+        menu = QtWidgets.QMenu(self)
+
+        name = str(model_.data(index, model.NameRole))
+
+        activate = QtWidgets.QAction("Activate", menu)
+        activate.triggered.connect(lambda: self.on_activate(name))
+        menu.addAction(activate)
+
+        menu.move(QtGui.QCursor.pos())
+        menu.show()
+
+    def on_activate(self, profile):
+        self.activated.emit(profile)
+
+    def selected_index(self):
+        return self.selectionModel().currentIndex()
+
+    def selected_profile(self):
+        index = self.selected_index()
+        if index.isValid():
+            return index.data(model.NameRole)
+
+
+class Profiles(AbstractDockWidget):
+    """Listing and changing profiles"""
+
+    icon = "Default_Profile"
+
+    profile_changed = QtCore.Signal(str)
+    version_changed = QtCore.Signal(str)
+    reset = QtCore.Signal()
+
+    def __init__(self, ctrl, parent=None):
+        super(Profiles, self).__init__("Profiles", parent)
+        self.setAttribute(QtCore.Qt.WA_StyledBackground)
+        self.setObjectName("Profiles")
+
+        panels = {
+            "central": QtWidgets.QWidget(),
+        }
+
+        widgets = {
+            "main": QtWidgets.QWidget(),
+            "tree": QtWidgets.QWidget(),
+            # current profile
+            "current": QtWidgets.QWidget(),
+            "name": QtWidgets.QLabel(),
+            "version": LineEditWithCompleter(),
+            # profile tools
+            "tools": QtWidgets.QWidget(),
+            "refresh": QtWidgets.QPushButton(""),
+            "favorite": QtWidgets.QPushButton(""),
+            "filtering": QtWidgets.QPushButton(""),
+            "expand": QtWidgets.QPushButton(""),
+            "collapse": QtWidgets.QPushButton(""),
+            # separator
+            "sep1": QtWidgets.QFrame(),
+            "versioning": QtWidgets.QPushButton(""),
+            # profile treeview
+            "search": QtWidgets.QLineEdit(),
+            "view": ProfileView(),
+        }
+
+        models = {
+            "source": None,
+            "proxy": model.ProfileProxyModel(),
+        }
+
+        layout = QtWidgets.QVBoxLayout(widgets["current"])
+        layout.setContentsMargins(0, 2, 0, 0)
+        layout.addWidget(widgets["name"])
+        layout.addWidget(widgets["version"])
+
+        layout = QtWidgets.QVBoxLayout(widgets["tools"])
+        layout.setContentsMargins(0, 2, 0, 0)
+        layout.addWidget(widgets["refresh"])
+        layout.addWidget(widgets["favorite"])
+        layout.addWidget(widgets["filtering"])
+        layout.addWidget(widgets["expand"])
+        layout.addWidget(widgets["collapse"])
+        layout.addWidget(widgets["sep1"])
+        layout.addWidget(widgets["versioning"])
+        # (epic) quick make profile
+        # (epic) quick edit profile
+        # (epic) remove or hide local profile
+        layout.addStretch()
+
+        layout = QtWidgets.QVBoxLayout(widgets["tree"])
+        layout.setContentsMargins(0, 2, 0, 0)
+        layout.addWidget(widgets["search"])
+        layout.addWidget(widgets["view"], stretch=True)
+
+        layout = QtWidgets.QHBoxLayout(widgets["main"])
+        layout.setContentsMargins(0, 2, 0, 0)
+        layout.addWidget(widgets["tools"])
+        layout.addWidget(widgets["tree"], stretch=True)
+
+        layout = QtWidgets.QVBoxLayout(panels["central"])
+        layout.setContentsMargins(6, 0, 6, 0)
+        layout.addWidget(widgets["current"])
+        layout.addWidget(widgets["main"], stretch=True)
+
+        version = widgets["version"]
+        search = widgets["search"]
+        view = widgets["view"]
+        proxy = models["proxy"]
+
+        view.setModel(proxy)
+        selection = view.selectionModel()
+
+        proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        search.setPlaceholderText("Filter profiles..")
+
+        version.setToolTip("Click to change profile version")
+        version.setEnabled(False)
+
+        widgets["sep1"].setFrameShape(QtWidgets.QFrame.HLine)
+        widgets["sep1"].setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        # icons
+        icon_size = QtCore.QSize(14, 14)
+
+        icon = res.icon("refresh")
+        widgets["refresh"].setIcon(icon)
+        widgets["refresh"].setIconSize(icon_size)
+
+        icon = res.icon("star_bright")
+        icon.addPixmap(res.pixmap("star_dim"), icon.Disabled)
+        widgets["favorite"].setIcon(icon)
+        widgets["favorite"].setIconSize(icon_size)
+
+        icon = QtGui.QIcon()
+        icon.addPixmap(res.pixmap("filter_on"), icon.Normal, icon.On)
+        icon.addPixmap(res.pixmap("filter_off"), icon.Normal, icon.Off)
+        widgets["filtering"].setIcon(icon)
+        widgets["filtering"].setIconSize(icon_size)
+        widgets["filtering"].setCheckable(True)
+        widgets["filtering"].setAutoRepeat(True)
+
+        icon = QtGui.QIcon()
+        icon.addPixmap(res.pixmap("version_on"), icon.Normal, icon.On)
+        icon.addPixmap(res.pixmap("version_off"), icon.Normal, icon.Off)
+        widgets["versioning"].setIcon(icon)
+        widgets["versioning"].setIconSize(icon_size)
+        widgets["versioning"].setCheckable(True)
+        widgets["versioning"].setAutoRepeat(True)
+
+        icon = res.icon("expand")
+        widgets["expand"].setIcon(icon)
+        widgets["expand"].setIconSize(icon_size)
+
+        icon = res.icon("collapse")
+        widgets["collapse"].setIcon(icon)
+        widgets["collapse"].setIconSize(icon_size)
+
+        # signals
+        view.activated.connect(self.profile_changed.emit)
+        selection.currentChanged.connect(self.on_selected_profile_changed)
+        version.changed.connect(self.version_changed.emit)
+        search.textChanged.connect(view.expandAll)
+        search.textChanged.connect(proxy.setFilterFixedString)
+        widgets["refresh"].clicked.connect(self.reset.emit)
+        widgets["favorite"].clicked.connect(self.on_favorite)
+        widgets["filtering"].clicked.connect(self.on_filtering)
+        widgets["versioning"].clicked.connect(
+            lambda *args: version.setEnabled(not version.isEnabled()))
+        widgets["expand"].clicked.connect(view.expandAll)
+        widgets["collapse"].clicked.connect(view.collapseAll)
+        ctrl.resetted.connect(view.expandAll)
+
+        self._widgets = widgets
+        self._models = models
+        self._ctrl = ctrl
+
+        self.setWidget(panels["central"])
+
+        self.update_favorite_btn(None)  # nothing selected on startup
+
+    def set_model(self, profile_model, version_model):
+        # profile
+        proxy = self._models["proxy"]
+        proxy.setSourceModel(profile_model)
+        self._models["source"] = profile_model
+        self._widgets["filtering"].setChecked(profile_model.is_filtering)
+        # version
+        self._widgets["version"].setModel(version_model)
+
+    def on_context_menu(self, window):
+        def _on_context_menu(*args):
+            name = self._models["source"].current
+
+            menu = MenuWithTooltip(window)
+            separator = QtWidgets.QWidgetAction(menu)
+            separator.setDefaultWidget(QtWidgets.QLabel(name))
+            menu.addAction(separator)
+
+            def on_reset():
+                window.reset()
+
+            reset = QtWidgets.QAction("Reset", menu)
+            reset.triggered.connect(on_reset)
+            reset.setToolTip("Re-scan repository for new Rez packages")
+            menu.addAction(reset)
+
+            menu.addSeparator()
+
+            menu.move(QtGui.QCursor.pos())
+            menu.show()
+
+        return _on_context_menu
+
+    def on_favorite(self):
+        model_ = self._models["source"]
+        proxy = self._models["proxy"]
+        view = self._widgets["view"]
+        index = proxy.mapToSource(view.selected_index())
+
+        model_.update_favorite(self._ctrl, index)
+        model_.update_profile_icon(index)
+
+    def on_filtering(self):
+        proxy = self._models["proxy"]
+        model_ = self._models["source"]
+        model_.is_filtering = not model_.is_filtering
+
+        proxy.invalidateFilter()
+
+    def on_selected_profile_changed(self):
+        view = self._widgets["view"]
+        self.update_favorite_btn(view.selected_profile())
+
+    def update_favorite_btn(self, profile):
+        btn = self._widgets["favorite"]
+        btn.setEnabled(bool(profile))
+
+    def update_current(self, profile, version):
+        self._widgets["name"].setText(profile)
+        self._widgets["version"].setText(version)

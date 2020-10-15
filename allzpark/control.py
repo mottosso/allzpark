@@ -26,8 +26,9 @@ except ImportError:
     localz = None
 
 log = logging.getLogger(__name__)
-Latest = None  # Enum
-NoVersion = None
+
+Latest = model.Latest  # Enum
+NoVersion = model.NoVersion
 
 
 class State(dict):
@@ -208,11 +209,11 @@ class Controller(QtCore.QObject):
         state = State(self, storage)
 
         models = {
-            "profileVersions": QtCore.QStringListModel(),
-            "profileNames": QtCore.QStringListModel(),
             "apps": model.ApplicationModel(),
+            "profileVersions": QtCore.QStringListModel(),
 
             # Docks
+            "profiles": model.ProfileModel(),
             "packages": model.PackagesModel(self),
             "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
@@ -589,8 +590,6 @@ class Controller(QtCore.QObject):
                 default_profile = name
 
             self._state["rezProfiles"].update(profiles)
-            self._models["profileNames"].setStringList(list(profiles))
-            self._models["profileNames"].layoutChanged.emit()
 
             # On resetting after startup, there will be a
             # currently selected profile that may differ from
@@ -606,6 +605,10 @@ class Controller(QtCore.QObject):
             # or user preferences has been wiped.
             if not current_profile:
                 current_profile = default_profile
+
+            self._models["profiles"].set_favorites(self)
+            self._models["profiles"].set_current(current_profile)
+            self._models["profiles"].reset(profiles)
 
             self._state["profileName"] = current_profile
             self._state["root"] = root
