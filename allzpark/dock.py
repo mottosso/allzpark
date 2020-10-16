@@ -1438,28 +1438,28 @@ class Profiles(AbstractDockWidget):
 
         panels = {
             "central": QtWidgets.QWidget(),
+            "head": QtWidgets.QWidget(),
+            "body": QtWidgets.QWidget(),
         }
 
         widgets = {
-            "main": QtWidgets.QWidget(),
-            "tree": QtWidgets.QWidget(),
-            # current profile
-            "current": QtWidgets.QWidget(),
+            # head: current profile
+            "icon": QtWidgets.QLabel(),
             "name": QtWidgets.QLabel(),
             "version": LineEditWithCompleter(),
-            # profile tools
-            "tools": QtWidgets.QWidget(),
+
+            # body: profiles view and toolset
             "refresh": QtWidgets.QPushButton(""),
+            "search": QtWidgets.QLineEdit(),
+            "view": ProfileView(),
+
+            "tools": QtWidgets.QWidget(),
             "favorite": QtWidgets.QPushButton(""),
             "filtering": QtWidgets.QPushButton(""),
             "expand": QtWidgets.QPushButton(""),
             "collapse": QtWidgets.QPushButton(""),
-            # separator
             "sep1": QtWidgets.QFrame(),
             "versioning": QtWidgets.QPushButton(""),
-            # profile treeview
-            "search": QtWidgets.QLineEdit(),
-            "view": ProfileView(),
         }
 
         models = {
@@ -1467,14 +1467,14 @@ class Profiles(AbstractDockWidget):
             "proxy": model.ProfileProxyModel(),
         }
 
-        layout = QtWidgets.QVBoxLayout(widgets["current"])
-        layout.setContentsMargins(0, 2, 0, 0)
-        layout.addWidget(widgets["name"])
-        layout.addWidget(widgets["version"])
+        layout = QtWidgets.QGridLayout(panels["head"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["icon"], 0, 0, 2, 1)
+        layout.addWidget(widgets["name"], 0, 1)
+        layout.addWidget(widgets["version"], 1, 1)
 
         layout = QtWidgets.QVBoxLayout(widgets["tools"])
         layout.setContentsMargins(0, 2, 0, 0)
-        layout.addWidget(widgets["refresh"])
         layout.addWidget(widgets["favorite"])
         layout.addWidget(widgets["filtering"])
         layout.addWidget(widgets["expand"])
@@ -1486,20 +1486,17 @@ class Profiles(AbstractDockWidget):
         # (epic) remove or hide local profile
         layout.addStretch()
 
-        layout = QtWidgets.QVBoxLayout(widgets["tree"])
-        layout.setContentsMargins(0, 2, 0, 0)
-        layout.addWidget(widgets["search"])
-        layout.addWidget(widgets["view"], stretch=True)
-
-        layout = QtWidgets.QHBoxLayout(widgets["main"])
-        layout.setContentsMargins(0, 2, 0, 0)
-        layout.addWidget(widgets["tools"])
-        layout.addWidget(widgets["tree"], stretch=True)
+        layout = QtWidgets.QGridLayout(panels["body"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["refresh"], 0, 0)
+        layout.addWidget(widgets["tools"], 1, 0)
+        layout.addWidget(widgets["search"], 0, 1)
+        layout.addWidget(widgets["view"], 1, 1)
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
-        layout.setContentsMargins(6, 0, 6, 0)
-        layout.addWidget(widgets["current"])
-        layout.addWidget(widgets["main"], stretch=True)
+        layout.setContentsMargins(4, 4, 4, 4)
+        layout.addWidget(panels["head"])
+        layout.addWidget(panels["body"], stretch=True)
 
         version = widgets["version"]
         search = widgets["search"]
@@ -1553,6 +1550,10 @@ class Profiles(AbstractDockWidget):
         icon = res.icon("collapse")
         widgets["collapse"].setIcon(icon)
         widgets["collapse"].setIconSize(icon_size)
+
+        icon = res.icon("Default_Profile")
+        icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
+        widgets["icon"].setPixmap(icon)
 
         # signals
         view.activated.connect(self.profile_changed.emit)
@@ -1634,6 +1635,10 @@ class Profiles(AbstractDockWidget):
         btn = self._widgets["favorite"]
         btn.setEnabled(bool(profile))
 
-    def update_current(self, profile, version):
+    def update_current(self, profile, version, icon):
         self._widgets["name"].setText(profile)
         self._widgets["version"].setText(version)
+
+        icon = res.icon(icon)
+        icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
+        self._widgets["icon"].setPixmap(icon)

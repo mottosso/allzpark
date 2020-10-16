@@ -552,7 +552,7 @@ class Window(QtWidgets.QMainWindow):
         self.setWindowTitle("%s  |  %s" % (label, self.title))
 
         profile_dock = self._docks["profiles"]
-        profile_dock.update_current(profile, version)
+        profile_dock.update_current(profile, version, icon)
 
         toggle = profile_dock.toggle
         toggle.setIcon(res.icon(icon))
