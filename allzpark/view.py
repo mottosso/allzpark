@@ -349,11 +349,17 @@ class Window(QtWidgets.QMainWindow):
         self.setTabPosition(QtCore.Qt.LeftDockWidgetArea,
                             QtWidgets.QTabWidget.North)
 
+        docks = list(self._docks.values())
+
+        area = QtCore.Qt.LeftDockWidgetArea
+        profile = docks[0]
+        self.addDockWidget(area, profile)
+
         area = QtCore.Qt.RightDockWidgetArea
-        first = list(self._docks.values())[0]
+        first = docks[1]
         self.addDockWidget(area, first)
 
-        for widget in self._docks.values():
+        for widget in docks[2:]:
             if widget is first:
                 continue
 
