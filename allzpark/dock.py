@@ -44,7 +44,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
         central = QtWidgets.QWidget()
 
         layout = QtWidgets.QVBoxLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(px(5))
         layout.addWidget(panels["help"])
         layout.addWidget(panels["body"])
@@ -240,11 +240,11 @@ class Console(AbstractDockWidget):
 
     def append(self, line, level=logging.INFO):
         color = {
-            logging.DEBUG: "<font color=\"grey\">",
+            logging.DEBUG: "<font color=\"lightgrey\">",
             logging.WARNING: "<font color=\"darkorange\">",
             logging.ERROR: "<font color=\"red\">",
             logging.CRITICAL: "<font color=\"red\">",
-        }.get(level, "<font color=\"#222\">")
+        }.get(level, "<font color=\"grey\">")
 
         line = line.replace(" ", "&nbsp;")
         line = line.replace("\n", "<br>")
@@ -1510,8 +1510,8 @@ class Profiles(AbstractDockWidget):
         version.setToolTip("Click to change profile version")
         version.setEnabled(False)
 
-        widgets["sep1"].setFrameShape(QtWidgets.QFrame.HLine)
-        widgets["sep1"].setFrameShadow(QtWidgets.QFrame.Sunken)
+        widgets["sep1"].setFrameStyle(QtWidgets.QFrame.HLine
+                                      | QtWidgets.QFrame.Plain)
 
         # icons
         icon_size = QtCore.QSize(14, 14)
