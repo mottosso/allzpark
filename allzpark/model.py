@@ -54,12 +54,15 @@ log = logging.getLogger(__name__)
 _basestring = six.string_types[0]  # For Python 2/3
 _usercount = itertools.count(1)
 Finish = None
+Latest = None  # Enum
+NoVersion = None
 
 DisplayRole = QtCore.Qt.DisplayRole
 IconRole = QtCore.Qt.DecorationRole
 LocalizingRole = QtCore.Qt.UserRole + 1
 BetaRole = QtCore.Qt.UserRole + 2
 LatestRole = QtCore.Qt.UserRole + 3
+NameRole = QtCore.Qt.UserRole + 4
 
 
 class AbstractTableModel(QtCore.QAbstractTableModel):
@@ -664,3 +667,328 @@ class ProxyModel(TriStateSortFilterProxyModel):
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return super(ProxyModel, self).rowCount(parent)
+
+
+class TreeItem(dict):
+
+    def __init__(self, data=None):
+        super(TreeItem, self).__init__(data or {})
+        self._children = list()
+        self._parent = None
+
+    def walk(self):
+        for i in self._children:
+            yield i
+        for i in self._children:
+            for j in i.walk():
+                yield j
+
+    def row(self):
+        if self._parent is not None:
+            siblings = self.parent().children()
+            return siblings.index(self)
+
+    def parent(self):
+        return self._parent
+
+    def child(self, row):
+        if row >= len(self._children):
+            log.warning("Invalid row as child: {0}".format(row))
+            return
+        return self._children[row]
+
+    def children(self):
+        return self._children
+
+    def childCount(self):
+        return len(self._children)
+
+    def add_child(self, child):
+        child._parent = self
+        self._children.append(child)
+
+
+class AbstractTreeModel(QtCore.QAbstractItemModel):
+    ColumnToKey = {}
+    Headers = []
+
+    def __init__(self, parent=None):
+        super(AbstractTreeModel, self).__init__(parent)
+        self.root = TreeItem()
+
+    def reset(self, items=None):
+        pass
+
+    def find(self, name):
+        walk = self.root.walk()
+        return next((i for i in walk if i.get("name") == name), None)
+
+    def findIndex(self, name):
+        item = self.find(name)
+        if item is None:
+            return QtCore.QModelIndex()
+        else:
+            return self.createIndex(item.row(), 0, item)
+
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        if parent.isValid():
+            item = parent.internalPointer()
+        else:
+            item = self.root
+
+        return item.childCount()
+
+    def columnCount(self, parent):
+        return len(self.ColumnToKey)
+
+    def index(self, row, column, parent):
+        if not parent.isValid():
+            parent_item = self.root
+        else:
+            parent_item = parent.internalPointer()
+
+        child_item = parent_item.child(row)
+        if child_item:
+            return self.createIndex(row, column, child_item)
+        else:
+            return QtCore.QModelIndex()
+
+    def headerData(self, section, orientation, role):
+        if orientation == QtCore.Qt.Vertical:
+            return
+
+        if role == QtCore.Qt.DisplayRole:
+            return self.Headers[section]
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        item = index.internalPointer()
+        col = index.column()
+
+        try:
+            value = item[role]
+
+            if isinstance(value, list):
+                # Prevent edits
+                value = value[:]
+
+            return value
+
+        except KeyError:
+            try:
+                key = self.ColumnToKey[col][role]
+            except KeyError:
+                return None
+
+        return item[key]
+
+    def setData(self, index, value, role=QtCore.Qt.EditRole):
+        if index.isValid():
+            item = index.internalPointer()
+            col = index.column()
+
+            try:
+                item[role] = value
+            except KeyError:
+                key = self.ColumnToKey[col][role]
+                item[key] = value
+
+            roles = [role] if isinstance(role, int) else []
+            QtCompat.dataChanged(self, index, index, roles)
+
+            return True
+
+        return False
+
+    def parent(self, index):
+        item = index.internalPointer()
+        parent_item = item.parent()
+
+        # If it has no parents we return invalid
+        if parent_item == self.root or not parent_item:
+            return QtCore.QModelIndex()
+
+        return self.createIndex(parent_item.row(), 0, parent_item)
+
+    def add_child(self, item, parent=None):
+        if parent is None:
+            parent = self.root
+
+        parent.add_child(item)
+
+
+def is_filtering_recursible():
+    """Does Qt binding support recursive filtering for QSortFilterProxyModel?
+
+    Recursive filtering was introduced in Qt 5.10.
+
+    """
+    return hasattr(QtCore.QSortFilterProxyModel,
+                   "setRecursiveFilteringEnabled")
+
+
+class RecursiveSortFilterProxyModel(QtCore.QSortFilterProxyModel):
+    """Filters to the regex if any of the children matches allow parent"""
+
+    if is_filtering_recursible():
+        def filter_accepts_parent(self, index, node):
+            # With the help of `RecursiveFiltering` feature from Qt 5.10+,
+            # parent always not be accepted by default.
+            return False
+    else:
+        def filter_accepts_parent(self, index, model):
+            for child_row in range(model.rowCount(index)):
+                if self.filterAcceptsRow(child_row, index):
+                    return True
+            return False
+
+        # Patch future function
+        def setRecursiveFilteringEnabled(self, *args):
+            pass
+
+    def __init__(self, *args, **kwargs):
+        super(RecursiveSortFilterProxyModel, self).__init__(*args, **kwargs)
+        self.setRecursiveFilteringEnabled(True)
+
+    def filterAcceptsRow(self, row, parent):
+        model = self.sourceModel()
+        source_index = model.index(row, self.filterKeyColumn(), parent)
+        if source_index.isValid():
+            item = source_index.internalPointer()
+            if item.childCount():
+                return self.filter_accepts_parent(source_index, model)
+
+        return super(RecursiveSortFilterProxyModel,
+                     self).filterAcceptsRow(row, parent)
+
+
+class ProfileModel(AbstractTreeModel):
+    """
+    * profile category
+    * profile name (label)
+    * favorite
+    * profile data
+    """
+    ColumnToKey = {
+        0: {
+            NameRole: "name",
+            QtCore.Qt.DisplayRole: "label",
+            QtCore.Qt.DecorationRole: "icon",
+        },
+    }
+
+    Headers = [
+        "label",
+    ]
+
+    DefaultCategory = "profiles"
+
+    def __init__(self, parent=None):
+        super(ProfileModel, self).__init__(parent)
+        self.is_filtering = True
+        self.current = ""
+        self.favorites = set([])
+
+        self.icons = [
+            # normal
+            res.icon("profile_normal"),
+            # favorite
+            res.icon("profile_normal_star"),
+            # current
+            res.icon("profile_current"),
+            # current + favorite
+            res.icon("profile_current_star"),
+        ]
+
+    def set_favorites(self, ctrl):
+        favorites = ctrl.state.retrieve("favoriteProfiles", "").split(",")
+        self.favorites = set(favorites)
+
+    def set_current(self, name):
+        previous = self.current
+        self.current = name
+        self.update_profile_icon(self.findIndex(previous))
+        self.update_profile_icon(self.findIndex(name))
+
+    def update_favorite(self, ctrl, index):
+        if not index.isValid():
+            return
+
+        name = index.data(NameRole)
+
+        if name in self.favorites:
+            self.favorites.remove(name)
+        else:
+            self.favorites.add(name)
+
+        ctrl.state.store("favoriteProfiles", ",".join(self.favorites))
+
+    def update_profile_icon(self, index):
+        if not index.isValid():
+            return
+
+        icon = self.profile_icon(index.data(NameRole))
+        self.setData(index, icon, role=QtCore.Qt.DecorationRole)
+
+    def reset(self, profiles=None):
+        profiles = profiles or dict()
+
+        self.beginResetModel()
+        self.root = TreeItem()
+
+        categories = dict()
+
+        for name, versions in profiles.items():
+            # NOTE: This model only takes the latest profile
+            package = versions[Latest]
+            data = allzparkconfig.metadata_from_package(package)
+
+            item = TreeItem({
+                "name": name,
+                "label": data.get("label", name),
+                "icon": self.profile_icon(name),
+                "category": data.get("category", self.DefaultCategory),
+            })
+
+            category_name = item["category"]
+            if category_name in categories:
+                category = categories[category_name]
+            else:
+                category = TreeItem({
+                    "name": None,
+                    "label": category_name,
+                    "icon": None,
+                })
+                categories[category_name] = category
+                self.root.add_child(category)
+
+            category.add_child(item)
+
+        self.endResetModel()
+
+    def profile_icon(self, name):
+        is_favorite = (name in self.favorites) * 1
+        is_current = (name == self.current) * 2
+        return self.icons[is_current + is_favorite]
+
+
+class ProfileProxyModel(RecursiveSortFilterProxyModel):
+
+    def filterAcceptsRow(self, row, parent):
+        model = self.sourceModel()
+        regex = self.filterRegExp()
+        source_index = model.index(row, self.filterKeyColumn(), parent)
+        if source_index.isValid():
+            item = source_index.internalPointer()
+
+            if item.childCount():
+                return self.filter_accepts_parent(source_index, model)
+
+            elif model.is_filtering and regex.isEmpty():
+                name = item["name"]
+                return name == model.current or name in model.favorites
+
+        return super(RecursiveSortFilterProxyModel,
+                     self).filterAcceptsRow(row, parent)

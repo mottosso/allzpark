@@ -105,36 +105,6 @@ Window #header QComboBox {
     padding: 0;
 }
 
-Window #header #profileBtn {
-    background: transparent;
-    border: 1px solid #aaa;
-    padding: 0;
-}
-
-Window #header #profileReset {
-
-}
-
-Window QStatusBar #profileReset {
-    max-width: 25px;
-    padding: 0;
-    margin: 0;
-    max-width: 16px;
-    max-height: 16px;
-    border: 5px solid yellow;
-    background: green;
-}
-
-
-Window QStatusBar #profileReset:hover {
-    background: blue;
-}
-
-
-Window QStatusBar #profileReset:pressed {
-    background: yellow;
-}
-
 Window #body {
     background: white;
 }
@@ -278,4 +248,23 @@ QTableView::item:selected:active, QTableView::item:selected:!focus {
 
 QFrame {
     border: none;
+}
+
+Profiles QTreeView::item {
+    padding: 2px 5px;
+}
+
+Profiles QPushButton {
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    background: transparent;
+    margin: 0;
+    padding: 0px;
+    border: 0;
+}
+
+Profiles QPushButton:hover {
+    background-color: #add9f2;
 }

@@ -60,10 +60,6 @@ class Window(QtWidgets.QMainWindow):
             "logo": QtWidgets.QToolButton(),
             "appVersion": QtWidgets.QLabel(version),
 
-            "profileBtn": dock.PushButtonWithMenu(),
-            "profileName": dock.LineEditWithCompleter(),
-            "profileVersion": dock.LineEditWithCompleter(),
-
             "apps": dock.SlimTableView(),
             "fullCommand": FullCommand(ctrl),
 
@@ -71,6 +67,7 @@ class Window(QtWidgets.QMainWindow):
             "continue": QtWidgets.QPushButton("Continue"),
             "reset": QtWidgets.QPushButton("Reset"),
 
+            "leftToggles": QtWidgets.QWidget(),
             "dockToggles": QtWidgets.QWidget(),
 
             "stateIndicator": QtWidgets.QLabel(),
@@ -78,6 +75,7 @@ class Window(QtWidgets.QMainWindow):
 
         # The order is reflected in the UI
         docks = odict((
+            ("profiles", dock.Profiles(ctrl)),
             ("app", dock.App(ctrl)),
             ("packages", dock.Packages(ctrl)),
             ("context", dock.Context(ctrl)),
@@ -165,11 +163,8 @@ class Window(QtWidgets.QMainWindow):
             if kwargs.get("stretch"):
                 layout.setColumnStretch(addColumn.row, kwargs["stretch"])
 
-        addColumn([widgets["profileBtn"]], 2, 1)
-        addColumn([widgets["profileName"],
-                   widgets["profileVersion"]])
-
-        addColumn([QtWidgets.QWidget()], stretch=1)
+        addColumn([widgets["leftToggles"]], 2, 1)
+        addColumn([QtWidgets.QWidget()], stretch=2)
         addColumn([widgets["dockToggles"]], 2, 1)
         addColumn([QtWidgets.QWidget()], stretch=2)
 
@@ -177,12 +172,18 @@ class Window(QtWidgets.QMainWindow):
                    widgets["appVersion"]])
         addColumn([widgets["logo"]], 2, 1)
 
-        layout = QtWidgets.QHBoxLayout(widgets["dockToggles"])
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        _layouts = dict()
+        _layouts["left"] = QtWidgets.QHBoxLayout(widgets["leftToggles"])
+        _layouts["dock"] = QtWidgets.QHBoxLayout(widgets["dockToggles"])
+        for _layout in _layouts.values():
+            _layout.setContentsMargins(0, 0, 0, 0)
+            _layout.setSpacing(0)
 
         for name, widget in docks.items():
-            toggle = QtWidgets.QPushButton()
+            has_menu = hasattr(widget, "on_context_menu")
+            BtnCls = (dock.PushButtonWithMenu
+                      if has_menu else QtWidgets.QPushButton)
+            toggle = BtnCls()
             toggle.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                  QtWidgets.QSizePolicy.Expanding)
             toggle.setObjectName(name + "Toggle")
@@ -203,6 +204,10 @@ class Window(QtWidgets.QMainWindow):
 
             toggle.clicked.connect(partial(on_toggled, widget, toggle))
 
+            if has_menu:
+                toggle.customContextMenuRequested.connect(
+                    widget.on_context_menu(self))
+
             # Store reference for showEvent
             widget.toggle = toggle
 
@@ -217,7 +222,8 @@ class Window(QtWidgets.QMainWindow):
             # Forward any messages
             widget.message.connect(self.tell)
 
-            layout.addWidget(toggle)
+            _section = "left" if name == "profiles" else "dock"
+            _layouts[_section].addWidget(toggle)
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
         layout.setSpacing(0)
@@ -235,24 +241,11 @@ class Window(QtWidgets.QMainWindow):
         widgets["noappsMessage"].setReadOnly(True)
         widgets["noappsMessage"].setOpenExternalLinks(True)
 
-        widgets["profileBtn"].setIconSize(QtCore.QSize(px(32), px(32)))
-        widgets["profileBtn"].setToolTip("Click to change profile\n"
-                                         "Right-click for options")
-        widgets["profileBtn"].setIcon(res.icon("Default_Profile"))
-
-        css = "QWidget { border-image: url(%s); }"
-
         widgets["logo"].setCursor(QtCore.Qt.PointingHandCursor)
         widgets["logo"].setToolTip(allzparkconfig.help_url)
-        widgets["profileBtn"].setCursor(QtCore.Qt.PointingHandCursor)
-        widgets["profileName"].setCursor(QtCore.Qt.PointingHandCursor)
-        widgets["profileVersion"].setCursor(QtCore.Qt.PointingHandCursor)
 
-        widgets["profileName"].setToolTip("Click to change profile")
-        widgets["profileName"].setModel(ctrl.models["profileNames"])
-        widgets["profileVersion"].setToolTip("Click to change profile version")
-        widgets["profileVersion"].setModel(ctrl.models["profileVersions"])
-
+        docks["profiles"].set_model(ctrl.models["profiles"],
+                                    ctrl.models["profileVersions"])
         docks["packages"].set_model(ctrl.models["packages"])
         docks["context"].set_model(ctrl.models["context"])
         docks["environment"].set_model(ctrl.models["environment"])
@@ -264,12 +257,14 @@ class Window(QtWidgets.QMainWindow):
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
         widgets["logo"].clicked.connect(self.on_logo_clicked)
-        widgets["profileBtn"].clicked.connect(self.on_profilebtn_pressed)
-        widgets["profileBtn"].customContextMenuRequested.connect(
-            self.on_profilebtn_contextmenu)
-        widgets["profileName"].changed.connect(self.on_profilename_changed)
-        widgets["profileVersion"].changed.connect(
+
+        docks["profiles"].profile_changed.connect(
+            self.on_profilename_changed)
+        docks["profiles"].profile_changed.connect(
+            ctrl.models["profiles"].set_current)
+        docks["profiles"].version_changed.connect(
             self.on_profileversion_changed)
+        docks["profiles"].reset.connect(self.reset)
 
         widgets["reset"].clicked.connect(self.on_reset_clicked)
         widgets["continue"].clicked.connect(self.on_continue_clicked)
@@ -281,7 +276,7 @@ class Window(QtWidgets.QMainWindow):
         selection_model.selectionChanged.connect(self.on_app_selection_changed)
 
         ctrl.models["apps"].modelReset.connect(self.on_apps_reset)
-        ctrl.models["profileNames"].modelReset.connect(
+        ctrl.models["profiles"].modelReset.connect(
             self.on_profilename_reset)
         ctrl.models["profileVersions"].modelReset.connect(
             self.on_profileversion_reset)
@@ -330,7 +325,6 @@ class Window(QtWidgets.QMainWindow):
 
     def update_advanced_controls(self):
         shown = bool(self._ctrl.state.retrieve("showAdvancedControls"))
-        self._widgets["profileVersion"].setVisible(shown)
         self._widgets["fullCommand"].setVisible(shown)
 
         # Update dock toggles
@@ -355,11 +349,17 @@ class Window(QtWidgets.QMainWindow):
         self.setTabPosition(QtCore.Qt.LeftDockWidgetArea,
                             QtWidgets.QTabWidget.North)
 
+        docks = list(self._docks.values())
+
+        area = QtCore.Qt.LeftDockWidgetArea
+        profile = docks[0]
+        self.addDockWidget(area, profile)
+
         area = QtCore.Qt.RightDockWidgetArea
-        first = list(self._docks.values())[0]
+        first = docks[1]
         self.addDockWidget(area, first)
 
-        for widget in self._docks.values():
+        for widget in docks[2:]:
             if widget is first:
                 continue
 
@@ -458,7 +458,7 @@ class Window(QtWidgets.QMainWindow):
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
-        if not visible:
+        if not visible or dock == self._docks["profiles"]:
             return
 
         # Handle the easy cases first
@@ -467,7 +467,9 @@ class Window(QtWidgets.QMainWindow):
         allow_multiple = bool(self._ctrl.state.retrieve("allowMultipleDocks"))
 
         if ctrl_held or not allow_multiple:
-            for d in self._docks.values():
+            for name, d in self._docks.items():
+                if name == "profiles":
+                    continue
                 d.setVisible(d == dock)
             return
 
@@ -519,35 +521,6 @@ class Window(QtWidgets.QMainWindow):
         self._ctrl.select_profile(profile, version)
         self.setFocus()
 
-    def on_profilebtn_pressed(self):
-        widget = self._widgets["profileName"]
-        widget.setFocus()
-        widget.selectAll()
-
-        completer = widget.completer()
-        completer.complete()
-
-    def on_profilebtn_contextmenu(self):
-        name = self._widgets["profileName"].text()
-
-        menu = dock.MenuWithTooltip(self)
-        separator = QtWidgets.QWidgetAction(menu)
-        separator.setDefaultWidget(QtWidgets.QLabel(name))
-        menu.addAction(separator)
-
-        def on_reset():
-            self.reset()
-
-        reset = QtWidgets.QAction("Reset", menu)
-        reset.triggered.connect(on_reset)
-        reset.setToolTip("Re-scan repository for new Rez packages")
-        menu.addAction(reset)
-
-        menu.addSeparator()
-
-        menu.move(QtGui.QCursor.pos())
-        menu.show()
-
     def on_logo_clicked(self):
         url = allzparkconfig.help_url
         QtGui.QDesktopServices.openUrl(QtCore.QUrl(url))
@@ -589,11 +562,11 @@ class Window(QtWidgets.QMainWindow):
         self.tell("%s %s-%s" % (action, profile, version))
         self.setWindowTitle("%s  |  %s" % (label, self.title))
 
-        self._widgets["profileName"].setText(label)
-        self._widgets["profileVersion"].setText(version)
+        profile_dock = self._docks["profiles"]
+        profile_dock.update_current(profile, version, icon)
 
-        button = self._widgets["profileBtn"]
-        button.setIcon(res.icon(icon))
+        toggle = profile_dock.toggle
+        toggle.setIcon(res.icon(icon))
 
         # Determine aspect ratio
         height = px(32)
@@ -605,8 +578,8 @@ class Window(QtWidgets.QMainWindow):
         pixmap = pixmap.scaledToHeight(height)
         width = pixmap.width()
 
-        button.setIconSize(QtCore.QSize(width, height))
-        button.setAutoFillBackground(True)
+        toggle.setIconSize(QtCore.QSize(width, height))
+        toggle.setAutoFillBackground(True)
 
     def setStyleSheet(self, style):
         style = style % {
@@ -635,9 +608,6 @@ class Window(QtWidgets.QMainWindow):
         page = self._pages.get(str(state), self._pages["home"])
         page_name = page.objectName()
         self._panels["pages"].setCurrentWidget(page)
-        self._widgets["profileName"].setEnabled(True)
-        self._widgets["profileVersion"].setEnabled(True)
-        self._widgets["profileBtn"].setEnabled(True)
 
         launch_btn = self._docks["app"]._widgets["launchBtn"]
         launch_btn.setText("Launch")
@@ -648,24 +618,18 @@ class Window(QtWidgets.QMainWindow):
 
         if page_name == "home":
             self._widgets["apps"].setEnabled(state == "ready")
-            self._widgets["profileBtn"].setEnabled(state == "ready")
-            self._widgets["profileVersion"].setEnabled(state == "ready")
 
         elif page_name == "noapps":
             message = self._ctrl.state["error"]
-            self._widgets["profileBtn"].setEnabled(True)
             self._widgets["noappsMessage"].setText(message)
 
         elif page_name == "noprofiles":
-            self._widgets["profileBtn"].setEnabled(True)
+            pass
 
         if state == "launching":
             self._docks["app"].setEnabled(False)
 
         if state == "loading":
-            self._widgets["profileBtn"].setEnabled(False)
-            self._widgets["profileName"].setEnabled(False)
-            self._widgets["profileVersion"].setEnabled(False)
             for widget in self._docks.values():
                 widget.setEnabled(False)
 
