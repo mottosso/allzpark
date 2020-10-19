@@ -67,6 +67,7 @@ class Window(QtWidgets.QMainWindow):
             "continue": QtWidgets.QPushButton("Continue"),
             "reset": QtWidgets.QPushButton("Reset"),
 
+            "leftToggles": QtWidgets.QWidget(),
             "dockToggles": QtWidgets.QWidget(),
 
             "stateIndicator": QtWidgets.QLabel(),
@@ -162,10 +163,8 @@ class Window(QtWidgets.QMainWindow):
             if kwargs.get("stretch"):
                 layout.setColumnStretch(addColumn.row, kwargs["stretch"])
 
-        # Here once lived profile widgets, and has been removed.
-        addColumn([], offset=2, stretch=1)
-
-        addColumn([QtWidgets.QWidget()], stretch=1)
+        addColumn([widgets["leftToggles"]], 2, 1)
+        addColumn([QtWidgets.QWidget()], stretch=2)
         addColumn([widgets["dockToggles"]], 2, 1)
         addColumn([QtWidgets.QWidget()], stretch=2)
 
@@ -173,9 +172,12 @@ class Window(QtWidgets.QMainWindow):
                    widgets["appVersion"]])
         addColumn([widgets["logo"]], 2, 1)
 
-        layout = QtWidgets.QHBoxLayout(widgets["dockToggles"])
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        _layouts = dict()
+        _layouts["left"] = QtWidgets.QHBoxLayout(widgets["leftToggles"])
+        _layouts["dock"] = QtWidgets.QHBoxLayout(widgets["dockToggles"])
+        for _layout in _layouts.values():
+            _layout.setContentsMargins(0, 0, 0, 0)
+            _layout.setSpacing(0)
 
         for name, widget in docks.items():
             has_menu = hasattr(widget, "on_context_menu")
@@ -220,7 +222,8 @@ class Window(QtWidgets.QMainWindow):
             # Forward any messages
             widget.message.connect(self.tell)
 
-            layout.addWidget(toggle)
+            _section = "left" if name == "profiles" else "dock"
+            _layouts[_section].addWidget(toggle)
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
         layout.setSpacing(0)
