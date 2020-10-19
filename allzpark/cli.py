@@ -213,7 +213,8 @@ def main():
     with timings("- Loading Qt.. ") as msg:
         try:
             from .vendor import Qt
-            msg["success"] = "(%s) - ok {:.2f}\n" % Qt.__binding__
+            msg["success"] = "(%s - %s) - ok {:.2f}\n"\
+                             % (Qt.__binding__, Qt.__qt_version__)
         except ImportError:
             msg["failure"] = (
                 "ERROR: allzpark requires a Python binding for Qt,\n"
