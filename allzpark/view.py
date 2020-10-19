@@ -455,6 +455,12 @@ class Window(QtWidgets.QMainWindow):
             allzparkconfig.exclude_filter = value
             self._ctrl.reset()
 
+        if key == "palette":
+            user_css = self._ctrl.state.retrieve("userCss", "")
+            self._originalcss = res.load_style(value)
+            self.setStyleSheet("\n".join([self._originalcss,
+                                          res.format_stylesheet(user_css)]))
+
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
@@ -580,13 +586,6 @@ class Window(QtWidgets.QMainWindow):
 
         toggle.setIconSize(QtCore.QSize(width, height))
         toggle.setAutoFillBackground(True)
-
-    def setStyleSheet(self, style):
-        style = style % {
-            "root": os.path.dirname(__file__).replace("\\", "/"),
-            "res": res.dirname.replace("\\", "/"),
-        }
-        super(Window, self).setStyleSheet(style)
 
     def on_repository_changed(self):
         self.reset()

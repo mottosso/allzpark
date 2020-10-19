@@ -24,6 +24,25 @@ exclude_filter = "*.beta"
 # Where to go when clicking the logo
 help_url = "https://allzpark.com"
 
+# Custom colors for Allzpark stylesheet, e.g.:
+#
+# {
+#     "my_theme_name": {
+#         "brightest": "#403E3D",
+#         "bright": "#383635",
+#         "base": "#2E2C2C",
+#         "dim": "#21201F",
+#         "dimmest": "#141413",
+#
+#         "highlight": "#69D6C2",
+#         "highlighted": "#111111",
+#         "active": "silver",
+#         "inactive": "dimGray",
+#     },
+# }
+#
+palettes = {}
+
 
 def profiles():
     """Return list of profiles

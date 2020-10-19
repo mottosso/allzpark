@@ -230,6 +230,7 @@ class Console(AbstractDockWidget):
         self.setWidget(panels["central"])
 
         widgets["text"].setReadOnly(True)
+        widgets["text"].setObjectName("consolelog")
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -958,11 +959,8 @@ class Preferences(AbstractDockWidget):
 
         qargparse.Separator("Theme"),
 
-        qargparse.Info("primaryColor", default="white", help=(
-            "Main color of the GUI"
-        )),
-        qargparse.Info("secondaryColor", default="steelblue", help=(
-            "Secondary color of the GUI"
+        qargparse.Enum("palette", items=list(res.load_palettes()), help=(
+            "Main colors of the GUI"
         )),
 
         qargparse.Button("resetLayout", help=(
@@ -1082,7 +1080,7 @@ class Preferences(AbstractDockWidget):
     def on_css_applied(self, css):
         self._ctrl.state.store("userCss", css)
         self._window.setStyleSheet("\n".join([
-            self._window._originalcss, css]))
+            self._window._originalcss, res.format_stylesheet(css)]))
         self._window.tell("Applying css..")
 
 
