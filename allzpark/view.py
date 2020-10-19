@@ -458,7 +458,7 @@ class Window(QtWidgets.QMainWindow):
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
-        if not visible:
+        if not visible or dock == self._docks["profiles"]:
             return
 
         # Handle the easy cases first
@@ -467,7 +467,9 @@ class Window(QtWidgets.QMainWindow):
         allow_multiple = bool(self._ctrl.state.retrieve("allowMultipleDocks"))
 
         if ctrl_held or not allow_multiple:
-            for d in self._docks.values():
+            for name, d in self._docks.items():
+                if name == "profiles":
+                    continue
                 d.setVisible(d == dock)
             return
 
