@@ -28,13 +28,16 @@ help_url = "https://allzpark.com"
 #
 # {
 #     "my_theme_name": {
+#         "prim": "2E2C2C",
+#
 #         "brightest": "#403E3D",
 #         "bright": "#383635",
 #         "base": "#2E2C2C",
 #         "dim": "#21201F",
 #         "dimmest": "#141413",
 #
-#         "highlight": "#69D6C2",
+#         "hover": "rgba(65, 166, 148, 40)",
+#         "highlight": "rgb(117, 189, 176)",
 #         "highlighted": "#111111",
 #         "active": "silver",
 #         "inactive": "dimGray",
