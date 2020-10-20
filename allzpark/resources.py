@@ -61,6 +61,8 @@ def format_stylesheet(css):
 def load_palettes():
     palettes = {
         "dark": {
+            "prim": "#2E2C2C",
+
             "brightest": "#403E3D",
             "bright": "#383635",
             "base": "#2E2C2C",
@@ -75,11 +77,13 @@ def load_palettes():
         },
 
         "light": {
-            "brightest": "#fafcfe",
-            "bright": "#efeff0",
-            "base": "#e6e6e6",
-            "dim": "#c5c7c9",
-            "dimmest": "#b2b5b8",
+            "prim": "#FFFFFF",
+
+            "brightest": "#FDFDFD",
+            "bright": "#F9F9F9",
+            "base": "#EFEFEF",
+            "dim": "#DFDFDF",
+            "dimmest": "#CFCFCF",
 
             "hover": "rgba(57, 196, 171, 40)",
             "highlight": "rgb(105, 214, 194)",

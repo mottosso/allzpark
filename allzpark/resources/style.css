@@ -1,7 +1,10 @@
 /*
 Following color keywords require to be formatted
 
-Main colors :
+Prim color:
+    %(prim)s
+
+Mono colors :
     %(brightest)s
     %(bright)s
     %(base)s
@@ -63,7 +66,7 @@ QPushButton:pressed {
 }
 
 QAbstractScrollArea {
-    background: %(base)s;
+    background: %(bright)s;
 }
 
 QToolTip, QTextEdit, QLineEdit {
@@ -72,9 +75,9 @@ QToolTip, QTextEdit, QLineEdit {
 }
 
 QComboBox {
-    background: %(brightest)s;
+    background: %(base)s;
     color: %(active)s;
-    border: none;
+    border: 1px solid %(dim)s;
     padding: 2px;
     padding-right: 0px;
 }
@@ -97,11 +100,11 @@ Window {
     min-width: 580px;
     min-height: 300px;
     height: 350px;
-    background: %(base)s;
+    background: %(prim)s;
 }
 
 Window #header {
-    background: %(base)s;
+    background: %(prim)s;
     border-bottom: 1px solid %(dimmest)s;
 }
 
@@ -177,6 +180,7 @@ FullCommand QLineEdit {
 }
 
 FullCommand QComboBox {
+    border: none;
     background: %(bright)s;
 }
 
@@ -305,7 +309,7 @@ Context #overlay {
 }
 
 QDockWidget {
-    background: %(base)s;
+    background: %(prim)s;
     border: 1px solid %(dim)s;
 }
 
