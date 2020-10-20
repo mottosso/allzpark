@@ -9,6 +9,7 @@ Main colors :
     %(dimmest)s
 
 Selection colors :
+    %(hover)s
     %(highlight)s
     %(highlighted)s
 
@@ -119,7 +120,8 @@ Window #header QPushButton[type=toggle] {
 }
 
 Window #header QPushButton[type=toggle]:checked {
-    background: %(dim)s;
+    border: 1px solid %(highlight)s;
+    background: %(hover)s;
 }
 
 Window #header QPushButton[type=toggle]:hover {
@@ -190,6 +192,7 @@ QMenu {
 }
 
 QAbstractItemView {
+    show-decoration-selected: 1;  /* highlight the decoration (branch) ! */
     background: %(bright)s;
 }
 
@@ -201,10 +204,6 @@ QAbstractItemView, QMenu {
 
 QAbstractItemView::item:selected:active,
 QAbstractItemView::item:selected:!focus {
-    background: %(highlight)s;
-}
-
-QTreeView::branch::selected {
     background: %(highlight)s;
 }
 
@@ -231,12 +230,23 @@ QTreeView::branch:open:has-children:has-siblings:hover  {
     image: url(%(res)s/branch_open-on.png);
 }
 
-QAbstractItemView::item:selected {
-    border: none;
-    background: transparent;
+QTreeView::branch::selected {
+    background: %(highlight)s;
+}
+
+QTreeView::branch::hover {
+    background: %(hover)s;
 }
 
 QAbstractItemView::item::hover {
+    background: %(hover)s;
+}
+
+/* SlimTableView highlight entire row on select, but hover only highlight
+   on item, so instead of re-implement the paint(), increase the padding
+   as an alternative indication. */
+SlimTableView::item:!selected:hover {
+    padding: 3px;
     background: transparent;
 }
 
@@ -301,7 +311,8 @@ QDockWidget {
 
 QDockWidget::title {
     background-color: %(dim)s;
-    padding: 3px;
+    border: 1px solid %(dimmest)s;
+    margin: 2px;
 }
 
 QDockWidget::float-button, QDockWidget::close-button {
@@ -320,7 +331,7 @@ LineEditWithCompleter {
 
 /* Underline on hover */
 LineEditWithCompleter:hover {
-    border-bottom: 2px solid steelblue;
+    border-bottom: 2px solid %(hover)s;
     padding: 0px;
 }
 
@@ -373,32 +384,38 @@ QTabBar:focus
     border: 0px transparent;
 }
 
-QTabBar::tab:top {
+QTabBar::tab {
     background-color: %(brightest)s;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
+    border: 1px solid %(dim)s;
     padding: 5px;
 }
 
-QTabBar::tab:top:!selected
+QTabBar::tab:!selected
 {
     color: %(inactive)s;
     background-color: %(base)s;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
 }
 
-QTabBar::tab:top:!selected:hover {
-    background-color: %(brightest)s;
+QTabBar::tab:!selected:hover {
+    color: %(active)s;
+    background-color: %(hover)s;
 }
 
 QTabBar::tab:top {
-    border: 1px solid %(dim)s;
     border-right: none;
     border-bottom: none;
 }
 
 QTabBar::tab:top:last {
+    border-right: 1px solid %(dim)s;
+}
+
+QTabBar::tab:bottom {
+    border-right: none;
+    border-top: none;
+}
+
+QTabBar::tab:bottom:last {
     border-right: 1px solid %(dim)s;
 }
 
