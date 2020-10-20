@@ -1,10 +1,11 @@
 import re
+import types
 import logging
 
 from collections import OrderedDict as odict
 from Qt import QtCore, QtWidgets, QtGui
 
-__version__ = "0.5.4"
+__version__ = "0.5.5"
 _log = logging.getLogger(__name__)
 _type = type  # used as argument
 
@@ -697,26 +698,29 @@ class Enum(QArgument):
         kwargs["default"] = kwargs.pop("default", None)
         kwargs["items"] = kwargs.get("items", [])
 
-        assert isinstance(kwargs["items"], (tuple, list)), (
-            "items must be list"
+        _enum_types = (tuple, list, types.GeneratorType)
+        assert isinstance(kwargs["items"], _enum_types), (
+            "items must be list, tuple or generator"
         )
 
         super(Enum, self).__init__(name, **kwargs)
 
     def create(self):
+        items = list(self["items"])
+
         widget = QtWidgets.QComboBox()
-        widget.addItems(self["items"])
+        widget.addItems(items)
         widget.currentIndexChanged.connect(
             lambda index: self.changed.emit())
 
         self._read = lambda: widget.currentText()
         self._write = lambda value: widget.setCurrentText(value)
 
-        if self["default"] is not None and len(self["items"]):
+        if self["default"] is not None and len(items):
             if isinstance(self["default"], int):
                 index = self["default"]
-                index = 0 if index > len(self["items"]) else index
-                self["default"] = self["items"][index]
+                index = 0 if index > len(items) else index
+                self["default"] = items[index]
             else:
                 # Must be str type. If the default str is not in list, will
                 # fallback to the first item silently.
