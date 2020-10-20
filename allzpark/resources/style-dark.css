@@ -78,8 +78,6 @@ QComboBox {
     background: %(base)s;
     color: %(active)s;
     border: 1px solid %(dim)s;
-    padding: 2px;
-    padding-right: 0px;
 }
 
 QComboBox::drop-down {
@@ -109,10 +107,6 @@ Window #header {
 }
 
 Window #header QLabel {
-    padding: 0;
-}
-
-Window #header QComboBox {
     padding: 0;
 }
 
@@ -182,6 +176,8 @@ FullCommand QLineEdit {
 FullCommand QComboBox {
     border: none;
     background: %(bright)s;
+    padding: 2px;
+    padding-right: 0px;
 }
 
 #launchBtn {

@@ -957,10 +957,10 @@ class Preferences(AbstractDockWidget):
             "Load this application on startup"
         )),
 
-        qargparse.Separator("Theme"),
+        qargparse.Separator("Appearance"),
 
-        qargparse.Enum("palette", items=list(res.load_palettes()), help=(
-            "Main colors of the GUI"
+        qargparse.Enum("theme", items=res.theme_names(), help=(
+            "GUI skin. May need to restart Allzpark after changed."
         )),
 
         qargparse.Button("resetLayout", help=(

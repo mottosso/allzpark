@@ -305,6 +305,9 @@ def main():
     except ImportError:
         allzparkconfig._localz_enabled = False
 
+    with timings("- Loading themes.. "):
+        resources.load_themes()
+
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
     app = QtWidgets.QApplication([])
@@ -332,8 +335,7 @@ def main():
 
     window = view.Window(ctrl)
     user_css = storage.value("userCss") or ""
-    originalcss = resources.load_style(storage.value("palette", "dark"),
-                                       load_fonts=True)
+    originalcss = resources.load_theme(storage.value("theme", None))
     # Store for CSS Editor
     window._originalcss = originalcss
     window.setStyleSheet("\n".join([originalcss,

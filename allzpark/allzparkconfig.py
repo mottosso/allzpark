@@ -24,28 +24,6 @@ exclude_filter = "*.beta"
 # Where to go when clicking the logo
 help_url = "https://allzpark.com"
 
-# Custom colors for Allzpark stylesheet, e.g.:
-#
-# {
-#     "my_theme_name": {
-#         "prim": "2E2C2C",
-#
-#         "brightest": "#403E3D",
-#         "bright": "#383635",
-#         "base": "#2E2C2C",
-#         "dim": "#21201F",
-#         "dimmest": "#141413",
-#
-#         "hover": "rgba(65, 166, 148, 40)",
-#         "highlight": "rgb(117, 189, 176)",
-#         "highlighted": "#111111",
-#         "active": "silver",
-#         "inactive": "dimGray",
-#     },
-# }
-#
-palettes = {}
-
 
 def profiles():
     """Return list of profiles
@@ -123,3 +101,28 @@ def metadata_from_package(variant):
         "icon": data.get("icon", ""),
         "hidden": data.get("hidden", False),
     })
+
+
+def themes():
+    """Allzpark GUI theme list provider
+
+    This will only be called once on startup.
+
+    Each theme in list is a dict object, for example:
+
+    {
+        "name": "theme_name",
+        "source": "my_style.css",
+        "keywords": {"base-tone": "red", "res": "path-to-icons"},
+    }
+
+    * `name` is the theme name, this is required.
+    * `source` can be a file path or plain css code, this is required.
+    * `keywords` is optional, must be dict type if provided, will be
+        used to string format the css code.
+
+    Returns:
+        list
+
+    """
+    return []

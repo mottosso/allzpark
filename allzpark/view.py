@@ -455,9 +455,9 @@ class Window(QtWidgets.QMainWindow):
             allzparkconfig.exclude_filter = value
             self._ctrl.reset()
 
-        if key == "palette":
+        if key == "theme":
             user_css = self._ctrl.state.retrieve("userCss", "")
-            self._originalcss = res.load_style(value)
+            self._originalcss = res.load_theme(value)
             self.setStyleSheet("\n".join([self._originalcss,
                                           res.format_stylesheet(user_css)]))
 

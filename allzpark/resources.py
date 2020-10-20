@@ -1,9 +1,11 @@
 import os
+from collections import OrderedDict as odict
 from . import allzparkconfig
 from .vendor.Qt import QtGui
 
 dirname = os.path.dirname(__file__)
 _cache = {}
+_themes = odict()
 
 
 def px(value, scale=1.0):
@@ -37,69 +39,98 @@ def icon(*paths):
     return QtGui.QIcon(pixmap(*paths))
 
 
-def load_style(palette_name, load_fonts=False):
-    palettes = load_palettes()
-    _cache["_current_palette_"] = palettes[palette_name]
+def load_themes():
+    _themes.clear()
+    for theme in default_themes() + allzparkconfig.themes():
+        _themes[theme["name"]] = theme
 
-    with open(find("style.css")) as f:
-        css = format_stylesheet(f.read())
 
-    if load_fonts:
-        _load_fonts()
+def theme_names():
+    for name in _themes.keys():
+        yield name
 
-    return css
+
+def load_theme(name=None):
+    if name:
+        theme = _themes.get(name)
+        if theme is None:
+            print("No theme named: %s" % name)
+            return
+    else:
+        theme = next(iter(_themes.values()))
+
+    source = theme["source"]
+    keywords = theme.get("keywords", dict())
+
+    if any(source.endswith(ext) for ext in [".css", ".qss"]):
+        if not os.path.isfile(source):
+            print("Theme stylesheet file not found: %s" % source)
+            return
+        else:
+            with open(source) as f:
+                css = f.read()
+    else:
+        # plain css code
+        css = source
+
+    _cache["_keywordsCache_"] = keywords
+
+    return format_stylesheet(css)
 
 
 def format_stylesheet(css):
-    return css % dict(
-        root=dirname.replace("\\", "/"),
-        res=os.path.join(dirname, "resources").replace("\\", "/"),
-        **_cache["_current_palette_"]
-    )
+    try:
+        return css % _cache["_keywordsCache_"]
+    except KeyError as e:
+        print("Stylesheet format failed: %s" % str(e))
+        return ""
 
 
-def load_palettes():
-    palettes = {
-        "dark": {
-            "prim": "#2E2C2C",
-
-            "brightest": "#403E3D",
-            "bright": "#383635",
-            "base": "#2E2C2C",
-            "dim": "#21201F",
-            "dimmest": "#141413",
-
-            "hover": "rgba(65, 166, 148, 40)",
-            "highlight": "rgb(117, 189, 176)",
-            "highlighted": "#111111",
-            "active": "silver",
-            "inactive": "dimGray",
+def default_themes():
+    # _load_fonts()
+    res_root = os.path.join(dirname, "resources").replace("\\", "/")
+    return [
+        {
+            "name": "default-dark",
+            "source": find("style-dark.css"),
+            "keywords": {
+                "prim": "#2E2C2C",
+                "brightest": "#403E3D",
+                "bright": "#383635",
+                "base": "#2E2C2C",
+                "dim": "#21201F",
+                "dimmest": "#141413",
+                "hover": "rgba(65, 166, 148, 40)",
+                "highlight": "rgb(117, 189, 176)",
+                "highlighted": "#111111",
+                "active": "silver",
+                "inactive": "dimGray",
+                "res": res_root,
+            }
         },
-
-        "light": {
-            "prim": "#FFFFFF",
-
-            "brightest": "#FDFDFD",
-            "bright": "#F9F9F9",
-            "base": "#EFEFEF",
-            "dim": "#DFDFDF",
-            "dimmest": "#CFCFCF",
-
-            "hover": "rgba(57, 196, 171, 40)",
-            "highlight": "rgb(105, 214, 194)",
-            "highlighted": "#111111",
-            "active": "black",
-            "inactive": "gray",
+        {
+            "name": "default-light",
+            "source": find("style-light.css"),
+            "keywords": {
+                "prim": "#FFFFFF",
+                "brightest": "#FDFDFD",
+                "bright": "#F9F9F9",
+                "base": "#EFEFEF",
+                "dim": "#DFDFDF",
+                "dimmest": "#CFCFCF",
+                "hover": "rgba(57, 196, 171, 40)",
+                "highlight": "rgb(105, 214, 194)",
+                "highlighted": "#111111",
+                "active": "black",
+                "inactive": "gray",
+                "res": res_root,
+            }
         },
-    }
-    if allzparkconfig.palettes:
-        palettes.update(allzparkconfig.palettes)
-
-    return palettes
+    ]
 
 
 def _load_fonts():
-    """Load fonts from resources"""
+    """Load default fonts from resources"""
     _res_root = os.path.join(dirname, "resources").replace("\\", "/")
 
     font_root = os.path.join(_res_root, "fonts")
