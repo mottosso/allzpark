@@ -708,7 +708,11 @@ class JsonView(QtWidgets.QTreeView):
             else:
                 data = model_.json()
 
-            text = str(data)
+            text = json.dumps(data,
+                              indent=4,
+                              sort_keys=True,
+                              ensure_ascii=False)
+
             app = QtWidgets.QApplication.instance()
             app.clipboard().setText(text)
 

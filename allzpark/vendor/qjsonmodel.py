@@ -113,7 +113,7 @@ class QJsonTreeItem(object):
         elif isinstance(value, list):
             for index, value in enumerate(value):
                 child = self.load(value, rootItem)
-                child.key = str(index)
+                child.key = index
                 child.type = type(value)
                 rootItem.appendChild(child)
 
@@ -125,15 +125,13 @@ class QJsonTreeItem(object):
 
 
 class QJsonModel(QtCore.QAbstractItemModel):
-    JsonRole = QtCore.Qt.UserRole + 1
-
     def __init__(self, parent=None):
         super(QJsonModel, self).__init__(parent)
 
         self._rootItem = QJsonTreeItem()
         self._headers = ("key", "value")
 
-    def reset(self):
+    def clear(self):
         self.load({})
 
     def load(self, document):
@@ -189,9 +187,6 @@ class QJsonModel(QtCore.QAbstractItemModel):
         elif role == QtCore.Qt.EditRole:
             if index.column() == 1:
                 return item.value
-
-        if role == QJsonModel.JsonRole:
-            return self.json(item)
 
     def setData(self, index, value, role):
         if role == QtCore.Qt.EditRole:
