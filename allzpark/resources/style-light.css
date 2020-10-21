@@ -50,9 +50,45 @@ QMenu, QLabel {
     color: %(dimmest)s;
 }
 
+QCheckBox
+{
+    spacing: 5px;
+    margin-bottom: 2px;
+}
+
+QCheckBox::indicator,
+QGroupBox::indicator {
+    width: 15px;
+    height: 15px;
+}
+
+QGroupBox::indicator {
+    margin-left: 2px;
+}
+
+QCheckBox::indicator:unchecked,
+QGroupBox::indicator:unchecked {
+    image: url(%(res)s/checkbox_unchecked_dim.png);
+}
+
+QCheckBox::indicator:unchecked:disabled,
+QGroupBox::indicator:unchecked:disabled {
+    image: url(%(res)s/checkbox_unchecked.png);
+}
+
+QCheckBox::indicator:checked,
+QGroupBox::indicator:checked {
+    image: url(%(res)s/checkbox_checked_dim.png);
+}
+
+QCheckBox::indicator:checked:disabled,
+QGroupBox::indicator:checked:disabled {
+    image: url(%(res)s/checkbox_checked.png);
+}
+
 QPushButton {
     border: 1px solid %(dim)s;
-    background: %(brightest)s;
+    background: %(base)s;
     padding: 5px;
 }
 
@@ -67,6 +103,7 @@ QPushButton:pressed {
 
 QAbstractScrollArea {
     background: %(bright)s;
+    border: 1px solid %(dim)s;
 }
 
 QToolTip, QTextEdit, QLineEdit {
@@ -75,9 +112,10 @@ QToolTip, QTextEdit, QLineEdit {
 }
 
 QComboBox {
-    background: %(base)s;
+    background: %(brightest)s;
     color: %(active)s;
     border: 1px solid %(dim)s;
+    padding: 2px;
 }
 
 QComboBox::drop-down {
@@ -91,7 +129,50 @@ QComboBox::down-arrow {
 QComboBox::down-arrow:on,
 QComboBox::down-arrow:hover,
 QComboBox::down-arrow:focus {
-    image: url(%(res)s/down_arrow.png);
+    image: url(%(res)s/down_arrow_dim.png);
+}
+
+QAbstractSpinBox {
+    background-color: %(brightest)s;
+    color: %(active)s;
+    border: 1px solid %(dim)s;
+}
+
+QAbstractSpinBox:up-button
+{
+    background-color: transparent;
+    subcontrol-origin: border;
+    subcontrol-position: center right;
+}
+
+QAbstractSpinBox:down-button
+{
+    background-color: transparent;
+    subcontrol-origin: border;
+    subcontrol-position: center left;
+}
+
+QAbstractSpinBox::up-arrow,
+QAbstractSpinBox::up-arrow:disabled,
+QAbstractSpinBox::up-arrow:off {
+    image: url(%(res)s/up_arrow_disabled.png);
+}
+
+QAbstractSpinBox::up-arrow:hover
+{
+    image: url(%(res)s/up_arrow_dim.png);
+}
+
+QAbstractSpinBox::down-arrow,
+QAbstractSpinBox::down-arrow:disabled,
+QAbstractSpinBox::down-arrow:off
+{
+    image: url(%(res)s/down_arrow_disabled.png);
+}
+
+QAbstractSpinBox::down-arrow:hover
+{
+    image: url(%(res)s/down_arrow_dim.png);
 }
 
 Window {
@@ -174,7 +255,6 @@ FullCommand QLineEdit {
 }
 
 FullCommand QComboBox {
-    border: none;
     background: %(bright)s;
     padding: 2px;
     padding-right: 0px;
@@ -221,13 +301,13 @@ QTreeView::branch:open:has-children:has-siblings  {
 
 QTreeView::branch:has-children:!has-siblings:closed:hover,
 QTreeView::branch:closed:has-children:has-siblings:hover {
-    image: url(%(res)s/branch_closed-on.png);
+    image: url(%(res)s/branch_closed-on-dim.png);
 }
 
 
 QTreeView::branch:open:has-children:!has-siblings:hover,
 QTreeView::branch:open:has-children:has-siblings:hover  {
-    image: url(%(res)s/branch_open-on.png);
+    image: url(%(res)s/branch_open-on-dim.png);
 }
 
 QTreeView::branch::selected {
@@ -335,6 +415,54 @@ LineEditWithCompleter:hover {
     padding: 0px;
 }
 
+QScrollBar:horizontal {
+    background-color: %(dim)s;
+    height: 15px;
+    border: none;
+    border-top: 1px solid %(dimmest)s;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: %(bright)s;
+    min-width: 20px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    margin: 0px;
+    height: 0px;
+    width: 0px;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QScrollBar:vertical {
+    background-color: %(dim)s;
+    width: 15px;
+    border: none;
+    border-left: 1px solid %(dimmest)s;
+}
+
+QScrollBar::handle:vertical {
+    background-color: %(bright)s;
+    min-height: 20px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    margin: 0px;
+    height: 0px;
+    width: 0px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
 Console {
     min-width: 200px;
     min-height: 100px;
@@ -419,54 +547,13 @@ QTabBar::tab:bottom:last {
     border-right: 1px solid %(dim)s;
 }
 
-QScrollBar:horizontal
-{
-    background-color: %(dim)s;
-    height: 15px;
-    border: none;
-    border-top: 1px solid %(dimmest)s;
+/* Patch missing right-border for Packages tab */
+Packages QTabBar::tab::top {
+    border: 1px solid %(dim)s;
+    border-bottom: none;
 }
-
-QScrollBar::handle:horizontal
-{
-    background-color: %(bright)s;
-    min-width: 20px;
-}
-
-QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal
-{
-    margin: 0px;
-    height: 0px;
-    width: 0px;
-}
-
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal
-{
-    background: none;
-}
-
-QScrollBar:vertical
-{
-    background-color: %(dim)s;
-    width: 15px;
-    border: none;
-    border-left: 1px solid %(dimmest)s;
-}
-
-QScrollBar::handle:vertical
-{
-    background-color: %(bright)s;
-    min-height: 20px;
-}
-
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical
-{
-    margin: 0px;
-    height: 0px;
-    width: 0px;
-}
-
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
-{
-    background: none;
+/* Patch missing right-border for Packages tab */
+Packages QTabBar::bottom::top {
+    border: 1px solid %(dim)s;
+    border-top: none;
 }

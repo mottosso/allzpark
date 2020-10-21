@@ -227,7 +227,7 @@ class Window(QtWidgets.QMainWindow):
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
         layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(1, 0, 1, 0)
         layout.addWidget(widgets["apps"])
         layout.addWidget(widgets["fullCommand"])
 
