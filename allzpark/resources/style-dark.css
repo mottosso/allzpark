@@ -19,6 +19,7 @@ Selection colors :
 Additional colors :
     %(active)s
     %(inactive)s
+    %(console)s
 
 
 https://www.w3.org/TR/SVG11/types.html#ColorKeywords
@@ -473,10 +474,19 @@ Console {
 }
 
 Console #consolelog {
-    border: 2;
+    border: 1px solid %(console)s;
     font-family: "JetBrains Mono";
     font-size: 11px;
-    background: #161616;
+    background: %(console)s;
+}
+
+Console QScrollBar:vertical {
+    border-left: 1px solid %(console)s;
+    background-color: %(console)s;
+}
+
+Console QScrollBar::handle:vertical {
+    background-color: %(bright)s;
 }
 
 Options QTableView {

@@ -1,4 +1,5 @@
 import os
+import logging
 from collections import OrderedDict as odict
 from . import allzparkconfig
 from .vendor.Qt import QtGui
@@ -86,6 +87,16 @@ def format_stylesheet(css):
         return ""
 
 
+def log_level_color(level):
+    keywords = _cache.get("_keywordsCache_", dict())
+    return {
+        logging.DEBUG: keywords.get("log.debug", "lightgrey"),
+        logging.WARNING: keywords.get("log.warning", "darkorange"),
+        logging.ERROR: keywords.get("log.error", "lightcoral"),
+        logging.CRITICAL: keywords.get("log.critical", "red"),
+    }.get(level, keywords.get("log.info", "grey"),)
+
+
 def default_themes():
     _load_fonts()
     res_root = os.path.join(dirname, "resources").replace("\\", "/")
@@ -105,6 +116,12 @@ def default_themes():
                 "highlighted": "#111111",
                 "active": "silver",
                 "inactive": "dimGray",
+                "console": "#161616",
+                "log.debug": "lightgrey",
+                "log.info": "grey",
+                "log.warning": "darkorange",
+                "log.error": "lightcoral",
+                "log.critical": "red",
                 "res": res_root,
             }
         },
@@ -123,6 +140,12 @@ def default_themes():
                 "highlighted": "#111111",
                 "active": "black",
                 "inactive": "gray",
+                "console": "#363636",
+                "log.debug": "lightgrey",
+                "log.info": "grey",
+                "log.warning": "darkorange",
+                "log.error": "lightcoral",
+                "log.critical": "red",
                 "res": res_root,
             }
         },

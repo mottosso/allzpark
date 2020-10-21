@@ -239,12 +239,7 @@ class Console(AbstractDockWidget):
         self._widgets = widgets
 
     def append(self, line, level=logging.INFO):
-        color = {
-            logging.DEBUG: "<font color=\"lightgrey\">",
-            logging.WARNING: "<font color=\"darkorange\">",
-            logging.ERROR: "<font color=\"red\">",
-            logging.CRITICAL: "<font color=\"red\">",
-        }.get(level, "<font color=\"grey\">")
+        color = "<font color=\"%s\">" % res.log_level_color(level)
 
         line = line.replace(" ", "&nbsp;")
         line = line.replace("\n", "<br>")
