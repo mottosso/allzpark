@@ -75,6 +75,13 @@ def load_theme(name=None):
         css = source
 
     _cache["_keywordsCache_"] = keywords
+    _cache["_logColorCache_"] = {
+        logging.DEBUG: keywords.get("log.debug", "lightgrey"),
+        logging.INFO: keywords.get("log.info", "grey"),
+        logging.WARNING: keywords.get("log.warning", "darkorange"),
+        logging.ERROR: keywords.get("log.error", "lightcoral"),
+        logging.CRITICAL: keywords.get("log.critical", "red"),
+    }
 
     return format_stylesheet(css)
 
@@ -88,13 +95,8 @@ def format_stylesheet(css):
 
 
 def log_level_color(level):
-    keywords = _cache.get("_keywordsCache_", dict())
-    return {
-        logging.DEBUG: keywords.get("log.debug", "lightgrey"),
-        logging.WARNING: keywords.get("log.warning", "darkorange"),
-        logging.ERROR: keywords.get("log.error", "lightcoral"),
-        logging.CRITICAL: keywords.get("log.critical", "red"),
-    }.get(level, keywords.get("log.info", "grey"),)
+    log_colors = _cache.get("_logColorCache_", dict())
+    return log_colors.get(level, "grey")
 
 
 def default_themes():
