@@ -87,7 +87,7 @@ def format_stylesheet(css):
 
 
 def default_themes():
-    # _load_fonts()
+    _load_fonts()
     res_root = os.path.join(dirname, "resources").replace("\\", "/")
     return [
         {

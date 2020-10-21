@@ -305,9 +305,6 @@ def main():
     except ImportError:
         allzparkconfig._localz_enabled = False
 
-    with timings("- Loading themes.. "):
-        resources.load_themes()
-
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
     app = QtWidgets.QApplication([])
@@ -332,6 +329,9 @@ def main():
             sys.__excepthook__(type, value, traceback)
 
     sys.excepthook = excepthook
+
+    with timings("- Loading themes.. "):
+        resources.load_themes()
 
     window = view.Window(ctrl)
     user_css = storage.value("userCss") or ""
