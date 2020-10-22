@@ -482,7 +482,7 @@ class Window(QtWidgets.QMainWindow):
         # TabBar's are dynamically created as the user
         # moves docks around, and not all of them are
         # visible or in use at all times. (Poor garbage collection)
-        bars = self.findChildren(QtWidgets.QTabBar)
+        bars = self.findChildren(QtWidgets.QTabBar, "")
 
         # The children of a QTabBar isn't the dock directly, but rather
         # the buttons in the tab, which are of type QToolButton.
