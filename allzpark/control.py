@@ -13,6 +13,7 @@ import subprocess
 from collections import OrderedDict as odict
 
 from .vendor.Qt import QtCore, QtGui
+from .vendor.six import PY3
 from .vendor import transitions
 from . import model, util, allzparkconfig
 
@@ -1159,6 +1160,7 @@ class Command(QtCore.QObject):
         self.cmd = command
 
         self._running = False
+        self.__eof = False
 
         # Launching may take a moment, and there's no need
         # for the user to wait around for that to happen.
@@ -1226,11 +1228,31 @@ class Command(QtCore.QObject):
 
     def listen_on_stdout(self):
         self._running = True
-        for line in iter(self.popen.stdout.readline, ""):
+
+        for line in iter(self.popen.stdout.readline, b""):
+            if self.__eof:
+                break
+            line = _decode(line)
             self.stdout.emit(line.rstrip())
+
         self._running = False
+        self.__eof = False
         self.killed.emit()
 
     def listen_on_stderr(self):
-        for line in iter(self.popen.stderr.readline, ""):
-            self.stderr.emit(line.rstrip())
+        buffer = []
+        buffer.append(self.popen.stderr.read())
+        self.__eof = True
+        self.popen.stderr.close()
+
+        line = _decode(buffer[0])
+        self.stderr.emit(line.rstrip())
+
+
+def _decode(line):
+    if PY3:
+        try:
+            line = line.decode()
+        except UnicodeDecodeError:
+            pass
+    return line
