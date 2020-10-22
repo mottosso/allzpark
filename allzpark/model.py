@@ -541,6 +541,9 @@ class CommandsModel(AbstractTableModel):
 
 
 class JsonModel(qjsonmodel.QJsonModel):
+
+    JsonRole = QtCore.Qt.UserRole + 1
+
     def setData(self, index, value, role):
         # Support copy/paste, but prevent edits
         return False
@@ -562,7 +565,12 @@ class JsonModel(qjsonmodel.QJsonModel):
             if index.column() == 1:
                 return item.value
 
+        if role == self.JsonRole:
+            return self.json(item)
+
         return super(JsonModel, self).data(index, role)
+
+    reset = qjsonmodel.QJsonModel.clear
 
 
 class EnvironmentModel(JsonModel):

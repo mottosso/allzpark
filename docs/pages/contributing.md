@@ -62,6 +62,15 @@ This will ensure a reproducible environment via Rez packages.
 
 You typically won't have to manually increment the version of this project.
 
+Instead, you can find the current version based on the current commit.
+
+```bash
+python -m allzpark --version
+1.3.5
+```
+
+This is the version to be used when making a new GitHub release, and the version used by setup.py during release on PyPI (in case you should accidentally tag your GitHub release errouneously).
+
 Major and minor versions are incremented for breaking and new changes respectively, the patch version however is special. It is incremented automatically in correspondance with the current commit number. E.g. commit number 200 yields a patch number of 200. See `allzpark/version.py` for details.
 
 To see the patch version as you develop, ensure `git` is available on PATH, as it is used to detect the commit number at launch. Once built and distributed to PyPI, this number is then embedded into the resulting package. See `setup.py` for details.
