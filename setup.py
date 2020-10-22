@@ -47,6 +47,7 @@ setup(
         "allzpark": [
             "resources/*.png",
             "resources/*.css",
+            "resources/*.svg",
         ]
     },
     entry_points={
