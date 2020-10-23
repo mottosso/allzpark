@@ -458,7 +458,7 @@ class Window(QtWidgets.QMainWindow):
     def on_dock_toggled(self, dock, visible):
         """Make toggled dock the active dock"""
 
-        if not visible or dock == self._docks["profiles"]:
+        if not visible:
             return
 
         # Handle the easy cases first
@@ -467,11 +467,19 @@ class Window(QtWidgets.QMainWindow):
         allow_multiple = bool(self._ctrl.state.retrieve("allowMultipleDocks"))
 
         if ctrl_held or not allow_multiple:
+            ignore_allow_multiple = [
+                # docks that are not restricted by this rule
+                "profiles",
+            ]
+
             for name, d in self._docks.items():
-                if name == "profiles":
+                if name in ignore_allow_multiple:
                     continue
                 d.setVisible(d == dock)
-            return
+
+            if len([d for d in self._docks.values() if d.isVisible()]) <= 1:
+                # Only one or no visible dock
+                return
 
         # Otherwise we'll want to make the newly visible dock the active tab.
 
@@ -482,7 +490,7 @@ class Window(QtWidgets.QMainWindow):
         # TabBar's are dynamically created as the user
         # moves docks around, and not all of them are
         # visible or in use at all times. (Poor garbage collection)
-        bars = self.findChildren(QtWidgets.QTabBar)
+        bars = self.findChildren(QtWidgets.QTabBar, "")
 
         # The children of a QTabBar isn't the dock directly, but rather
         # the buttons in the tab, which are of type QToolButton.
