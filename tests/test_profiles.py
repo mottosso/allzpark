@@ -9,6 +9,7 @@ class TestProfiles(unittest.TestCase):
     def setUp(self):
         from allzpark import cli
 
+        os.environ["ALLZPARK_PREFERENCES_NAME"] = "preferences_test"
         os.environ["REZ_PACKAGES_PATH"] = util.MEMORY_LOCATION
 
         app, ctrl = cli.initialize(clean=True)

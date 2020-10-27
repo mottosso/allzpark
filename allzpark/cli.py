@@ -207,9 +207,12 @@ def initialize(config_file=None,
     config.catch_rex_errors = False
 
     with timings("- Loading preferences.. "):
+        preferences_name = os.getenv("ALLZPARK_PREFERENCES_NAME",
+                                     "preferences")
         storage = QtCore.QSettings(QtCore.QSettings.IniFormat,
                                    QtCore.QSettings.UserScope,
-                                   "Allzpark", "preferences")
+                                   "Allzpark",
+                                   preferences_name)
 
         try:
             storage.value("startupApp")
