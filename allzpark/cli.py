@@ -266,7 +266,7 @@ def initialize(config_file=None,
 
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
-    app = QtWidgets.QApplication([])
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
     ctrl = control.Controller(storage)
 
     return app, ctrl
