@@ -213,7 +213,8 @@ def main():
     with timings("- Loading Qt.. ") as msg:
         try:
             from .vendor import Qt
-            msg["success"] = "(%s) - ok {:.2f}\n" % Qt.__binding__
+            msg["success"] = "(%s - %s) - ok {:.2f}\n"\
+                             % (Qt.__binding__, Qt.__qt_version__)
         except ImportError:
             msg["failure"] = (
                 "ERROR: allzpark requires a Python binding for Qt,\n"
@@ -329,16 +330,16 @@ def main():
 
     sys.excepthook = excepthook
 
+    with timings("- Loading themes.. "):
+        resources.load_themes()
+
     window = view.Window(ctrl)
     user_css = storage.value("userCss") or ""
-
-    with open(resources.find("style.css")) as f:
-        css = f.read()
-
-        # Store for CSS Editor
-        window._originalcss = css
-
-        window.setStyleSheet("\n".join([css, user_css]))
+    originalcss = resources.load_theme(storage.value("theme", None))
+    # Store for CSS Editor
+    window._originalcss = originalcss
+    window.setStyleSheet("\n".join([originalcss,
+                                    resources.format_stylesheet(user_css)]))
 
     window.show()
 

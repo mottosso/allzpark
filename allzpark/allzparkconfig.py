@@ -101,3 +101,28 @@ def metadata_from_package(variant):
         "icon": data.get("icon", ""),
         "hidden": data.get("hidden", False),
     })
+
+
+def themes():
+    """Allzpark GUI theme list provider
+
+    This will only be called once on startup.
+
+    Each theme in list is a dict object, for example:
+
+    {
+        "name": "theme_name",
+        "source": "my_style.css",
+        "keywords": {"base-tone": "red", "res": "path-to-icons"},
+    }
+
+    * `name` is the theme name, this is required.
+    * `source` can be a file path or plain css code, this is required.
+    * `keywords` is optional, must be dict type if provided, will be
+        used to string format the css code.
+
+    Returns:
+        list
+
+    """
+    return []
