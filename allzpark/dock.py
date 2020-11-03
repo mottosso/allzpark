@@ -523,6 +523,7 @@ class Context(AbstractDockWidget):
         pages = {
             "context": QtWidgets.QWidget(),
             "graph": QtWidgets.QWidget(),
+            "code": QtWidgets.QWidget(),
         }
 
         widgets = {
@@ -531,6 +532,8 @@ class Context(AbstractDockWidget):
             "generateGraph": QtWidgets.QPushButton("Update"),
             "graphHotkeys": QtWidgets.QLabel(),
             "overlay": QtWidgets.QWidget(),
+            "code": QtWidgets.QPlainTextEdit(),
+            "printCode": QtWidgets.QPushButton("Get Shell Code"),
         }
 
         # Expose to CSS
@@ -553,13 +556,22 @@ class Context(AbstractDockWidget):
         layout.addWidget(widgets["generateGraph"])
         layout.addWidget(QtWidgets.QWidget(), 1)
 
+        layout = QtWidgets.QVBoxLayout(pages["code"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["code"])
+        layout.addWidget(widgets["printCode"])
+
         panels["central"].addTab(pages["context"], "Context")
         panels["central"].addTab(pages["graph"], "Graph")
+        panels["central"].addTab(pages["code"], "Code")
 
         ctrl.application_changed.connect(self.on_application_changed)
 
         widgets["overlay"].setParent(pages["graph"])
         widgets["overlay"].show()
+
+        widgets["code"].setObjectName("shellcode")
+        widgets["code"].setReadOnly(True)
 
         widgets["generateGraph"].clicked.connect(self.on_generate_clicked)
         widgets["graphHotkeys"].setText("""\
@@ -570,6 +582,7 @@ class Context(AbstractDockWidget):
             - <b>Zoom</b>: Right mouse + drag <br>
             - <b>Reset</b>: Double-click right mouse <br>
         """)
+        widgets["printCode"].clicked.connect(self.on_print_code_clicked)
 
         self._ctrl = ctrl
         self._panels = panels
@@ -603,7 +616,12 @@ class Context(AbstractDockWidget):
         self._widgets["graph"].setImage(pixmap)
         self._widgets["graph"]._pixmapHandle.setGraphicsEffect(None)
 
+    def on_print_code_clicked(self):
+        code = self._ctrl.shell_code()
+        self._widgets["code"].setPlainText(code)
+
     def on_application_changed(self):
+        self._widgets["code"].setPlainText("")
         if not self._widgets["graph"]._pixmapHandle:
             return
 

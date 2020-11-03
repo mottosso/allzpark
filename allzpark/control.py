@@ -1162,6 +1162,12 @@ class Controller(QtCore.QObject):
 
         return pixmap
 
+    def shell_code(self):
+        app_request = self._state["appRequest"]
+        context = self._state["rezContexts"][app_request]
+        parent_env = self.parent_environ()
+        return context.get_shell_code(parent_environ=parent_env)
+
     def test_environment(self):
         app_request = self._state["appRequest"]
 

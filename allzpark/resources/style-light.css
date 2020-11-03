@@ -385,6 +385,11 @@ Context #overlay {
     min-height: 150px;
 }
 
+Context #shellcode {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+}
+
 QDockWidget {
     background: %(prim)s;
     border: 1px solid %(dim)s;
