@@ -77,6 +77,8 @@ class App(AbstractDockWidget):
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("App")
 
+        default_app_icon = res.pixmap("Alert_Info_32")
+
         panels = {
             "central": QtWidgets.QWidget(),
             "shortcuts": QtWidgets.QWidget(),
@@ -142,7 +144,7 @@ class App(AbstractDockWidget):
         layout.setRowStretch(15, 1)
         layout.addWidget(panels["footer"], 40, 0, 1, 2)
 
-        widgets["icon"].setPixmap(res.pixmap("Alert_Info_32"))
+        widgets["icon"].setPixmap(default_app_icon)
         widgets["environment"].setIcon(res.icon(Environment.icon))
         widgets["packages"].setIcon(res.icon(Packages.icon))
         widgets["terminal"].setIcon(res.icon(Console.icon))
@@ -159,6 +161,7 @@ class App(AbstractDockWidget):
         self._panels = panels
         self._widgets = widgets
         self._proxy = proxy_model
+        self._default_app_icon = default_app_icon
 
         self.setWidget(panels["central"])
 
@@ -186,6 +189,8 @@ class App(AbstractDockWidget):
         if icon:
             icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
             self._widgets["icon"].setPixmap(icon)
+        else:
+            self._widgets["icon"].setPixmap(self._default_app_icon)
 
         self._widgets["label"].setText(name)
 

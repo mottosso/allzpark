@@ -498,11 +498,11 @@ class Controller(QtCore.QObject):
 
             yield pkg
 
-    def env(self, request, use_filter=True):
+    def env(self, requests, use_filter=True):
         """Resolve context, relative Allzpark state
 
         Arguments:
-            request (str): Fully formatted request, including any
+            requests (list): Fully formatted request, including any
                 number of packages. E.g. "six==1.2 PySide2"
             use_filter (bool, optional): Whether or not to apply
                 the current package_filter
@@ -513,7 +513,7 @@ class Controller(QtCore.QObject):
         paths = self._package_paths()
 
         return rez.env(
-            request,
+            requests,
             package_paths=paths,
             package_filter=package_filter if use_filter else None
         )
