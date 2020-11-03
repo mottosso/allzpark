@@ -126,3 +126,20 @@ def themes():
 
     """
     return []
+
+
+def application_parent_environment():
+    """Application's launching environment
+
+    You may want to set this so the application won't be inheriting current
+    environment which is used to launch Allzpark. E.g. when Allzaprk is
+    launched from a Rez resolved context.
+
+    But if using bleeding-rez, and `config.inherit_parent_environment` is
+    set to False, config will be respected and this will be ignored.
+
+    Returns:
+        dict
+
+    """
+    return None

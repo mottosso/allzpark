@@ -43,7 +43,7 @@ class State(dict):
 
     """
 
-    def __init__(self, ctrl, storage):
+    def __init__(self, ctrl, storage, parent_environ=None):
         super(State, self).__init__({
             "profileName": storage.value("startupProfile"),
             "appRequest": storage.value("startupApplication"),
@@ -65,6 +65,9 @@ class State(dict):
 
             # Cache, for performance only
             "rezEnvirons": {},
+
+            # Parent environment for all applications
+            "parentEnviron": parent_environ,
 
             "rezApps": odict(),
             "fullCommand": "rez env",
@@ -203,10 +206,16 @@ class Controller(QtCore.QObject):
         _State("pkgnotfound", help="One or more packages was not found"),
     ]
 
-    def __init__(self, storage, stdio=None, stderr=None, parent=None):
+    def __init__(self,
+                 storage,
+                 parent_environ=None,
+                 stdio=None,
+                 stderr=None,
+                 parent=None):
+
         super(Controller, self).__init__(parent)
 
-        state = State(self, storage)
+        state = State(self, storage, parent_environ)
 
         models = {
             "apps": model.ApplicationModel(),
@@ -280,6 +289,18 @@ class Controller(QtCore.QObject):
     def context(self, app_request):
         return self._state["rezContexts"][app_request].to_dict()
 
+    def parent_environ(self):
+        environ = self._state["parentEnviron"].copy()
+        # Inject user environment
+        #
+        # NOTE: Rez takes precendence on environment, so a user
+        # cannot edit the environment in such a way that packages break.
+        # However it also means it cannot edit variables also edited
+        # by a package. Win some lose some
+        environ = dict(environ, **self._state.retrieve("userEnv", {}))
+
+        return environ
+
     def environ(self, app_request):
         """Fetch the environment of a context
 
@@ -305,15 +326,18 @@ class Controller(QtCore.QObject):
             return env[app_request]
 
         except KeyError:
+            context = ctx[app_request]
+            parent_env = self.parent_environ()
             try:
-                environ = ctx[app_request].get_environ()
-                env[app_request] = environ
-                return environ
+                environ = context.get_environ(parent_environ=parent_env)
 
             except rez.ResolvedContextError:
                 return {
                     "error": "Failed context"
                 }
+            else:
+                env[app_request] = environ
+                return environ
 
     def resolved_packages(self, app_request):
         return self._state["rezContexts"][app_request].resolved_packages
@@ -692,7 +716,7 @@ class Controller(QtCore.QObject):
 
             overrides = self._models["packages"]._overrides
             disabled = self._models["packages"]._disabled
-            environ = self._state.retrieve("userEnv", {})
+            environ = self.parent_environ()
 
             self.debug(
                 "Launching %s%s.." % (
@@ -1190,20 +1214,11 @@ class Command(QtCore.QObject):
             "command": self.cmd,
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
-            "parent_environ": None,
+            "parent_environ": self.environ or None,
             "startupinfo": startupinfo
         }
 
         context = self.context
-
-        if self.environ:
-            # Inject user environment
-            #
-            # NOTE: Rez takes precendence on environment, so a user
-            # cannot edit the environment in such a way that packages break.
-            # However it also means it cannot edit variables also edited
-            # by a package. Win some lose some
-            kwargs["parent_environ"] = dict(os.environ, **self.environ)
 
         try:
             self.popen = context.execute_shell(**kwargs)
