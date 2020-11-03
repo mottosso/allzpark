@@ -2,6 +2,7 @@
 
 import os
 import time
+import json
 import errno
 import shutil
 import logging
@@ -67,7 +68,10 @@ class State(dict):
             "rezEnvirons": {},
 
             # Parent environment for all applications
-            "parentEnviron": parent_environ,
+            "parentEnviron": parent_environ or {},
+
+            # Cache environment testing result
+            "testedEnvirons": {},
 
             "rezApps": odict(),
             "fullCommand": "rez env",
@@ -226,6 +230,8 @@ class Controller(QtCore.QObject):
             "packages": model.PackagesModel(self),
             "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
+            "parentenv": model.EnvironmentModel(),
+            "diagnose": model.EnvironmentModel(),
             "commands": model.CommandsModel(),
         }
 
@@ -235,6 +241,8 @@ class Controller(QtCore.QObject):
 
         timers["commandsPoller"].timeout.connect(self.on_tasks_polled)
         timers["commandsPoller"].start(500)
+
+        models["parentenv"].load(state["parentEnviron"].copy())
 
         # Initialize the state machine
         self._machine = transitions.Machine(
@@ -708,6 +716,8 @@ class Controller(QtCore.QObject):
                 "command", app_model.data(app_index, "tool"))
             is_detached = kwargs.get(
                 "detached", app_model.data(app_index, "detached"))
+            stdout = kwargs.get("stdout", self.info)
+            stderr = kwargs.get("stderr", self.error)
 
             assert tool_name, (
                 "There should have been at least one tool name. "
@@ -738,8 +748,8 @@ class Controller(QtCore.QObject):
                 parent=self
             )
 
-            cmd.stdout.connect(self.info)
-            cmd.stderr.connect(self.error)
+            cmd.stdout.connect(stdout)
+            cmd.stderr.connect(stderr)
             cmd.error.connect(on_error)
 
             cmd.execute()
@@ -855,11 +865,13 @@ class Controller(QtCore.QObject):
         self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
+        self._models["diagnose"].reset()
         self._models["packages"].reset()
         self._models["profileVersions"].setStringList([])
 
         self._state["rezContexts"].clear()
         self._state["rezEnvirons"].clear()
+        self._state["testedEnvirons"].clear()
         self._state["rezApps"].clear()
 
         def on_apps_found(apps):
@@ -947,16 +959,19 @@ class Controller(QtCore.QObject):
             context = self.context(app_request)
             environ = self.environ(app_request)
             packages = self.resolved_packages(app_request)
+            diagnose = self._state["testedEnvirons"].get(app_request, {})
 
         except Exception:
             self._models["packages"].reset()
             self._models["context"].reset()
             self._models["environment"].reset()
+            self._models["diagnose"].reset()
             raise
 
         self._models["packages"].reset(packages)
         self._models["context"].load(context)
         self._models["environment"].load(environ)
+        self._models["diagnose"].load(diagnose)
 
         tools = self._models["apps"].find(app_request)["tools"]
         self._state["tool"] = tools[0]
@@ -1146,6 +1161,20 @@ class Controller(QtCore.QObject):
             shutil.rmtree(tempdir)
 
         return pixmap
+
+    def test_environment(self):
+        app_request = self._state["appRequest"]
+
+        command = ("python -c \""
+                   "import os,sys,json;"
+                   "sys.stdout.write(json.dumps(os.environ.copy()));\"")
+
+        def load(message):
+            env = json.loads(message)
+            self._state["testedEnvirons"][app_request] = env
+            self._models["diagnose"].load(env)
+
+        self.launch(command=command, stdout=load)
 
 
 class Command(QtCore.QObject):

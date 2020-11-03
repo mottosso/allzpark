@@ -631,11 +631,14 @@ class Environment(AbstractDockWidget):
             "environment": QtWidgets.QWidget(),
             "editor": EnvironmentEditor(),
             "penv": QtWidgets.QWidget(),
+            "diagnose": QtWidgets.QWidget(),
         }
 
         widgets = {
             "view": JsonView(),
             "penv": JsonView(),
+            "test": JsonView(),
+            "compute": QtWidgets.QPushButton("Compute Environment"),
         }
 
         layout = QtWidgets.QVBoxLayout(pages["environment"])
@@ -646,18 +649,26 @@ class Environment(AbstractDockWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["penv"])
 
+        layout = QtWidgets.QVBoxLayout(pages["diagnose"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["test"])
+        layout.addWidget(widgets["compute"])
+
         widgets["view"].setSortingEnabled(True)
         widgets["penv"].setSortingEnabled(True)
+        widgets["test"].setSortingEnabled(True)
 
         pages["editor"].applied.connect(self.on_env_applied)
 
         panels["central"].addTab(pages["environment"], "Context")
         panels["central"].addTab(pages["penv"], "Parent")
         panels["central"].addTab(pages["editor"], "User")
+        panels["central"].addTab(pages["diagnose"], "Diagnose")
 
         user_env = ctrl.state.retrieve("userEnv", {})
         pages["editor"].from_environment(user_env)
         pages["editor"].warning.connect(self.on_env_warning)
+        widgets["compute"].clicked.connect(ctrl.test_environment)
 
         self.setWidget(panels["central"])
 
@@ -666,16 +677,18 @@ class Environment(AbstractDockWidget):
         self._pages = pages
         self._widgets = widgets
 
-    def set_model(self, model_):
+    def set_model(self, environ, parent, diagnose):
         proxy_model = QtCore.QSortFilterProxyModel()
-        proxy_model.setSourceModel(model_)
+        proxy_model.setSourceModel(environ)
         self._widgets["view"].setModel(proxy_model)
 
-        parent_env_model = model.EnvironmentModel()
         proxy_model = QtCore.QSortFilterProxyModel()
-        proxy_model.setSourceModel(parent_env_model)
+        proxy_model.setSourceModel(parent)
         self._widgets["penv"].setModel(proxy_model)
-        parent_env_model.load(self._ctrl.state["parentEnviron"].copy())
+
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(diagnose)
+        self._widgets["test"].setModel(proxy_model)
 
     def on_env_applied(self, env):
         self._ctrl.state.store("userEnv", env)
