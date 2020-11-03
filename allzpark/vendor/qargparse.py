@@ -1,10 +1,11 @@
 import re
+import types
 import logging
 
 from collections import OrderedDict as odict
 from Qt import QtCore, QtWidgets, QtGui
 
-__version__ = "0.5.3"
+__version__ = "0.5.5"
 _log = logging.getLogger(__name__)
 _type = type  # used as argument
 
@@ -57,8 +58,9 @@ class QArgumentParser(QtWidgets.QWidget):
         layout = QtWidgets.QGridLayout(self)
         layout.setRowStretch(999, 1)
 
-        if description:
-            layout.addWidget(QtWidgets.QLabel(description), 0, 0, 1, 2)
+        description = QtWidgets.QLabel(description or "")
+        description.setVisible(bool(False))
+        layout.addWidget(description, 0, 0, 1, 2)
 
         self._row = 1
         self._storage = storage
@@ -72,8 +74,8 @@ class QArgumentParser(QtWidgets.QWidget):
         self.setStyleSheet(style)
 
     def setDescription(self, text):
-        # (TODO) This won't work.
-        self._description.setText(text)
+        self._description.setText(text or "")
+        self._description.setVisible(bool(text))
 
     def addArgument(self, name, type=None, default=None, **kwargs):
         # Infer type from default
@@ -687,31 +689,43 @@ class Enum(QArgument):
         label (str, optional): Display name, convert from `name` if not given
         help (str, optional): Tool tip message of this argument
         items (list, optional): List of strings for select, default `[]`
-        default (int, optional): Index of default item, use first of `items`
-            if not given.
+        default (int, str, optional): Index or text of default item, use first
+            of `items` if not given.
         enabled (bool, optional): Whether to enable this widget, default True
 
     """
     def __init__(self, name, **kwargs):
-        kwargs["default"] = kwargs.pop("default", 0)
+        kwargs["default"] = kwargs.pop("default", None)
         kwargs["items"] = kwargs.get("items", [])
 
-        assert isinstance(kwargs["items"], (tuple, list)), (
-            "items must be list"
+        _enum_types = (tuple, list, types.GeneratorType)
+        assert isinstance(kwargs["items"], _enum_types), (
+            "items must be list, tuple or generator"
         )
 
         super(Enum, self).__init__(name, **kwargs)
 
     def create(self):
+        items = list(self["items"])
+
         widget = QtWidgets.QComboBox()
-        widget.addItems(self["items"])
+        widget.addItems(items)
         widget.currentIndexChanged.connect(
             lambda index: self.changed.emit())
 
         self._read = lambda: widget.currentText()
-        self._write = lambda value: widget.setCurrentIndex(value)
+        self._write = lambda value: widget.setCurrentText(value)
 
-        if self["default"] is not None:
+        if self["default"] is not None and len(items):
+            if isinstance(self["default"], int):
+                index = self["default"]
+                index = 0 if index > len(items) else index
+                self["default"] = items[index]
+            else:
+                # Must be str type. If the default str is not in list, will
+                # fallback to the first item silently.
+                pass
+
             self._write(self["default"])
 
         return widget

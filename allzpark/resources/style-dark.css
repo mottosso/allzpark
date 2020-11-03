@@ -1,0 +1,573 @@
+/*
+Following color keywords require to be formatted
+
+Prim color:
+    %(prim)s
+
+Mono colors :
+    %(brightest)s
+    %(bright)s
+    %(base)s
+    %(dim)s
+    %(dimmest)s
+
+Selection colors :
+    %(hover)s
+    %(highlight)s
+    %(highlighted)s
+
+Additional colors :
+    %(active)s
+    %(inactive)s
+    %(console)s
+
+
+https://www.w3.org/TR/SVG11/types.html#ColorKeywords
+
+*/
+
+
+
+* {
+    outline: none;
+    color: %(active)s;
+    border-color: %(active)s;
+    font-family: "Open Sans";
+}
+
+
+QWidget:disabled {
+    border: none;
+    color: %(inactive)s;
+}
+
+QMenu, QLabel {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    /*font-weight: bold;*/
+}
+
+.QFrame {
+    color: %(dimmest)s;
+}
+
+QCheckBox
+{
+    spacing: 5px;
+    margin-bottom: 2px;
+}
+
+QCheckBox::indicator,
+QGroupBox::indicator {
+    width: 15px;
+    height: 15px;
+}
+
+QGroupBox::indicator {
+    margin-left: 2px;
+}
+
+QCheckBox::indicator:unchecked,
+QGroupBox::indicator:unchecked {
+    image: url(%(res)s/checkbox_unchecked.png);
+}
+
+QCheckBox::indicator:unchecked:disabled,
+QGroupBox::indicator:unchecked:disabled {
+    image: url(%(res)s/checkbox_unchecked_dim.png);
+}
+
+QCheckBox::indicator:checked,
+QGroupBox::indicator:checked {
+    image: url(%(res)s/checkbox_checked.png);
+}
+
+QCheckBox::indicator:checked:disabled,
+QGroupBox::indicator:checked:disabled {
+    image: url(%(res)s/checkbox_checked_dim.png);
+}
+
+QPushButton {
+    border: 1px solid %(dim)s;
+    background: %(bright)s;
+    padding: 5px;
+}
+
+QPushButton:hover {
+    border: 1px solid %(highlight)s;
+}
+
+QPushButton:pressed {
+    background: %(highlight)s;
+    color: %(highlighted)s;
+}
+
+QAbstractScrollArea {
+    background: %(base)s;
+    border: 1px solid %(dim)s;
+}
+
+QToolTip, QTextEdit, QLineEdit {
+    border: 1px solid %(dim)s;
+    background: %(brightest)s;
+}
+
+QCheckBox::indicator {
+    background: %(bright)s;
+}
+
+QComboBox {
+    background: %(brightest)s;
+    color: %(active)s;
+    border: 1px solid %(dim)s;
+    padding: 2px;
+}
+
+QComboBox::drop-down {
+    border: none;
+}
+
+QComboBox::down-arrow {
+    image: url(%(res)s/down_arrow_disabled.png);
+}
+
+QComboBox::down-arrow:on,
+QComboBox::down-arrow:hover,
+QComboBox::down-arrow:focus {
+    image: url(%(res)s/down_arrow.png);
+}
+
+QAbstractSpinBox {
+    background-color: %(brightest)s;
+    color: %(active)s;
+    border: 1px solid %(dim)s;
+}
+
+QAbstractSpinBox:up-button
+{
+    background-color: transparent;
+    subcontrol-origin: border;
+    subcontrol-position: center right;
+}
+
+QAbstractSpinBox:down-button
+{
+    background-color: transparent;
+    subcontrol-origin: border;
+    subcontrol-position: center left;
+}
+
+QAbstractSpinBox::up-arrow,
+QAbstractSpinBox::up-arrow:disabled,
+QAbstractSpinBox::up-arrow:off {
+    image: url(%(res)s/up_arrow_disabled.png);
+}
+
+QAbstractSpinBox::up-arrow:hover
+{
+    image: url(%(res)s/up_arrow.png);
+}
+
+QAbstractSpinBox::down-arrow,
+QAbstractSpinBox::down-arrow:disabled,
+QAbstractSpinBox::down-arrow:off
+{
+    image: url(%(res)s/down_arrow_disabled.png);
+}
+
+QAbstractSpinBox::down-arrow:hover
+{
+    image: url(%(res)s/down_arrow.png);
+}
+
+Window {
+    min-width: 580px;
+    min-height: 300px;
+    height: 350px;
+    background: %(prim)s;
+}
+
+Window #header {
+    background: %(prim)s;
+    border-bottom: 1px solid %(dimmest)s;
+}
+
+Window #header QLabel {
+    padding: 0;
+}
+
+Window #header QPushButton[type=toggle] {
+    border: none;
+    background: transparent;
+    margin: 1px;
+}
+
+Window #header QPushButton[type=toggle]:checked {
+    border: 1px solid %(highlight)s;
+    background: %(hover)s;
+}
+
+Window #header QPushButton[type=toggle]:hover {
+    border: 1px solid %(highlight)s;
+}
+
+Window #logo {
+    width: 32px;
+    max-width: 32px;
+    height: 32px;
+    max-height: 32px;
+    padding: 0;
+}
+
+/* Give it a slight nudge */
+Window #logo:hover {
+    border: -1px solid transparent;
+}
+
+Window #pages QTableView {
+    margin-bottom: 5px;
+}
+
+Window #apps {
+    min-width: 300px;
+}
+
+Window #loading QLabel {
+    font-size: 16px;
+}
+
+Window App #tools {
+    max-height: 100px;
+    min-height: 100px;
+}
+
+Window App #label {
+    font-size: 13px;
+}
+
+Window App QAbstractItemView {
+    max-height: 100px;
+}
+
+Window #body QLineEdit {
+    border: 1px solid %(dim)s;
+    padding: 3px;
+    margin: 3px;
+}
+
+FullCommand QLineEdit {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+FullCommand QComboBox {
+    background: %(bright)s;
+    padding: 2px;
+    padding-right: 0px;
+}
+
+#launchBtn {
+    height: 30px;
+    margin: 0;
+    margin-top: 3;
+    padding: 0;
+}
+
+QMenu {
+    background: %(dim)s;
+}
+
+QAbstractItemView {
+    show-decoration-selected: 1;  /* highlight the decoration (branch) ! */
+    background: %(bright)s;
+}
+
+QAbstractItemView, QMenu {
+    border: 1px solid %(dim)s;
+    selection-background-color: %(highlight)s;
+    selection-color: %(highlighted)s;
+}
+
+QAbstractItemView::item:selected:active,
+QAbstractItemView::item:selected:!focus {
+    background: %(highlight)s;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+    image: url(%(res)s/branch_closed.png);
+}
+
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+    image: url(%(res)s/branch_open.png);
+}
+
+
+QTreeView::branch:has-children:!has-siblings:closed:hover,
+QTreeView::branch:closed:has-children:has-siblings:hover {
+    image: url(%(res)s/branch_closed-on.png);
+}
+
+
+QTreeView::branch:open:has-children:!has-siblings:hover,
+QTreeView::branch:open:has-children:has-siblings:hover  {
+    image: url(%(res)s/branch_open-on.png);
+}
+
+QTreeView::branch::selected {
+    background: %(highlight)s;
+}
+
+QTreeView::branch::hover {
+    background: %(hover)s;
+}
+
+QAbstractItemView::item::hover {
+    background: %(hover)s;
+}
+
+/* SlimTableView highlight entire row on select, but hover only highlight
+   on item, so instead of re-implement the paint(), increase the padding
+   as an alternative indication. */
+SlimTableView::item:!selected:hover {
+    padding: 3px;
+    background: transparent;
+}
+
+QHeaderView {
+    border: none;
+    font-weight: bold;
+    qproperty-defaultAlignment: AlignLeft;
+}
+
+QHeaderView::section {
+    padding: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    background: %(base)s;
+    border: none;
+    border-top: none;
+    border-bottom: 1px solid %(dim)s;
+    border-left: none;
+    border-right: 1px solid %(dim)s;
+}
+
+QHeaderView::section::last
+{
+    border-right: none;
+}
+
+Profiles QTreeView::item {
+    padding: 2px 5px;
+}
+
+Profiles QPushButton {
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+    max-height: 20px;
+    background: transparent;
+    margin: 0;
+    padding: 0px;
+    border: none;
+}
+
+/* Docks */
+Context #generateGraph {
+    max-width: 60px;
+    min-width: 60px;
+    max-height: 20px;
+}
+
+/* Risky, dependent on font and platform */
+Context #overlay {
+    max-width: 200px;
+    min-width: 200px;
+    max-height: 150px;
+    min-height: 150px;
+}
+
+QDockWidget {
+    background: %(prim)s;
+    border: 1px solid %(dim)s;
+}
+
+QDockWidget::title {
+    background-color: %(dim)s;
+    border: 1px solid %(dimmest)s;
+    margin: 2px;
+}
+
+QDockWidget::float-button, QDockWidget::close-button {
+}
+
+QDockWidget #dockHelp {
+    border: none;
+    padding: 5px;
+}
+
+LineEditWithCompleter {
+    border: none;
+    /* Leave room for hover */
+    padding-bottom: 2px;
+}
+
+/* Underline on hover */
+LineEditWithCompleter:hover {
+    border-bottom: 2px solid %(hover)s;
+    padding: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: %(dim)s;
+    height: 15px;
+    border: none;
+    border-top: 1px solid %(dimmest)s;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: %(bright)s;
+    min-width: 20px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    margin: 0px;
+    height: 0px;
+    width: 0px;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
+}
+
+QScrollBar:vertical {
+    background-color: %(dim)s;
+    width: 15px;
+    border: none;
+    border-left: 1px solid %(dimmest)s;
+}
+
+QScrollBar::handle:vertical {
+    background-color: %(bright)s;
+    min-height: 20px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    margin: 0px;
+    height: 0px;
+    width: 0px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+Console {
+    min-width: 200px;
+    min-height: 100px;
+}
+
+Console #consolelog {
+    border: 1px solid %(console)s;
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    background: %(console)s;
+}
+
+Console QScrollBar:vertical {
+    border-left: 1px solid %(console)s;
+    background-color: %(console)s;
+}
+
+Console QScrollBar::handle:vertical {
+    background-color: %(bright)s;
+}
+
+Options QTableView {
+    background: transparent;
+    border: none;
+}
+
+Options #label {
+    font-size: 15px;
+}
+
+QToolBar {
+    border: none;
+}
+
+QToolButton {
+    min-height: 35px;
+}
+
+QTabWidget{
+    border: none;
+}
+
+QTabWidget::pane {
+    border: 1px solid %(dim)s;
+    border-radius: 0px;
+    padding: 3px;
+}
+
+QTabBar
+{
+    qproperty-drawBase: 0;
+}
+
+QTabBar:focus
+{
+    border: 0px transparent;
+}
+
+QTabBar::tab {
+    background-color: %(brightest)s;
+    border: 1px solid %(dim)s;
+    padding: 5px;
+}
+
+QTabBar::tab:!selected
+{
+    color: %(inactive)s;
+    background-color: %(base)s;
+}
+
+QTabBar::tab:!selected:hover {
+    color: %(active)s;
+    background-color: %(hover)s;
+}
+
+QTabBar::tab:top {
+    border-right: none;
+    border-bottom: none;
+}
+
+QTabBar::tab:top:last {
+    border-right: 1px solid %(dim)s;
+}
+
+QTabBar::tab:bottom {
+    border-right: none;
+    border-top: none;
+}
+
+QTabBar::tab:bottom:last {
+    border-right: 1px solid %(dim)s;
+}
+
+/* Patch missing right-border for Packages tab */
+Packages QTabBar::tab::top {
+    border: 1px solid %(dim)s;
+    border-bottom: none;
+}
+/* Patch missing right-border for Packages tab */
+Packages QTabBar::bottom::top {
+    border: 1px solid %(dim)s;
+    border-top: none;
+}

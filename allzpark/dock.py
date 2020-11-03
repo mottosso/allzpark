@@ -44,7 +44,7 @@ class AbstractDockWidget(QtWidgets.QDockWidget):
         central = QtWidgets.QWidget()
 
         layout = QtWidgets.QVBoxLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(4, 4, 4, 4)
         layout.setSpacing(px(5))
         layout.addWidget(panels["help"])
         layout.addWidget(panels["body"])
@@ -230,6 +230,7 @@ class Console(AbstractDockWidget):
         self.setWidget(panels["central"])
 
         widgets["text"].setReadOnly(True)
+        widgets["text"].setObjectName("consolelog")
 
         layout = QtWidgets.QVBoxLayout(panels["central"])
         layout.setContentsMargins(0, 0, 0, 0)
@@ -238,12 +239,7 @@ class Console(AbstractDockWidget):
         self._widgets = widgets
 
     def append(self, line, level=logging.INFO):
-        color = {
-            logging.DEBUG: "<font color=\"grey\">",
-            logging.WARNING: "<font color=\"darkorange\">",
-            logging.ERROR: "<font color=\"red\">",
-            logging.CRITICAL: "<font color=\"red\">",
-        }.get(level, "<font color=\"#222\">")
+        color = "<font color=\"%s\">" % res.log_level_color(level)
 
         line = line.replace(" ", "&nbsp;")
         line = line.replace("\n", "<br>")
@@ -960,13 +956,10 @@ class Preferences(AbstractDockWidget):
             "Load this application on startup"
         )),
 
-        qargparse.Separator("Theme"),
+        qargparse.Separator("Appearance"),
 
-        qargparse.Info("primaryColor", default="white", help=(
-            "Main color of the GUI"
-        )),
-        qargparse.Info("secondaryColor", default="steelblue", help=(
-            "Secondary color of the GUI"
+        qargparse.Enum("theme", items=res.theme_names(), help=(
+            "GUI skin. May need to restart Allzpark after changed."
         )),
 
         qargparse.Button("resetLayout", help=(
@@ -1086,7 +1079,7 @@ class Preferences(AbstractDockWidget):
     def on_css_applied(self, css):
         self._ctrl.state.store("userCss", css)
         self._window.setStyleSheet("\n".join([
-            self._window._originalcss, css]))
+            self._window._originalcss, res.format_stylesheet(css)]))
         self._window.tell("Applying css..")
 
 
@@ -1516,8 +1509,8 @@ class Profiles(AbstractDockWidget):
         version.setToolTip("Click to change profile version")
         version.setEnabled(False)
 
-        widgets["sep1"].setFrameShape(QtWidgets.QFrame.HLine)
-        widgets["sep1"].setFrameShadow(QtWidgets.QFrame.Sunken)
+        widgets["sep1"].setFrameStyle(QtWidgets.QFrame.HLine
+                                      | QtWidgets.QFrame.Plain)
 
         # icons
         icon_size = QtCore.QSize(14, 14)
