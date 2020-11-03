@@ -1,6 +1,7 @@
 """Orchestrates view.py and model.py"""
 
 import os
+import sys
 import time
 import json
 import errno
@@ -1172,10 +1173,10 @@ class Controller(QtCore.QObject):
         app_request = self._state["appRequest"]
 
         command = (
-            'python -c "'
+            '%s -c "'
             'import os,sys,json;'
             'sys.stdout.write(json.dumps(os.environ.copy(),ensure_ascii=0))"'
-        )
+        ) % sys.executable
 
         def load(message):
             try:
