@@ -630,21 +630,29 @@ class Environment(AbstractDockWidget):
         pages = {
             "environment": QtWidgets.QWidget(),
             "editor": EnvironmentEditor(),
+            "penv": QtWidgets.QWidget(),
         }
 
         widgets = {
             "view": JsonView(),
+            "penv": JsonView(),
         }
 
         layout = QtWidgets.QVBoxLayout(pages["environment"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["view"])
 
+        layout = QtWidgets.QVBoxLayout(pages["penv"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["penv"])
+
         widgets["view"].setSortingEnabled(True)
+        widgets["penv"].setSortingEnabled(True)
 
         pages["editor"].applied.connect(self.on_env_applied)
 
         panels["central"].addTab(pages["environment"], "Context")
+        panels["central"].addTab(pages["penv"], "Parent")
         panels["central"].addTab(pages["editor"], "User")
 
         user_env = ctrl.state.retrieve("userEnv", {})
@@ -662,6 +670,12 @@ class Environment(AbstractDockWidget):
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(model_)
         self._widgets["view"].setModel(proxy_model)
+
+        parent_env_model = model.EnvironmentModel()
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(parent_env_model)
+        self._widgets["penv"].setModel(proxy_model)
+        parent_env_model.load(self._ctrl.state["parentEnviron"].copy())
 
     def on_env_applied(self, env):
         self._ctrl.state.store("userEnv", env)
