@@ -567,6 +567,9 @@ class Context(AbstractDockWidget):
 
         ctrl.application_changed.connect(self.on_application_changed)
 
+        widgets["view"].setSortingEnabled(True)
+        widgets["view"].sortByColumn(0, QtCore.Qt.AscendingOrder)
+
         widgets["overlay"].setParent(pages["graph"])
         widgets["overlay"].show()
 
@@ -672,9 +675,9 @@ class Environment(AbstractDockWidget):
         layout.addWidget(widgets["test"])
         layout.addWidget(widgets["compute"])
 
-        widgets["view"].setSortingEnabled(True)
-        widgets["penv"].setSortingEnabled(True)
-        widgets["test"].setSortingEnabled(True)
+        for view in ["view", "penv", "test"]:
+            widgets[view].setSortingEnabled(True)
+            widgets[view].sortByColumn(0, QtCore.Qt.AscendingOrder)
 
         pages["editor"].applied.connect(self.on_env_applied)
 
