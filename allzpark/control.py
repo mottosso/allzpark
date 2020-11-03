@@ -1171,14 +1171,20 @@ class Controller(QtCore.QObject):
     def test_environment(self):
         app_request = self._state["appRequest"]
 
-        command = ("python -c \""
-                   "import os,sys,json;"
-                   "sys.stdout.write(json.dumps(os.environ.copy()));\"")
+        command = (
+            'python -c "'
+            'import os,sys,json;'
+            'sys.stdout.write(json.dumps(os.environ.copy(),ensure_ascii=0))"'
+        )
 
         def load(message):
-            env = json.loads(message)
-            self._state["testedEnvirons"][app_request] = env
-            self._models["diagnose"].load(env)
+            try:
+                env = json.loads(message)
+            except json.JSONDecodeError:
+                self.info(message)  # regular messages during resolve
+            else:
+                self._state["testedEnvirons"][app_request] = env
+                self._models["diagnose"].load(env)
 
         self.launch(command=command, stdout=load)
 

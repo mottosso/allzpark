@@ -10,6 +10,7 @@ from .vendor.Qt import QtWidgets, QtCore, QtGui, QtCompat
 from .vendor import qargparse, QtImageViewer
 
 from . import resources as res, model, delegates, util
+from . import _rezapi as rez
 from . import allzparkconfig
 
 try:
@@ -537,7 +538,7 @@ class Context(AbstractDockWidget):
             "generateGraph": QtWidgets.QPushButton("Update"),
             "graphHotkeys": QtWidgets.QLabel(),
             "overlay": QtWidgets.QWidget(),
-            "code": QtWidgets.QPlainTextEdit(),
+            "code": QtWidgets.QTextEdit(),
             "printCode": QtWidgets.QPushButton("Get Shell Code"),
         }
 
@@ -626,7 +627,15 @@ class Context(AbstractDockWidget):
 
     def on_print_code_clicked(self):
         code = self._ctrl.shell_code()
-        self._widgets["code"].setPlainText(code)
+        comment = "REM " if rez.system.shell == "cmd" else "# "
+
+        pretty = []
+        for ln in code.split("\n"):
+            level = logging.DEBUG if ln.startswith(comment) else logging.INFO
+            color = "<font color=\"%s\">" % res.log_level_color(level)
+            pretty.append("%s%s</font>" % (color, ln.replace(" ", "&nbsp;")))
+
+        self._widgets["code"].setText("<br>".join(pretty))
 
     def on_application_changed(self):
         self._widgets["code"].setPlainText("")
