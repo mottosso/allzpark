@@ -12,11 +12,12 @@ import subprocess
 from .vendor import six
 from .vendor.Qt import QtCore
 
-_timer = time.time if os.name == "nt" else time.clock
 _lru_cache = {}
 _threads = []
 _basestring = six.string_types[0]  # For Python 2/3
 _log = logging.getLogger(__name__)
+_timer = (time.process_time
+          if six.PY3 else (time.time if os.name == "nt" else time.clock))
 
 USE_THREADING = not bool(os.getenv("ALLZPARK_NOTHREADING"))
 
