@@ -35,4 +35,4 @@ def wait(signal, on_value=None, timeout=1000):
     loop.exec_()
 
     if state["timeout"]:
-        raise TimeoutError("Signal waiting timeout.")
+        raise Exception("Signal waiting timeout.")

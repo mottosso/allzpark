@@ -12,7 +12,7 @@ class TestApps(unittest.TestCase):
         os.environ["ALLZPARK_PREFERENCES_NAME"] = "preferences_test"
         os.environ["REZ_PACKAGES_PATH"] = util.MEMORY_LOCATION
 
-        app, ctrl = cli.initialize(clean=True)
+        app, ctrl = cli.initialize(clean=True, verbose=3)
         window = cli.launch(ctrl)
 
         self.app = app
