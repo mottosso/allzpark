@@ -1,6 +1,7 @@
 """Orchestrates view.py and model.py"""
 
 import os
+import sys
 import time
 import errno
 import shutil
@@ -1193,6 +1194,14 @@ class Command(QtCore.QObject):
             "parent_environ": None,
             "startupinfo": startupinfo
         }
+        if rez.project == "rez":
+            # bleeding-rez adds `universal_newlines=True` when spawning shell,
+            # nerdvegas/rez doesn't.
+            kwargs["universal_newlines"] = True
+
+        if sys.version_info[:2] >= (3, 6):
+            kwargs["encoding"] = allzparkconfig.subprocess_encoding()
+            kwargs["errors"] = allzparkconfig.unicode_decode_error_handler()
 
         context = self.context
 
