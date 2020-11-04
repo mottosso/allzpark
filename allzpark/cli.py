@@ -303,8 +303,8 @@ def launch(ctrl):
         resources.load_themes()
 
     window = view.Window(ctrl)
-    user_css = storage.value("userCss") or ""
-    originalcss = resources.load_theme(storage.value("theme", None))
+    user_css = ctrl.state.retrieve("userCss", "")
+    originalcss = resources.load_theme(ctrl.state.retrieve("theme"))
     # Store for CSS Editor
     window._originalcss = originalcss
     window.setStyleSheet("\n".join([originalcss,
