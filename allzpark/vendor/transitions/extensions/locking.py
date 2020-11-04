@@ -13,7 +13,7 @@ import inspect
 import warnings
 import logging
 
-from transitions.core import Machine, Event, listify
+from ..core import Machine, Event, listify
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.addHandler(logging.NullHandler())
