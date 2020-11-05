@@ -1071,13 +1071,21 @@ class Controller(QtCore.QObject):
 
         contexts = odict()
         with util.timing() as t:
-            for app_request in apps:
-                app_request = rez.PackageRequest(app_request.strip("~"))
-                app_package = rez.find_latest(app_request.name,
-                                              range_=app_request.range)
 
-                if package_filter.excludes(app_package):
-                    continue
+            for app_request in apps:
+                request_str = app_request.strip("~")
+                app_request = rez.PackageRequest(request_str)
+
+                try:
+                    app_package = rez.find_latest(app_request.name,
+                                                  range_=app_request.range)
+                except (rez.PackageFamilyNotFoundError,
+                        rez.PackageNotFoundError) as err:
+                    self.error(str(err))
+                    app_package = model.BrokenPackage(request_str)
+                else:
+                    if package_filter.excludes(app_package):
+                        continue
 
                 app_request = "%s==%s" % (app_package.name,
                                           app_package.version)

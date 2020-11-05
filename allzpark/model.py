@@ -383,7 +383,7 @@ class PackagesModel(AbstractTableModel):
             versions = sorted(
                 [str(v.version) for v in versions],
                 key=util.natural_keys
-            )
+            ) or [version]  # broken package
 
             if localz:
                 relocatable = localz.is_relocatable(pkg)
