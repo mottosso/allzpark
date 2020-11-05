@@ -10,6 +10,7 @@ from .vendor.Qt import QtWidgets, QtCore, QtGui, QtCompat
 from .vendor import qargparse, QtImageViewer
 
 from . import resources as res, model, delegates, util
+from . import _rezapi as rez
 from . import allzparkconfig
 
 try:
@@ -77,6 +78,8 @@ class App(AbstractDockWidget):
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("App")
 
+        default_app_icon = res.pixmap("Alert_Info_32")
+
         panels = {
             "central": QtWidgets.QWidget(),
             "shortcuts": QtWidgets.QWidget(),
@@ -142,7 +145,7 @@ class App(AbstractDockWidget):
         layout.setRowStretch(15, 1)
         layout.addWidget(panels["footer"], 40, 0, 1, 2)
 
-        widgets["icon"].setPixmap(res.pixmap("Alert_Info_32"))
+        widgets["icon"].setPixmap(default_app_icon)
         widgets["environment"].setIcon(res.icon(Environment.icon))
         widgets["packages"].setIcon(res.icon(Packages.icon))
         widgets["terminal"].setIcon(res.icon(Console.icon))
@@ -159,6 +162,7 @@ class App(AbstractDockWidget):
         self._panels = panels
         self._widgets = widgets
         self._proxy = proxy_model
+        self._default_app_icon = default_app_icon
 
         self.setWidget(panels["central"])
 
@@ -186,6 +190,8 @@ class App(AbstractDockWidget):
         if icon:
             icon = icon.pixmap(QtCore.QSize(px(32), px(32)))
             self._widgets["icon"].setPixmap(icon)
+        else:
+            self._widgets["icon"].setPixmap(self._default_app_icon)
 
         self._widgets["label"].setText(name)
 
@@ -523,6 +529,7 @@ class Context(AbstractDockWidget):
         pages = {
             "context": QtWidgets.QWidget(),
             "graph": QtWidgets.QWidget(),
+            "code": QtWidgets.QWidget(),
         }
 
         widgets = {
@@ -531,6 +538,8 @@ class Context(AbstractDockWidget):
             "generateGraph": QtWidgets.QPushButton("Update"),
             "graphHotkeys": QtWidgets.QLabel(),
             "overlay": QtWidgets.QWidget(),
+            "code": QtWidgets.QTextEdit(),
+            "printCode": QtWidgets.QPushButton("Get Shell Code"),
         }
 
         # Expose to CSS
@@ -553,13 +562,25 @@ class Context(AbstractDockWidget):
         layout.addWidget(widgets["generateGraph"])
         layout.addWidget(QtWidgets.QWidget(), 1)
 
+        layout = QtWidgets.QVBoxLayout(pages["code"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["code"])
+        layout.addWidget(widgets["printCode"])
+
         panels["central"].addTab(pages["context"], "Context")
         panels["central"].addTab(pages["graph"], "Graph")
+        panels["central"].addTab(pages["code"], "Code")
 
         ctrl.application_changed.connect(self.on_application_changed)
 
+        widgets["view"].setSortingEnabled(True)
+        widgets["view"].sortByColumn(0, QtCore.Qt.AscendingOrder)
+
         widgets["overlay"].setParent(pages["graph"])
         widgets["overlay"].show()
+
+        widgets["code"].setObjectName("shellcode")
+        widgets["code"].setReadOnly(True)
 
         widgets["generateGraph"].clicked.connect(self.on_generate_clicked)
         widgets["graphHotkeys"].setText("""\
@@ -570,6 +591,7 @@ class Context(AbstractDockWidget):
             - <b>Zoom</b>: Right mouse + drag <br>
             - <b>Reset</b>: Double-click right mouse <br>
         """)
+        widgets["printCode"].clicked.connect(self.on_print_code_clicked)
 
         self._ctrl = ctrl
         self._panels = panels
@@ -603,7 +625,20 @@ class Context(AbstractDockWidget):
         self._widgets["graph"].setImage(pixmap)
         self._widgets["graph"]._pixmapHandle.setGraphicsEffect(None)
 
+    def on_print_code_clicked(self):
+        code = self._ctrl.shell_code()
+        comment = "REM " if rez.system.shell == "cmd" else "# "
+
+        pretty = []
+        for ln in code.split("\n"):
+            level = logging.DEBUG if ln.startswith(comment) else logging.INFO
+            color = "<font color=\"%s\">" % res.log_level_color(level)
+            pretty.append("%s%s</font>" % (color, ln.replace(" ", "&nbsp;")))
+
+        self._widgets["code"].setText("<br>".join(pretty))
+
     def on_application_changed(self):
+        self._widgets["code"].setPlainText("")
         if not self._widgets["graph"]._pixmapHandle:
             return
 
@@ -630,26 +665,45 @@ class Environment(AbstractDockWidget):
         pages = {
             "environment": QtWidgets.QWidget(),
             "editor": EnvironmentEditor(),
+            "penv": QtWidgets.QWidget(),
+            "diagnose": QtWidgets.QWidget(),
         }
 
         widgets = {
             "view": JsonView(),
+            "penv": JsonView(),
+            "test": JsonView(),
+            "compute": QtWidgets.QPushButton("Compute Environment"),
         }
 
         layout = QtWidgets.QVBoxLayout(pages["environment"])
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(widgets["view"])
 
-        widgets["view"].setSortingEnabled(True)
+        layout = QtWidgets.QVBoxLayout(pages["penv"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["penv"])
+
+        layout = QtWidgets.QVBoxLayout(pages["diagnose"])
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(widgets["test"])
+        layout.addWidget(widgets["compute"])
+
+        for view in ["view", "penv", "test"]:
+            widgets[view].setSortingEnabled(True)
+            widgets[view].sortByColumn(0, QtCore.Qt.AscendingOrder)
 
         pages["editor"].applied.connect(self.on_env_applied)
 
         panels["central"].addTab(pages["environment"], "Context")
+        panels["central"].addTab(pages["penv"], "Parent")
         panels["central"].addTab(pages["editor"], "User")
+        panels["central"].addTab(pages["diagnose"], "Diagnose")
 
         user_env = ctrl.state.retrieve("userEnv", {})
         pages["editor"].from_environment(user_env)
         pages["editor"].warning.connect(self.on_env_warning)
+        widgets["compute"].clicked.connect(ctrl.test_environment)
 
         self.setWidget(panels["central"])
 
@@ -658,10 +712,18 @@ class Environment(AbstractDockWidget):
         self._pages = pages
         self._widgets = widgets
 
-    def set_model(self, model_):
+    def set_model(self, environ, parent, diagnose):
         proxy_model = QtCore.QSortFilterProxyModel()
-        proxy_model.setSourceModel(model_)
+        proxy_model.setSourceModel(environ)
         self._widgets["view"].setModel(proxy_model)
+
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(parent)
+        self._widgets["penv"].setModel(proxy_model)
+
+        proxy_model = QtCore.QSortFilterProxyModel()
+        proxy_model.setSourceModel(diagnose)
+        self._widgets["test"].setModel(proxy_model)
 
     def on_env_applied(self, env):
         self._ctrl.state.store("userEnv", env)
