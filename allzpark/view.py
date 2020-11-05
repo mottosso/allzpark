@@ -11,9 +11,17 @@ from .vendor.Qt import QtWidgets, QtCore, QtGui
 from .vendor import qargparse
 from .version import version
 from . import resources as res, dock, model
-from . import allzparkconfig
+from . import allzparkconfig, delegates
 
 px = res.px
+
+
+class Applications(dock.SlimTableView):
+
+    def __init__(self, ctrl, parent=None):
+        super(Applications, self).__init__(parent)
+        self.setItemDelegate(delegates.Package(ctrl, self))
+        self.setEditTriggers(self.EditKeyPressed)
 
 
 class Window(QtWidgets.QMainWindow):
@@ -60,7 +68,7 @@ class Window(QtWidgets.QMainWindow):
             "logo": QtWidgets.QToolButton(),
             "appVersion": QtWidgets.QLabel(version),
 
-            "apps": dock.SlimTableView(),
+            "apps": Applications(ctrl),
             "fullCommand": FullCommand(ctrl),
 
             # Error page
@@ -695,6 +703,9 @@ class Window(QtWidgets.QMainWindow):
         app = self._docks["app"]
         app.show()
         self.on_dock_toggled(app, visible=True)
+
+        if index.column() == 1:
+            self._widgets["apps"].edit(index)
 
     def on_app_selection_changed(self, selected, deselected):
         """The current app was changed

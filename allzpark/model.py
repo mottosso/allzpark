@@ -179,15 +179,20 @@ class ApplicationModel(AbstractTableModel):
         "version"
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ctrl, *args, **kwargs):
         super(ApplicationModel, self).__init__(*args, **kwargs)
         self._broken_icon = res.icon("Action_Stop_1_32.png")
+        self._ctrl = ctrl
 
     def reset(self, applications=None):
         applications = applications or []
 
         self.beginResetModel()
         self.items[:] = []
+
+        # TODO: This isn't nice. The model should
+        # not have to reach into the controller.
+        paths = self._ctrl._package_paths()
 
         for app in applications:
             root = app.root
@@ -196,16 +201,29 @@ class ApplicationModel(AbstractTableModel):
             tools = getattr(app, "tools", None) or [app.name]
             app_request = "%s==%s" % (app.name, app.version)
 
+            version = str(app.version)
+
+            # Fetch all versions of package
+            # TODO: set range to profile request
+            versions = rez.find(app.name, paths=paths)
+            versions = sorted(
+                [str(v.version) for v in versions],
+                key=util.natural_keys
+            )
+
             item = {
                 "name": app_request,
                 "label": data["label"],
-                "version": str(app.version),
+                "version": version,
+                "versions": versions,
                 "icon": parse_icon(root, template=data["icon"]),
                 "package": app,
                 "context": None,
                 "active": True,
                 "hidden": data["hidden"],
                 "broken": isinstance(app, BrokenPackage),
+                "family": app.name,
+                "default": version,
 
                 # Whether or not to open a separate console for this app
                 "detached": False,
@@ -252,6 +270,16 @@ class ApplicationModel(AbstractTableModel):
                     return self._broken_icon
 
         return super(ApplicationModel, self).data(index, role)
+
+    def flags(self, index):
+        if index.column() == 1:
+            return (
+                QtCore.Qt.ItemIsEnabled |
+                QtCore.Qt.ItemIsSelectable |
+                QtCore.Qt.ItemIsEditable
+            )
+
+        return super(ApplicationModel, self).flags(index)
 
 
 class BrokenContext(object):
@@ -401,6 +429,7 @@ class PackagesModel(AbstractTableModel):
                 "state": state,
                 "relocatable": relocatable,
                 "localizing": False,  # in progress
+                "family": pkg.name,
             }
 
             self.items.append(item)

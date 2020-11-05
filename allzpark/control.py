@@ -223,7 +223,7 @@ class Controller(QtCore.QObject):
         state = State(self, storage, parent_environ)
 
         models = {
-            "apps": model.ApplicationModel(),
+            "apps": model.ApplicationModel(self),
             "profileVersions": QtCore.QStringListModel(),
 
             # Docks
@@ -1083,6 +1083,11 @@ class Controller(QtCore.QObject):
                             "patchWithFilter", False
                         )
                     )
+                    # update context key `app_request` if patched
+                    for pkg in context.resolved_packages or []:
+                        if pkg.name == app_package.name:
+                            app_request = "%s==%s" % (pkg.name, pkg.version)
+                            break
 
                 contexts[app_request] = context
 
