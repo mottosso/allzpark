@@ -341,9 +341,7 @@ class Controller(QtCore.QObject):
                 environ = context.get_environ(parent_environ=parent_env)
 
             except rez.ResolvedContextError:
-                return {
-                    "error": "Failed context"
-                }
+                return model.BrokenContext.broken_dict.copy()
             else:
                 env[app_request] = environ
                 return environ

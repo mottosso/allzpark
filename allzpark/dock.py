@@ -607,6 +607,12 @@ class Context(AbstractDockWidget):
         self._widgets["view"].setModel(proxy_model)
         self._model = model_
 
+        model_.modelReset.connect(self.on_context_loaded)
+
+    def on_context_loaded(self):
+        self._widgets["generateGraph"].setEnabled(not self._model.is_broken)
+        self._widgets["printCode"].setEnabled(not self._model.is_broken)
+
     def on_generate_clicked(self):
         pixmap = self._ctrl.graph()
 
@@ -711,19 +717,33 @@ class Environment(AbstractDockWidget):
         self._panels = panels
         self._pages = pages
         self._widgets = widgets
+        self._models = {
+            "environ": None,
+            "parent": None,
+            "diagnose": None,
+        }
 
     def set_model(self, environ, parent, diagnose):
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(environ)
         self._widgets["view"].setModel(proxy_model)
+        self._models["environ"] = environ
 
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(parent)
         self._widgets["penv"].setModel(proxy_model)
+        self._models["parent"] = parent
 
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(diagnose)
         self._widgets["test"].setModel(proxy_model)
+        self._models["diagnose"] = diagnose
+
+        environ.modelReset.connect(self.on_environ_loaded)
+
+    def on_environ_loaded(self):
+        environ = self._models["environ"]
+        self._widgets["compute"].setEnabled(not environ.is_broken)
 
     def on_env_applied(self, env):
         self._ctrl.state.store("userEnv", env)

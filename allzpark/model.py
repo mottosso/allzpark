@@ -255,6 +255,8 @@ class ApplicationModel(AbstractTableModel):
 
 
 class BrokenContext(object):
+    broken_dict = {"error": "Failed context"}
+
     def __init__(self, app_name, request):
         self.resolved_packages = [BrokenPackage(app_name)]
         self.success = False
@@ -265,11 +267,11 @@ class BrokenContext(object):
     def requested_packages(self):
         return self._request
 
-    def to_dict(self):
-        return {}
+    def to_dict(self, *args, **kwargs):
+        return self.broken_dict
 
-    def get_environ(self):
-        return {}
+    def get_environ(self, *args, **kwargs):
+        raise rez.ResolvedContextError("This is a broken context.")
 
 
 class BrokenPackage(object):
@@ -574,7 +576,13 @@ class JsonModel(qjsonmodel.QJsonModel):
 
 
 class EnvironmentModel(JsonModel):
+
+    def __init__(self, *args, **kwargs):
+        super(EnvironmentModel, self).__init__(*args, **kwargs)
+        self.is_broken = False
+
     def load(self, data):
+        self.is_broken = data == BrokenContext.broken_dict
 
         # Convert PATH environment variables to lists
         # for improved viewing experience
@@ -587,7 +595,14 @@ class EnvironmentModel(JsonModel):
 
 
 class ContextModel(JsonModel):
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super(ContextModel, self).__init__(*args, **kwargs)
+        self.is_broken = False
+
+    def load(self, data):
+        self.is_broken = data == BrokenContext.broken_dict
+        super(ContextModel, self).load(data)
 
 
 class TriStateSortFilterProxyModel(QtCore.QSortFilterProxyModel):
