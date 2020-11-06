@@ -1,6 +1,29 @@
 
+import os
+import unittest
+
 
 MEMORY_LOCATION = "memory@any"
+
+
+class TestBase(unittest.TestCase):
+
+    def setUp(self):
+        from allzpark import cli
+
+        os.environ["ALLZPARK_PREFERENCES_NAME"] = "preferences_test"
+        os.environ["REZ_PACKAGES_PATH"] = MEMORY_LOCATION
+
+        app, ctrl = cli.initialize(clean=True, verbose=3)
+        window = cli.launch(ctrl)
+
+        self.app = app
+        self.ctrl = ctrl
+        self.window = window
+
+    def tearDown(self):
+        wait(timeout=500)
+        self.window.close()
 
 
 def memory_repository(packages):

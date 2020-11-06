@@ -1,29 +1,12 @@
 
-import os
-import unittest
 from tests import util
 
 
-class TestApps(unittest.TestCase):
-
-    def setUp(self):
-        from allzpark import cli
-
-        os.environ["ALLZPARK_PREFERENCES_NAME"] = "preferences_test"
-        os.environ["REZ_PACKAGES_PATH"] = util.MEMORY_LOCATION
-
-        app, ctrl = cli.initialize(clean=True, verbose=3)
-        window = cli.launch(ctrl)
-
-        self.app = app
-        self.ctrl = ctrl
-        self.window = window
-
-    def tearDown(self):
-        util.wait(timeout=500)
-        self.window.close()
+class TestApps(util.TestBase):
 
     def test_select_app(self):
+        """Test app selecting behavior
+        """
         util.memory_repository({
             "foo": {
                 "1.0.0": {
@@ -68,6 +51,8 @@ class TestApps(unittest.TestCase):
         self.assertIn("app_B==1.0.0", env)
 
     def test_app_environ(self):
+        """Test resolved environment in each app
+        """
         util.memory_repository({
             "foo": {
                 "1.0.0": {

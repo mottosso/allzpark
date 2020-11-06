@@ -1,30 +1,12 @@
 
-import os
-import unittest
 from tests import util
 
 
-class TestProfiles(unittest.TestCase):
-
-    def setUp(self):
-        from allzpark import cli
-
-        os.environ["ALLZPARK_PREFERENCES_NAME"] = "preferences_test"
-        os.environ["REZ_PACKAGES_PATH"] = util.MEMORY_LOCATION
-
-        app, ctrl = cli.initialize(clean=True, verbose=3)
-        window = cli.launch(ctrl)
-
-        self.app = app
-        self.ctrl = ctrl
-        self.window = window
-
-    def tearDown(self):
-        util.wait(timeout=500)
-        self.window.close()
+class TestProfiles(util.TestBase):
 
     def test_reset(self):
-        """Test session reset"""
+        """Test session reset
+        """
         util.memory_repository({
             "foo": {
                 "1.0.0": {
@@ -48,7 +30,8 @@ class TestProfiles(unittest.TestCase):
         self.assertEqual(["foo", "bar"], list(self.ctrl.state["rezProfiles"]))
 
     def test_select_profile_with_out_apps(self):
-        """Test selecting profile that has no apps"""
+        """Test selecting profile that has no apps
+        """
         util.memory_repository({
             "foo": {
                 "1.0.0": {
@@ -72,7 +55,8 @@ class TestProfiles(unittest.TestCase):
         self.assertEqual("foo", self.ctrl.state["profileName"])
 
     def test_profile_list_apps(self):
-        """Test listing apps from profile"""
+        """Test listing apps from profile
+        """
         util.memory_repository({
             "foo": {
                 "1.0.0": {

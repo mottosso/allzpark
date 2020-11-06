@@ -90,6 +90,10 @@ jobs:
         displayName: "Install PySide2"
 
       - script: |
+          sudo pip install nose
+        displayName: "Install test tools"
+
+      - script: |
           sudo pip install . --no-deps
         displayName: "Install allzpark"
 
@@ -98,7 +102,7 @@ jobs:
         displayName: "Setup Xvfb"
 
       - script: |
-          xvfb-run sudo python -m unittest discover
+          xvfb-run sudo nosetests
         displayName: "Run tests"
 
 
@@ -146,11 +150,15 @@ jobs:
         displayName: "Install PySide2"
 
       - script: |
+          pip install nose
+        displayName: "Install test tools"
+
+      - script: |
           pip install . --no-deps
         displayName: "Install allzpark"
 
       - script: |
-          python -m unittest discover
+          nosetests
         displayName: "Run tests"
 
   - job: Windows
@@ -195,11 +203,15 @@ jobs:
         displayName: "Install PySide2"
 
       - script: |
+          pip install nose
+        displayName: "Install test tools"
+
+      - script: |
           pip install . --no-deps
         displayName: "Install allzpark"
 
       - script: |
-          python -m unittest discover
+          nosetests
         displayName: "Run tests"
 
 
