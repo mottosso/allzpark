@@ -128,7 +128,8 @@ else:
         try:
             result = target(*(args or []), **(kwargs or {}))
         except Exception as e:
-            on_failure(e)
+            error = traceback.format_exc()
+            on_failure(e, error)
         else:
             on_success(result)
 

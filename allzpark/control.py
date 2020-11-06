@@ -651,7 +651,7 @@ class Controller(QtCore.QObject):
             self._state.to_ready()
             self.resetted.emit()
 
-        def _on_success():
+        def _on_success(result=None):
             profile = not self._state["profileName"]
 
             if profile:
@@ -791,7 +791,7 @@ class Controller(QtCore.QObject):
                 self.debug("Cleaning up..")
                 shutil.rmtree(tempdir)
 
-        def on_success(result):
+        def on_success(result=None):
             self.repository_changed.emit()
 
         def on_failure(error, trace):
@@ -808,7 +808,7 @@ class Controller(QtCore.QObject):
             self.debug("Delocalizing %s" % package.root)
             localz.delocalize(package)
 
-        def on_success(result):
+        def on_success(result=None):
             self.repository_changed.emit()
 
         def on_failure(error, trace):
