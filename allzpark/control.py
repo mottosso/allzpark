@@ -209,6 +209,8 @@ class Controller(QtCore.QObject):
         _State("noapps", help="There were no applications to choose from"),
         _State("notresolved", help="Rez couldn't resolve a request"),
         _State("pkgnotfound", help="One or more packages was not found"),
+        _State("appfailed", help="Selected application is broken"),
+        _State("appok", help="Selected application is available"),
     ]
 
     def __init__(self,
@@ -296,7 +298,7 @@ class Controller(QtCore.QObject):
         return self._state["tool"]
 
     def context(self, app_request):
-        return self._state["rezContexts"][app_request].to_dict()
+        return self._state["rezContexts"][app_request]
 
     def parent_environ(self):
         environ = self._state["parentEnviron"].copy()
@@ -968,7 +970,7 @@ class Controller(QtCore.QObject):
             raise
 
         self._models["packages"].reset(packages)
-        self._models["context"].load(context)
+        self._models["context"].load(context.to_dict())
         self._models["environment"].load(environ)
         self._models["diagnose"].load(diagnose)
 
@@ -979,6 +981,13 @@ class Controller(QtCore.QObject):
         self.update_command()
         self._state.store("startupApplication", app_request)
         self.application_changed.emit()
+
+        if context.success:
+            self._state.to_appok()
+        else:
+            self._state.to_appfailed()
+
+        self._state.to_ready()
 
     def select_tool(self, tool_name):
         self._state["tool"] = tool_name

@@ -576,14 +576,7 @@ class JsonModel(qjsonmodel.QJsonModel):
 
 
 class EnvironmentModel(JsonModel):
-
-    def __init__(self, *args, **kwargs):
-        super(EnvironmentModel, self).__init__(*args, **kwargs)
-        self.is_broken = False
-
     def load(self, data):
-        self.is_broken = data == BrokenContext.broken_dict
-
         # Convert PATH environment variables to lists
         # for improved viewing experience
         for key, value in data.copy().items():
@@ -595,14 +588,7 @@ class EnvironmentModel(JsonModel):
 
 
 class ContextModel(JsonModel):
-
-    def __init__(self, *args, **kwargs):
-        super(ContextModel, self).__init__(*args, **kwargs)
-        self.is_broken = False
-
-    def load(self, data):
-        self.is_broken = data == BrokenContext.broken_dict
-        super(ContextModel, self).load(data)
+    pass
 
 
 class TriStateSortFilterProxyModel(QtCore.QSortFilterProxyModel):
