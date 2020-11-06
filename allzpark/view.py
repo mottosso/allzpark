@@ -248,7 +248,9 @@ class Window(QtWidgets.QMainWindow):
                                     ctrl.models["profileVersions"])
         docks["packages"].set_model(ctrl.models["packages"])
         docks["context"].set_model(ctrl.models["context"])
-        docks["environment"].set_model(ctrl.models["environment"])
+        docks["environment"].set_model(ctrl.models["environment"],
+                                       ctrl.models["parentenv"],
+                                       ctrl.models["diagnose"])
         docks["commands"].set_model(ctrl.models["commands"])
 
         proxy_model = model.ProxyModel(ctrl.models["apps"])

@@ -74,6 +74,19 @@ def _patch_allzparkconfig():
                 getattr(allzparkconfig, member))
 
 
+def _get_application_parent_environ():
+    from rez.config import config
+    from rez.shells import create_shell
+
+    if not config.get("inherit_parent_environment", True):
+        # bleeding-rez, isolate enabled.
+        sh = create_shell()
+        return sh.environment()
+
+    return (allzparkconfig.application_parent_environment()
+            or os.environ.copy())
+
+
 @contextlib.contextmanager
 def timings(title, timing=True):
     tell(title, newlines=0)
@@ -202,6 +215,9 @@ def initialize(config_file=None,
 
     _backwards_compatibility()
 
+    with timings("- Loading application parent environment.. ") as msg:
+        parent_environ = _get_application_parent_environ()
+
     # Allow the application to die on CTRL+C
     signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -271,7 +287,7 @@ def initialize(config_file=None,
     tell("-" * 30)  # Add some space between boot messages, and upcoming log
 
     app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
-    ctrl = control.Controller(storage)
+    ctrl = control.Controller(storage, parent_environ)
 
     return app, ctrl
 
