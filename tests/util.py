@@ -11,12 +11,12 @@ def memory_repository(packages):
     repository.data = packages
 
 
-def wait(signal, on_value=None, timeout=1000):
+def wait(signal=None, on_value=None, timeout=1000):
     from allzpark.vendor.Qt import QtCore
 
     loop = QtCore.QEventLoop()
     timer = QtCore.QTimer()
-    state = {"timeout": True}
+    state = {"timeout": False}
 
     if on_value:
         def trigger(value):
@@ -28,7 +28,9 @@ def wait(signal, on_value=None, timeout=1000):
             loop.quit()
             state["timeout"] = False
 
-    signal.connect(trigger)
+    if signal is not None:
+        state["timeout"] = True
+        signal.connect(trigger)
     timer.timeout.connect(loop.quit)
 
     timer.start(timeout)

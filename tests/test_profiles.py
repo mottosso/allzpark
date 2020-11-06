@@ -20,7 +20,8 @@ class TestProfiles(unittest.TestCase):
         self.window = window
 
     def tearDown(self):
-        pass
+        util.wait(timeout=500)
+        self.window.close()
 
     def test_reset(self):
         """Test session reset"""

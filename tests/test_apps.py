@@ -20,7 +20,8 @@ class TestApps(unittest.TestCase):
         self.window = window
 
     def tearDown(self):
-        pass
+        util.wait(timeout=500)
+        self.window.close()
 
     def test_select_app(self):
         util.memory_repository({
