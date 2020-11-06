@@ -32,14 +32,6 @@ jobs:
       vmImage: "ubuntu-20.04"  # Focal
     strategy:
       matrix:
-        Py27-Rez:
-          python.version: "2.7"
-          rez.project: "rez"
-
-        Py27-BleedingRez:
-          python.version: "2.7"
-          rez.project: "bleeding-rez"
-
         Py35-Rez:
           python.version: "3.5"
           rez.project: "rez"
@@ -75,18 +67,18 @@ jobs:
           cd rez-src
           sudo pip install .
         condition: eq(variables['rez.project'], 'rez')
-        displayName: "pip install rez (for API)"
+        displayName: "Install rez (pip for API)"
 
       - script: |
           sudo pip install bleeding-rez
         condition: eq(variables['rez.project'], 'bleeding-rez')
-        displayName: "pip install bleeding-rez"
+        displayName: "Install bleeding-rez"
 
       - script: |
           sudo apt-get install python-pyside
           sudo python -c "from PySide import QtCore;print(QtCore.__version__)"
         condition: startsWith(variables['python.version'], '2.')
-        displayName: "pip install PySide"
+        displayName: "Install PySide"
 
       - script: |
           sudo apt-get install python3-pyside2.qtcore \
@@ -95,11 +87,11 @@ jobs:
                                python3-pyside2.qtsvg
           sudo python -c "from PySide2 import QtCore;print(QtCore.__version__)"
         condition: startsWith(variables['python.version'], '3.')
-        displayName: "pip3 install PySide2"
+        displayName: "Install PySide2"
 
       - script: |
           sudo pip install . --no-deps
-        displayName: "pip install allzpark"
+        displayName: "Install allzpark"
 
       - script: |
           sudo apt-get install xvfb
@@ -107,7 +99,7 @@ jobs:
 
       - script: |
           xvfb-run sudo python -m unittest discover
-        displayName: "run tests"
+        displayName: "Run tests"
 
 
   - job: MacOS
@@ -115,14 +107,6 @@ jobs:
       vmImage: "macOS-10.15"
     strategy:
       matrix:
-        Py27-Rez:
-          python.version: "2.7"
-          rez.project: "rez"
-
-        Py27-BleedingRez:
-          python.version: "2.7"
-          rez.project: "bleeding-rez"
-
         Py37-Rez:
           python.version: "3.7"
           rez.project: "rez"
@@ -142,46 +126,38 @@ jobs:
           cd rez-src
           pip install .
         condition: eq(variables['rez.project'], 'rez')
-        displayName: "pip install rez (for API)"
+        displayName: "Install rez (pip for API)"
 
       - script: |
           pip install bleeding-rez
         condition: eq(variables['rez.project'], 'bleeding-rez')
-        displayName: "pip install bleeding-rez"
+        displayName: "Install bleeding-rez"
 
       - script: |
           brew tap cartr/qt4
           brew install qt@4
           pip install PySide
         condition: startsWith(variables['python.version'], '2.')
-        displayName: "pip install PySide"
+        displayName: "Install PySide"
 
       - script: |
           pip install PySide2
         condition: startsWith(variables['python.version'], '3.')
-        displayName: "pip3 install PySide2"
+        displayName: "Install PySide2"
 
       - script: |
           pip install . --no-deps
-        displayName: "pip install allzpark"
+        displayName: "Install allzpark"
 
       - script: |
           python -m unittest discover
-        displayName: "run tests"
+        displayName: "Run tests"
 
   - job: Windows
     pool:
       vmImage: vs2017-win2016
     strategy:
       matrix:
-        Py27-Rez:
-          python.version: "2.7"
-          rez.project: "rez"
-
-        Py27-BleedingRez:
-          python.version: "2.7"
-          rez.project: "bleeding-rez"
-
         Py37-Rez:
           python.version: "3.7"
           rez.project: "rez"
@@ -201,30 +177,30 @@ jobs:
           cd rez-src
           pip install .
         condition: eq(variables['rez.project'], 'rez')
-        displayName: "pip install rez (for API)"
+        displayName: "Install rez (pip for API)"
 
       - script: |
           pip install bleeding-rez
         condition: eq(variables['rez.project'], 'bleeding-rez')
-        displayName: "pip install bleeding-rez"
+        displayName: "Install bleeding-rez"
 
       - script: |
           pip install PySide
         condition: startsWith(variables['python.version'], '2.')
-        displayName: "pip install PySide"
+        displayName: "Install PySide"
 
       - script: |
           pip install PySide2
         condition: startsWith(variables['python.version'], '3.')
-        displayName: "pip install PySide2"
+        displayName: "Install PySide2"
 
       - script: |
           pip install . --no-deps
-        displayName: "pip install"
+        displayName: "Install allzpark"
 
       - script: |
           python -m unittest discover
-        displayName: "run tests"
+        displayName: "Run tests"
 
 
   # -----------------------------------------------------------------------
