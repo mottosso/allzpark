@@ -596,6 +596,8 @@ class Controller(QtCore.QObject):
         root = root or self._state["root"]
         assert root, "Tried resetting without a root, this is a bug"
 
+        self._state.to_booting()
+
         def do():
             profiles = dict()
             default_profile = None
@@ -672,7 +674,7 @@ class Controller(QtCore.QObject):
         # so that we can pick up new packages.
         rez.clear_caches()
 
-        self._state.to_booting()
+        self._state.to_loading()
         util.defer(
             do,
             on_success=_on_success,
