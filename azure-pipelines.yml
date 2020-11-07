@@ -29,17 +29,32 @@ jobs:
 
   - job: Ubuntu
     pool:
-      vmImage: "ubuntu-16.04"  # Xenial
+      vmImage: "ubuntu-20.04"  # Focal
     strategy:
       matrix:
-        Python27:
-          python.version: "2.7"
-        Python35:
+        Py35-Rez:
           python.version: "3.5"
-        Python36:
+          rez.project: "rez"
+
+        Py35-BleedingRez:
+          python.version: "3.5"
+          rez.project: "bleeding-rez"
+
+        Py36-Rez:
           python.version: "3.6"
-        Python37:
+          rez.project: "rez"
+
+        Py36-BleedingRez:
+          python.version: "3.6"
+          rez.project: "bleeding-rez"
+
+        Py37-Rez:
           python.version: "3.7"
+          rez.project: "rez"
+
+        Py37-BleedingRez:
+          python.version: "3.7"
+          rez.project: "bleeding-rez"
 
     steps:
       - task: UsePythonVersion@0
@@ -48,19 +63,61 @@ jobs:
         displayName: "Use Python $(python.version)"
 
       - script: |
-          pip install . --no-deps
-        displayName: "pip install"
+          git clone https://github.com/nerdvegas/rez.git rez-src
+          cd rez-src
+          sudo pip install .
+        condition: eq(variables['rez.project'], 'rez')
+        displayName: "Install rez (pip for API)"
+
+      - script: |
+          sudo pip install bleeding-rez
+        condition: eq(variables['rez.project'], 'bleeding-rez')
+        displayName: "Install bleeding-rez"
+
+      - script: |
+          sudo apt-get install python-pyside
+          sudo python -c "from PySide import QtCore;print(QtCore.__version__)"
+        condition: startsWith(variables['python.version'], '2.')
+        displayName: "Install PySide"
+
+      - script: |
+          sudo apt-get install python3-pyside2.qtcore \
+                               python3-pyside2.qtgui \
+                               python3-pyside2.qtwidgets \
+                               python3-pyside2.qtsvg
+          sudo python -c "from PySide2 import QtCore;print(QtCore.__version__)"
+        condition: startsWith(variables['python.version'], '3.')
+        displayName: "Install PySide2"
+
+      - script: |
+          sudo pip install nose
+        displayName: "Install test tools"
+
+      - script: |
+          sudo pip install . --no-deps
+        displayName: "Install allzpark"
+
+      - script: |
+          sudo apt-get install xvfb
+        displayName: "Setup Xvfb"
+
+      - script: |
+          xvfb-run sudo nosetests
+        displayName: "Run tests"
 
 
   - job: MacOS
     pool:
-      vmImage: "macOS-10.13"  # High-Sierra
+      vmImage: "macOS-10.15"
     strategy:
       matrix:
-        Python27:
-          python.version: "2.7"
-        Python37:
+        Py37-Rez:
           python.version: "3.7"
+          rez.project: "rez"
+
+        Py37-BleedingRez:
+          python.version: "3.7"
+          rez.project: "bleeding-rez"
 
     steps:
       - task: UsePythonVersion@0
@@ -69,27 +126,93 @@ jobs:
         displayName: "Use Python $(python.version)"
 
       - script: |
+          git clone https://github.com/nerdvegas/rez.git rez-src
+          cd rez-src
+          pip install .
+        condition: eq(variables['rez.project'], 'rez')
+        displayName: "Install rez (pip for API)"
+
+      - script: |
+          pip install bleeding-rez
+        condition: eq(variables['rez.project'], 'bleeding-rez')
+        displayName: "Install bleeding-rez"
+
+      - script: |
+          brew tap cartr/qt4
+          brew install qt@4
+          pip install PySide
+        condition: startsWith(variables['python.version'], '2.')
+        displayName: "Install PySide"
+
+      - script: |
+          pip install PySide2
+        condition: startsWith(variables['python.version'], '3.')
+        displayName: "Install PySide2"
+
+      - script: |
+          pip install nose
+        displayName: "Install test tools"
+
+      - script: |
           pip install . --no-deps
-        displayName: "pip install"
+        displayName: "Install allzpark"
+
+      - script: |
+          nosetests
+        displayName: "Run tests"
 
   - job: Windows
     pool:
       vmImage: vs2017-win2016
     strategy:
       matrix:
-        Python27:
-          python.version: "2.7"
-        Python37:
+        Py37-Rez:
           python.version: "3.7"
+          rez.project: "rez"
+
+        Py37-BleedingRez:
+          python.version: "3.7"
+          rez.project: "bleeding-rez"
 
     steps:
       - task: UsePythonVersion@0
         inputs:
           versionSpec: "$(python.version)"
         displayName: "Use Python $(python.version)"
-      - powershell: |
+
+      - script: |
+          git clone https://github.com/nerdvegas/rez.git rez-src
+          cd rez-src
+          pip install .
+        condition: eq(variables['rez.project'], 'rez')
+        displayName: "Install rez (pip for API)"
+
+      - script: |
+          pip install bleeding-rez
+        condition: eq(variables['rez.project'], 'bleeding-rez')
+        displayName: "Install bleeding-rez"
+
+      - script: |
+          pip install PySide
+        condition: startsWith(variables['python.version'], '2.')
+        displayName: "Install PySide"
+
+      - script: |
+          pip install PySide2
+        condition: startsWith(variables['python.version'], '3.')
+        displayName: "Install PySide2"
+
+      - script: |
+          pip install nose
+        displayName: "Install test tools"
+
+      - script: |
           pip install . --no-deps
-        displayName: "pip install"
+        displayName: "Install allzpark"
+
+      - script: |
+          nosetests
+        displayName: "Run tests"
 
 
   # -----------------------------------------------------------------------

@@ -10,7 +10,7 @@ from copy import copy, deepcopy
 from functools import partial
 import logging
 import warnings
-from six import string_types
+from ...six import string_types
 
 from ..core import Machine, Transition, State, Event, listify, MachineError, EventData
 

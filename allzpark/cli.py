@@ -121,6 +121,235 @@ def warn(msg, newlines=1):
     sys.stderr.write(("%s" + "\n" * newlines) % msg)
 
 
+def initialize(config_file=None,
+               no_config=False,
+               clean=False,
+               demo=False,
+               verbose=0):
+
+    tell("=" * 30)
+    tell(" allzpark (%s)" % version)
+    tell("=" * 30)
+
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter(
+        "%(levelname)-8s %(name)s %(message)s"
+        if verbose
+        else "%(message)s"
+    )
+
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+    log.setLevel(logging.DEBUG
+                 if verbose >= 2
+                 else logging.INFO
+                 if verbose == 1
+                 else logging.WARNING)
+
+    logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
+
+    if demo:
+        with timings("- Loading demo..") as msg:
+            try:
+                import allzparkdemo
+            except ImportError:
+                msg["failure"] = (
+                    " fail\n"
+                    "ERROR: The --demo flag requires allzparkdemo, "
+                    "try running `pip install allzparkdemo`\n"
+                )
+                raise
+
+            os.environ["REZ_CONFIG_FILE"] = allzparkdemo.rezconfig
+            config_file = allzparkdemo.allzparkconfig
+
+        tell("  - %s" % allzparkdemo.rezconfig)
+        tell("  - %s" % allzparkdemo.allzparkconfig)
+
+    with timings("- Loading Rez.. ") as msg:
+        try:
+            from rez import __file__ as _rez_location
+            from rez.utils._version import _rez_version
+            from rez.config import config
+            msg["success"] = "(%s) - ok {:.2f}\n" % _rez_version
+        except ImportError:
+            tell("ERROR: allzpark requires rez")
+            exit(1)
+
+    with timings("- Loading Qt.. ") as msg:
+        try:
+            from .vendor import Qt
+            msg["success"] = "(%s - %s) - ok {:.2f}\n"\
+                             % (Qt.__binding__, Qt.__qt_version__)
+        except ImportError:
+            msg["failure"] = (
+                "ERROR: allzpark requires a Python binding for Qt,\n"
+                "such as PySide, PySide2, PyQt4 or PyQt5.\n"
+            )
+
+        from .vendor import six
+        from .vendor.Qt import QtWidgets, QtCore
+
+    # Provide for vendor dependencies
+    sys.modules["Qt"] = Qt
+    sys.modules["six"] = six
+
+    with timings("- Loading allzpark.. ") as msg:
+        from . import view, control, resources, util
+        msg["success"] = "(%s) - ok {:.2f}\n" % version
+
+    _patch_allzparkconfig()
+
+    with timings("- Loading allzparkconfig.. ") as msg:
+        if no_config:
+            msg["success"] = "User config disabled.\n"
+        else:
+            try:
+                result = _load_userconfig(config_file)
+                msg["success"] = "ok {:.2f} (%s)\n" % result
+
+            except IOError:
+                pass
+
+    _backwards_compatibility()
+
+    with timings("- Loading application parent environment.. ") as msg:
+        parent_environ = _get_application_parent_environ()
+
+    # Allow the application to die on CTRL+C
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    config.catch_rex_errors = False
+
+    with timings("- Loading preferences.. "):
+        preferences_name = os.getenv("ALLZPARK_PREFERENCES_NAME",
+                                     "preferences")
+        storage = QtCore.QSettings(QtCore.QSettings.IniFormat,
+                                   QtCore.QSettings.UserScope,
+                                   "Allzpark",
+                                   preferences_name)
+
+        try:
+            storage.value("startupApp")
+        except ValueError:
+            # Likely settings stored with a previous version of Python
+            raise ValueError("Your settings could not be read, "
+                             "have they been created using a different "
+                             "version of Python? You can either use "
+                             "the same version or pass "
+                             "--clean to erase your previous settings and "
+                             "start anew")
+
+        if clean:
+            tell("(clean) ")
+            storage.clear()
+        else:
+            tell("(%s)" % storage.fileName())
+
+        defaults = {
+            "memcachedURI": os.getenv("REZ_MEMCACHED_URI", "None"),
+            "pythonExe": sys.executable,
+            "pythonVersion": ".".join(map(str, sys.version_info)),
+            "qtVersion": Qt.__binding_version__,
+            "qtBinding": Qt.__binding__,
+            "qtBindingVersion": Qt.__qt_version__,
+            "rezLocation": os.path.dirname(_rez_location),
+            "rezVersion": _rez_version,
+            "rezConfigFile": os.getenv("REZ_CONFIG_FILE", "None"),
+            "rezPackagesPath": config.packages_path,
+            "rezLocalPath": config.local_packages_path.split(os.pathsep),
+            "rezReleasePath": config.release_packages_path.split(os.pathsep),
+            "settingsPath": storage.fileName(),
+        }
+
+        for key, value in defaults.items():
+            storage.setValue(key, value)
+
+        if allzparkconfig.startup_profile:
+            storage.setValue("startupProfile", allzparkconfig.startup_profile)
+
+        if allzparkconfig.startup_application:
+            storage.setValue("startupApp", allzparkconfig.startup_application)
+
+        if demo:
+            # Normally unsafe, but for the purposes of a demo
+            # a convenient location for installed packages
+            storage.setValue("useDevelopmentPackages", True)
+
+    try:
+        __import__("localz")
+        allzparkconfig._localz_enabled = True
+    except ImportError:
+        allzparkconfig._localz_enabled = False
+
+    tell("-" * 30)  # Add some space between boot messages, and upcoming log
+
+    app = QtWidgets.QApplication.instance() or QtWidgets.QApplication([])
+    ctrl = control.Controller(storage, parent_environ)
+
+    return app, ctrl
+
+
+def launch(ctrl):
+    from . import view, resources, util
+
+    # Handle stdio from within the application if necessary
+    if hasattr(allzparkconfig, "__noconsole__"):
+        sys.stdout = ctrl.stdio(sys.stdout, logging.INFO)
+        sys.stderr = ctrl.stdio(sys.stderr, logging.ERROR)
+
+        # TODO: This isn't fool proof. There are logging mechanisms
+        # in control.py that must either print to stdio or not and
+        # there's currently some duplication.
+
+    def excepthook(type, value, traceback):
+        """Try handling these from within the controller"""
+
+        # Give handler a chance to remedy the situation
+        handled = ctrl.on_unhandled_exception(type, value, traceback)
+
+        if not handled:
+            sys.__excepthook__(type, value, traceback)
+
+    sys.excepthook = excepthook
+
+    with timings("- Loading themes.. "):
+        resources.load_themes()
+
+    window = view.Window(ctrl)
+    user_css = ctrl.state.retrieve("userCss", "")
+    originalcss = resources.load_theme(ctrl.state.retrieve("theme"))
+    # Store for CSS Editor
+    window._originalcss = originalcss
+    window.setStyleSheet("\n".join([originalcss,
+                                    resources.format_stylesheet(user_css)]))
+
+    window.show()
+
+    if os.name == "nt":
+        util.windows_taskbar_compat()
+
+    return window
+
+
+def reset(ctrl, profiles=None):
+    from .vendor.Qt import QtCore
+
+    def init():
+        timing["beforeReset"] = time.time()
+        root = profiles or allzparkconfig.profiles
+        ctrl.reset(root, on_success=measure)
+
+    def measure():
+        duration = time.time() - timing["beforeReset"]
+        tell("- Resolved contexts.. ok %.2fs" % duration)
+
+    # Give the window a moment to appear before occupying it
+    QtCore.QTimer.singleShot(50, init)
+
+
 def main():
     parser = argparse.ArgumentParser("allzpark", description=(
         "An application launcher built on Rez, "
@@ -172,226 +401,33 @@ def main():
         tell(version)
         exit(0)
 
-    tell("=" * 30)
-    tell(" allzpark (%s)" % version)
-    tell("=" * 30)
-
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.DEBUG)
-
-    formatter = logging.Formatter(
-        "%(levelname)-8s %(name)s %(message)s"
-        if opts.verbose
-        else "%(message)s"
+    app, ctrl = initialize(
+        config_file=opts.config_file,
+        verbose=opts.verbose,
+        clean=opts.clean,
+        demo=opts.demo,
+        no_config=opts.no_config,
     )
 
-    handler.setFormatter(formatter)
-    log.addHandler(handler)
-    log.setLevel(logging.DEBUG
-                 if opts.verbose >= 2
-                 else logging.INFO
-                 if opts.verbose == 1
-                 else logging.WARNING)
+    if opts.root:
+        warn("The flag --root has been deprecated, "
+             "use allzparkconfig.py:profiles.\n")
 
-    logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
-
-    if opts.demo:
-        with timings("- Loading demo..") as msg:
+        def profiles_from_dir(path):
             try:
-                import allzparkdemo
-            except ImportError:
-                msg["failure"] = (
-                    " fail\n"
-                    "ERROR: The --demo flag requires allzparkdemo, "
-                    "try running `pip install allzparkdemo`\n"
-                )
-                raise
+                _profiles = os.listdir(path)
+            except IOError:
+                warn("ERROR: Could not list directory %s" % opts.root)
+                _profiles = []
+            # Support directory names that use dash in place of underscore
+            _profiles = [p.replace("-", "_") for p in _profiles]
+            return _profiles
 
-            os.environ["REZ_CONFIG_FILE"] = allzparkdemo.rezconfig
-            opts.config_file = allzparkdemo.allzparkconfig
-
-        tell("  - %s" % allzparkdemo.rezconfig)
-        tell("  - %s" % allzparkdemo.allzparkconfig)
-
-    with timings("- Loading Rez.. ") as msg:
-        try:
-            from rez import __file__ as _rez_location
-            from rez.utils._version import _rez_version
-            from rez.config import config
-            msg["success"] = "(%s) - ok {:.2f}\n" % _rez_version
-        except ImportError:
-            tell("ERROR: allzpark requires rez")
-            exit(1)
-
-    with timings("- Loading Qt.. ") as msg:
-        try:
-            from .vendor import Qt
-            msg["success"] = "(%s - %s) - ok {:.2f}\n"\
-                             % (Qt.__binding__, Qt.__qt_version__)
-        except ImportError:
-            msg["failure"] = (
-                "ERROR: allzpark requires a Python binding for Qt,\n"
-                "such as PySide, PySide2, PyQt4 or PyQt5.\n"
-            )
-
-        from .vendor import six
-        from .vendor.Qt import QtWidgets, QtCore
-
-    # Provide for vendor dependencies
-    sys.modules["Qt"] = Qt
-    sys.modules["six"] = six
-
-    with timings("- Loading allzpark.. ") as msg:
-        from . import view, control, resources, util
-        msg["success"] = "(%s) - ok {:.2f}\n" % version
-
-    _patch_allzparkconfig()
-
-    with timings("- Loading allzparkconfig.. ") as msg:
-        try:
-            result = _load_userconfig(opts.config_file)
-            msg["success"] = "ok {:.2f} (%s)\n" % result
-
-        except IOError:
-            pass
-
-    _backwards_compatibility()
-
-    with timings("- Loading application parent environment.. ") as msg:
-        parent_environ = _get_application_parent_environ()
-
-    # Allow the application to die on CTRL+C
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-
-    config.catch_rex_errors = False
-
-    with timings("- Loading preferences.. "):
-        storage = QtCore.QSettings(QtCore.QSettings.IniFormat,
-                                   QtCore.QSettings.UserScope,
-                                   "Allzpark", "preferences")
-
-        try:
-            storage.value("startupApp")
-        except ValueError:
-            # Likely settings stored with a previous version of Python
-            raise ValueError("Your settings could not be read, "
-                             "have they been created using a different "
-                             "version of Python? You can either use "
-                             "the same version or pass "
-                             "--clean to erase your previous settings and "
-                             "start anew")
-
-        if opts.clean:
-            tell("(clean) ")
-            storage.clear()
-
-        defaults = {
-            "memcachedURI": os.getenv("REZ_MEMCACHED_URI", "None"),
-            "pythonExe": sys.executable,
-            "pythonVersion": ".".join(map(str, sys.version_info)),
-            "qtVersion": Qt.__binding_version__,
-            "qtBinding": Qt.__binding__,
-            "qtBindingVersion": Qt.__qt_version__,
-            "rezLocation": os.path.dirname(_rez_location),
-            "rezVersion": _rez_version,
-            "rezConfigFile": os.getenv("REZ_CONFIG_FILE", "None"),
-            "rezPackagesPath": config.packages_path,
-            "rezLocalPath": config.local_packages_path.split(os.pathsep),
-            "rezReleasePath": config.release_packages_path.split(os.pathsep),
-            "settingsPath": storage.fileName(),
-        }
-
-        for key, value in defaults.items():
-            storage.setValue(key, value)
-
-        if allzparkconfig.startup_profile:
-            storage.setValue("startupProfile", allzparkconfig.startup_profile)
-
-        if allzparkconfig.startup_application:
-            storage.setValue("startupApp", allzparkconfig.startup_application)
-
-        if opts.demo:
-            # Normally unsafe, but for the purposes of a demo
-            # a convenient location for installed packages
-            storage.setValue("useDevelopmentPackages", True)
-
-    try:
-        __import__("localz")
-        allzparkconfig._localz_enabled = True
-    except ImportError:
-        allzparkconfig._localz_enabled = False
-
-    tell("-" * 30)  # Add some space between boot messages, and upcoming log
-
-    app = QtWidgets.QApplication([])
-    ctrl = control.Controller(storage, parent_environ)
-
-    # Handle stdio from within the application if necessary
-    if hasattr(allzparkconfig, "__noconsole__"):
-        sys.stdout = ctrl.stdio(sys.stdout, logging.INFO)
-        sys.stderr = ctrl.stdio(sys.stderr, logging.ERROR)
-
-        # TODO: This isn't fool proof. There are logging mechanisms
-        # in control.py that must either print to stdio or not and
-        # there's currently some duplication.
-
-    def excepthook(type, value, traceback):
-        """Try handling these from within the controller"""
-
-        # Give handler a chance to remedy the situation
-        handled = ctrl.on_unhandled_exception(type, value, traceback)
-
-        if not handled:
-            sys.__excepthook__(type, value, traceback)
-
-    sys.excepthook = excepthook
-
-    with timings("- Loading themes.. "):
-        resources.load_themes()
-
-    window = view.Window(ctrl)
-    user_css = storage.value("userCss") or ""
-    originalcss = resources.load_theme(storage.value("theme", None))
-    # Store for CSS Editor
-    window._originalcss = originalcss
-    window.setStyleSheet("\n".join([originalcss,
-                                    resources.format_stylesheet(user_css)]))
-
-    window.show()
-
-    def profiles_from_dir(path):
-        try:
-            profiles = os.listdir(opts.root)
-        except IOError:
-            warn(
-                "ERROR: Could not list directory %s" % opts.root
-            )
-
-        # Support directory names that use dash in place of underscore
-        profiles = [p.replace("-", "_") for p in profiles]
-
-        return profiles
-
-    def init():
-        timing["beforeReset"] = time.time()
+        profiles = profiles_from_dir(opts.root)
+    else:
         profiles = []
 
-        if opts.root:
-            warn("The flag --root has been deprecated, "
-                 "use allzparkconfig.py:profiles.\n")
-            profiles = profiles_from_dir(opts.root)
-
-        root = profiles or allzparkconfig.profiles
-        ctrl.reset(root, on_success=measure)
-
-    def measure():
-        duration = time.time() - timing["beforeReset"]
-        tell("- Resolved contexts.. ok %.2fs" % duration)
-
-    # Give the window a moment to appear before occupying it
-    QtCore.QTimer.singleShot(50, init)
-
-    if os.name == "nt":
-        util.windows_taskbar_compat()
+    launch(ctrl)
+    reset(ctrl, profiles)
 
     app.exec_()
