@@ -22,9 +22,8 @@ class TestProfiles(util.TestBase):
                 }
             }
         })
-        self.ctrl.reset(["foo", "bar"])
-
-        util.wait(self.ctrl.resetted)
+        with util.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo", "bar"])
 
         # last profile will be selected by default
         self.assertEqual("bar", self.ctrl.state["profileName"])
@@ -47,12 +46,13 @@ class TestProfiles(util.TestBase):
                 }
             }
         })
-        self.ctrl.reset(["foo", "bar"])
-        util.wait(self.ctrl.resetted)
+        with util.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo", "bar"])
 
-        self.ctrl.select_profile("foo")
-        # enter 'noapps' state
-        util.wait(self.ctrl.state_changed, "noapps")
+        with util.wait_signal(self.ctrl.state_changed, "noapps"):
+            self.ctrl.select_profile("foo")
+            # wait enter 'noapps' state
+
         self.assertEqual("foo", self.ctrl.state["profileName"])
 
     def test_profile_list_apps(self):
@@ -89,11 +89,12 @@ class TestProfiles(util.TestBase):
                 }
             },
         })
-        self.ctrl.reset(["foo"])
-        util.wait(self.ctrl.resetted)
+        with util.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo"])
 
-        self.ctrl.select_profile("foo")
-        util.wait(self.ctrl.state_changed, "ready")
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.select_profile("foo")
+
         self.assertEqual(
             [
                 "app_A==1.0.0",

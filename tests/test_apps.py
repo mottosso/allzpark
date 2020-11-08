@@ -31,11 +31,11 @@ class TestApps(util.TestBase):
                 }
             },
         })
-        self.ctrl.reset(["foo"])
-        util.wait(self.ctrl.resetted)
+        with util.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo"])
 
-        self.ctrl.select_profile("foo")
-        util.wait(self.ctrl.state_changed, "ready")
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.select_profile("foo")
 
         env = self.ctrl.state["rezEnvirons"]
 
@@ -80,11 +80,11 @@ class TestApps(util.TestBase):
                 }
             },
         })
-        self.ctrl.reset(["foo"])
-        util.wait(self.ctrl.resetted)
+        with util.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo"])
 
-        self.ctrl.select_profile("foo")
-        util.wait(self.ctrl.state_changed, "ready")
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.select_profile("foo")
 
         env = self.ctrl.state["rezEnvirons"]
 

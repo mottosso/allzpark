@@ -22,11 +22,11 @@ class TestLaunch(util.TestBase):
                 }
             },
         })
-        self.ctrl.reset(["foo"])
-        util.wait(self.ctrl.resetted)
+        with util.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo"])
 
-        self.ctrl.select_profile("foo")
-        util.wait(self.ctrl.state_changed, "ready")
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.select_profile("foo")
 
         self.ctrl.select_application("app==1")
         self.assertEqual("app==1", self.ctrl.state["appRequest"])
@@ -42,13 +42,15 @@ class TestLaunch(util.TestBase):
           'sys.stdout.write(\'meow\')"'
         ) % sys.executable
 
-        self.ctrl.launch(command=command,
-                         stdout=lambda m: stdout.append(m),
-                         stderr=lambda m: stderr.append(m))
+        with util.wait_signal(self.ctrl.state_changed, "launching"):
+            self.ctrl.launch(command=command,
+                             stdout=lambda m: stdout.append(m),
+                             stderr=lambda m: stderr.append(m))
 
-        util.wait(self.ctrl.state_changed, "launching")
         self.assertEqual(len(commands), 1)
 
-        util.wait(commands[0].killed)
+        with util.wait_signal(commands[0].killed):
+            pass
+
         self.assertIn("meow", "\n".join(stdout))
         self.assertEqual("", "\n".join(stderr))
