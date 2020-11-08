@@ -105,3 +105,120 @@ class TestApps(util.TestBase):
 
         self.assertIn("THIS_B", env["app_B==1.0.0"])
         self.assertNotIn("THIS_B", env["app_A==1.0.0"])
+
+    def test_app_failed_independently_1(self):
+        """Test app resolve failure doesn't fail whole profile"""
+        util.memory_repository({
+            "foo": {
+                "1.0.0": {
+                    "name": "foo",
+                    "version": "1.0.0",
+                    "requires": [
+                        "anti_A",
+                        "~app_A",  # fail by reduction
+                        "~app_B",
+                    ],
+                },
+            },
+            "anti_A": {
+                "1": {
+                    "name": "anti_A",
+                    "version": "1",
+                    "requires": ["!app_A"],
+                }
+            },
+            "app_A": {"1": {"name": "app_A", "version": "1"}},
+            "app_B": {"1": {"name": "app_B", "version": "1"}},
+        })
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.reset(["foo"])
+        # should be in ready state
+
+        context_a = self.ctrl.state["rezContexts"]["app_A==1"]
+        context_b = self.ctrl.state["rezContexts"]["app_B==1"]
+
+        self.assertFalse(context_a.success)
+        self.assertTrue(context_b.success)
+
+    def test_app_failed_independently_2(self):
+        """Test app missing doesn't fail whole profile"""
+        util.memory_repository({
+            "foo": {
+                "1.0.0": {
+                    "name": "foo",
+                    "version": "1.0.0",
+                    "requires": [
+                        "~app_A",  # missing package family
+                        "~app_B",
+                    ],
+                },
+            },
+            "app_B": {"1": {"name": "app_B", "version": "1"}},
+        })
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.reset(["foo"])
+        # should be in ready state
+
+        context_a = self.ctrl.state["rezContexts"]["app_A==None"]
+        context_b = self.ctrl.state["rezContexts"]["app_B==1"]
+
+        self.assertFalse(context_a.success)  # broken context
+        self.assertTrue(context_b.success)
+
+    def test_app_failed_independently_3(self):
+        """Test app missing dependency doesn't fail whole profile"""
+        util.memory_repository({
+            "foo": {
+                "1.0.0": {
+                    "name": "foo",
+                    "version": "1.0.0",
+                    "requires": [
+                        "~app_A",  # has missing requires
+                        "~app_B",
+                    ],
+                },
+            },
+            "app_A": {
+                "1": {
+                    "name": "app_A",
+                    "version": "1",
+                    "requires": ["missing"],
+                }
+            },
+            "app_B": {"1": {"name": "app_B", "version": "1"}},
+        })
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.reset(["foo"])
+        # should be in ready state
+
+        context_a = self.ctrl.state["rezContexts"]["app_A==1"]
+        context_b = self.ctrl.state["rezContexts"]["app_B==1"]
+
+        self.assertFalse(context_a.success)
+        self.assertTrue(context_b.success)
+
+    def test_app_failed_independently_4(self):
+        """Test app missing version/variant doesn't fail whole profile"""
+        util.memory_repository({
+            "foo": {
+                "1.0.0": {
+                    "name": "foo",
+                    "version": "1.0.0",
+                    "requires": [
+                        "~app_A==2",  # missing package
+                        "~app_B",
+                    ],
+                },
+            },
+            "app_A": {"1": {"name": "app_A", "version": "1"}},
+            "app_B": {"1": {"name": "app_B", "version": "1"}},
+        })
+        with util.wait_signal(self.ctrl.state_changed, "ready"):
+            self.ctrl.reset(["foo"])
+        # should be in ready state
+
+        context_a = self.ctrl.state["rezContexts"]["app_A==2"]
+        context_b = self.ctrl.state["rezContexts"]["app_B==1"]
+
+        self.assertFalse(context_a.success)
+        self.assertTrue(context_b.success)
