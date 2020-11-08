@@ -1,6 +1,7 @@
 
 import os
 import unittest
+import contextlib
 
 
 MEMORY_LOCATION = "memory@any"
@@ -34,30 +35,47 @@ def memory_repository(packages):
     repository.data = packages
 
 
-def wait(signal=None, on_value=None, timeout=1000):
+def wait(timeout=1000):
     from allzpark.vendor.Qt import QtCore
 
     loop = QtCore.QEventLoop()
     timer = QtCore.QTimer()
-    state = {"timeout": False}
 
-    if on_value:
-        def trigger(value):
-            if value == on_value:
-                loop.quit()
-                state["timeout"] = False
-    else:
-        def trigger(*args):
-            loop.quit()
-            state["timeout"] = False
-
-    if signal is not None:
-        state["timeout"] = True
-        signal.connect(trigger)
     timer.timeout.connect(loop.quit)
-
     timer.start(timeout)
     loop.exec_()
 
-    if state["timeout"]:
+
+@contextlib.contextmanager
+def wait_signal(signal, on_value=None, timeout=1000):
+    from allzpark.vendor.Qt import QtCore
+
+    loop = QtCore.QEventLoop()
+    timer = QtCore.QTimer()
+    state = {"received": False}
+
+    if on_value is None:
+        def trigger(*args):
+            state["received"] = True
+            timer.stop()
+            loop.quit()
+    else:
+        def trigger(value):
+            if value == on_value:
+                state["received"] = True
+                timer.stop()
+                loop.quit()
+
+    def on_timeout():
+        loop.quit()
         raise Exception("Signal waiting timeout.")
+
+    signal.connect(trigger)
+    timer.timeout.connect(on_timeout)
+
+    try:
+        yield
+    finally:
+        if not state["received"]:
+            timer.start(timeout)
+            loop.exec_()

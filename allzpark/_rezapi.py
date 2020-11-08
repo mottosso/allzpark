@@ -47,7 +47,7 @@ def find_latest(name, range_=None, paths=None):
 
 
 try:
-    from rez import project
+    from rez import __project__ as project
 except ImportError:
     # nerdvegas/rez
     project = "rez"
