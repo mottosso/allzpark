@@ -1106,7 +1106,8 @@ class Controller(QtCore.QObject):
 
                 try:
                     context = self.env(request)
-                except rez.PackageFamilyNotFoundError as err:
+                except (rez.PackageFamilyNotFoundError,
+                        rez.PackageNotFoundError) as err:
                     self.error("Resolve failed: %s" % str(err))
                     context = model.BrokenContext(app_package.name,
                                                   request)
@@ -1122,7 +1123,8 @@ class Controller(QtCore.QObject):
                                 "patchWithFilter", False
                             )
                         )
-                    except rez.PackageFamilyNotFoundError as err:
+                    except (rez.PackageFamilyNotFoundError,
+                            rez.PackageNotFoundError) as err:
                         self.error("Patch failed: %s" % str(err))
                         context = model.BrokenContext(app_package.name,
                                                       request)
@@ -1159,12 +1161,18 @@ class Controller(QtCore.QObject):
                         "Please report this to "
                         "https://github.com/mottosso/allzpark/issues/66"
                     )
-
-                self.error(
-                    "Context for '%s' had no resolved packages, this is "
-                    "likely due to a version conflict and broken resolve. "
-                    "Try graphing it." % app_request
-                )
+                    self.error(
+                        "Context for '%s' had no resolved packages, this is "
+                        "likely due to a version conflict and broken resolve. "
+                        "Try graphing it." % app_request
+                    )
+                else:
+                    self.error(
+                        "Context for '%s' had no resolved packages, failure "
+                        "reason as follow:\n===\n%s\n===\nIf above description "
+                        "isn't clear, try graphing it." %
+                        (app_request, rez_context.failure_description)
+                    )
 
             self._state["rezApps"][app_request] = rez_pkg
 
