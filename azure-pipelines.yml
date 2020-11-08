@@ -102,6 +102,7 @@ jobs:
         displayName: "Setup Xvfb"
 
       - script: |
+          export DISPLAY=:99
           xvfb-run sudo nosetests
         displayName: "Run tests"
 
