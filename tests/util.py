@@ -1,10 +1,19 @@
 
 import os
+import time
 import unittest
 import contextlib
 
 
 MEMORY_LOCATION = "memory@any"
+
+
+def memory_repository(packages):
+    from allzpark import _rezapi as rez
+
+    manager = rez.package_repository_manager
+    repository = manager.get_repository(MEMORY_LOCATION)
+    repository.data = packages
 
 
 class TestBase(unittest.TestCase):
@@ -22,9 +31,12 @@ class TestBase(unittest.TestCase):
         self.ctrl = ctrl
         self.window = window
 
+        self.wait(timeout=50)
+
     def tearDown(self):
-        wait(timeout=500)
+        self.wait(timeout=500)
         self.window.close()
+        time.sleep(0.1)
 
     def show_advance_controls(self):
         preferences = self.window._docks["preferences"]
@@ -36,7 +48,7 @@ class TestBase(unittest.TestCase):
         dock = self.window._docks[name]
         dock.toggle.setChecked(True)
         dock.toggle.clicked.emit()
-        wait(timeout=200)
+        self.wait(timeout=200)
 
         if on_page is not None:
             tabs = dock._panels["central"]
@@ -46,60 +58,51 @@ class TestBase(unittest.TestCase):
 
         return dock
 
+    def wait(self, timeout=1000):
+        from allzpark.vendor.Qt import QtCore
 
-def memory_repository(packages):
-    from allzpark import _rezapi as rez
+        loop = QtCore.QEventLoop(self.window)
+        timer = QtCore.QTimer(self.window)
 
-    manager = rez.package_repository_manager
-    repository = manager.get_repository(MEMORY_LOCATION)
-    repository.data = packages
-
-
-def wait(timeout=1000):
-    from allzpark.vendor.Qt import QtCore
-
-    loop = QtCore.QEventLoop()
-    timer = QtCore.QTimer()
-
-    def on_timeout():
-        timer.stop()
-        loop.quit()
-
-    timer.timeout.connect(on_timeout)
-    timer.start(timeout)
-    loop.exec_()
-
-
-@contextlib.contextmanager
-def wait_signal(signal, on_value=None, timeout=1000):
-    from allzpark.vendor.Qt import QtCore
-
-    loop = QtCore.QEventLoop()
-    timer = QtCore.QTimer()
-    state = {"received": False}
-
-    if on_value is None:
-        def trigger(*args):
-            state["received"] = True
+        def on_timeout():
             timer.stop()
             loop.quit()
-    else:
-        def trigger(value):
-            if value == on_value:
+
+        timer.timeout.connect(on_timeout)
+        timer.start(timeout)
+        loop.exec_()
+
+    @contextlib.contextmanager
+    def wait_signal(self, signal, on_value=None, timeout=1000):
+        from allzpark.vendor.Qt import QtCore
+
+        loop = QtCore.QEventLoop(self.window)
+        timer = QtCore.QTimer(self.window)
+        state = {"received": False}
+
+        if on_value is None:
+            def trigger(*args):
                 state["received"] = True
                 timer.stop()
                 loop.quit()
+        else:
+            def trigger(value):
+                if value == on_value:
+                    state["received"] = True
+                    timer.stop()
+                    loop.quit()
 
-    def on_timeout():
-        loop.quit()
-        raise Exception("Signal waiting timeout.")
+        def on_timeout():
+            timer.stop()
+            loop.quit()
+            self.fail("Signal waiting timeout.")
 
-    signal.connect(trigger)
-    timer.timeout.connect(on_timeout)
+        signal.connect(trigger)
+        timer.timeout.connect(on_timeout)
 
-    try:
-        yield
-    finally:
-        if not state["received"]:
-            timer.start(timeout)
-            loop.exec_()
+        try:
+            yield
+        finally:
+            if not state["received"]:
+                timer.start(timeout)
+                loop.exec_()

@@ -19,9 +19,9 @@ class TestDocks(util.TestBase):
             },
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with util.wait_signal(self.ctrl.resetted):
+        with self.wait_signal(self.ctrl.resetted):
             self.ctrl.reset(["foo"])
-        util.wait(timeout=200)
+        self.wait(timeout=200)
         self.assertEqual(self.ctrl.state.state, "ready")
 
         context_a = self.ctrl.state["rezContexts"]["app_A==None"]
@@ -34,7 +34,7 @@ class TestDocks(util.TestBase):
 
         for app, state in {"app_A==None": False, "app_B==1": True}.items():
             self.ctrl.select_application(app)
-            util.wait(100)
+            self.wait(100)
 
             dock = self.show_dock("environment", on_page="diagnose")
             self.assertEqual(dock._widgets["compute"].isEnabled(), state)

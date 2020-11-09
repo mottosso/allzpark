@@ -22,12 +22,12 @@ class TestLaunch(util.TestBase):
                 }
             },
         })
-        with util.wait_signal(self.ctrl.resetted):
+        with self.wait_signal(self.ctrl.resetted):
             self.ctrl.reset(["foo"])
-        util.wait(timeout=200)
+        self.wait(timeout=200)
         self.assertEqual(self.ctrl.state.state, "ready")
 
-        with util.wait_signal(self.ctrl.state_changed, "ready"):
+        with self.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")
 
         self.ctrl.select_application("app==1")
@@ -44,14 +44,14 @@ class TestLaunch(util.TestBase):
           'sys.stdout.write(\'meow\')"'
         ) % sys.executable
 
-        with util.wait_signal(self.ctrl.state_changed, "launching"):
+        with self.wait_signal(self.ctrl.state_changed, "launching"):
             self.ctrl.launch(command=command,
                              stdout=lambda m: stdout.append(m),
                              stderr=lambda m: stderr.append(m))
 
         self.assertEqual(len(commands), 1)
 
-        with util.wait_signal(commands[0].killed):
+        with self.wait_signal(commands[0].killed):
             pass
 
         self.assertIn("meow", "\n".join(stdout))
