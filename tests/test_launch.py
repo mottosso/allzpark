@@ -24,6 +24,8 @@ class TestLaunch(util.TestBase):
         })
         with util.wait_signal(self.ctrl.resetted):
             self.ctrl.reset(["foo"])
+        util.wait(timeout=200)
+        self.assertEqual(self.ctrl.state.state, "ready")
 
         with util.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")

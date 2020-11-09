@@ -41,7 +41,11 @@ def wait(timeout=1000):
     loop = QtCore.QEventLoop()
     timer = QtCore.QTimer()
 
-    timer.timeout.connect(loop.quit)
+    def on_timeout():
+        timer.stop()
+        loop.quit()
+
+    timer.timeout.connect(on_timeout)
     timer.start(timeout)
     loop.exec_()
 
