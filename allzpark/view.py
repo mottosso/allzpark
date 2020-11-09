@@ -739,6 +739,8 @@ class Window(QtWidgets.QMainWindow):
     def closeEvent(self, event):
         self._ctrl.state.store("geometry", self.saveGeometry())
         self._ctrl.state.store("windowState", self.saveState())
+        for timer in self._ctrl.timers.values():
+            timer.stop()
         return super(Window, self).closeEvent(event)
 
 

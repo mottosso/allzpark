@@ -278,6 +278,10 @@ class Controller(QtCore.QObject):
         return self._models
 
     @property
+    def timers(self):
+        return self._timers
+
+    @property
     def state(self):
         return self._state
 
