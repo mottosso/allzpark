@@ -70,7 +70,8 @@ class Window(QtWidgets.QMainWindow):
             "leftToggles": QtWidgets.QWidget(),
             "dockToggles": QtWidgets.QWidget(),
 
-            "stateIndicator": QtWidgets.QLabel(),
+            "stateIndicator": StateIndicator(),
+            "commandIndicator": CommandIndicator(),
         }
 
         # The order is reflected in the UI
@@ -232,6 +233,7 @@ class Window(QtWidgets.QMainWindow):
         layout.addWidget(widgets["fullCommand"])
 
         status_bar = self.statusBar()
+        status_bar.addPermanentWidget(widgets["commandIndicator"])
         status_bar.addPermanentWidget(widgets["stateIndicator"])
 
         # Setup
@@ -284,6 +286,7 @@ class Window(QtWidgets.QMainWindow):
             self.on_profileversion_reset)
         ctrl.resetted.connect(self.on_reset)
         ctrl.state_changed.connect(self.on_state_changed)
+        ctrl.running_cmd_updated.connect(self.on_running_cmd_updated)
         ctrl.logged.connect(self.on_logged)
         ctrl.profile_changed.connect(self.on_profile_changed)
         ctrl.repository_changed.connect(self.on_repository_changed)
@@ -611,6 +614,9 @@ class Window(QtWidgets.QMainWindow):
     def on_logged(self, message, level):
         self._docks["console"].append(message, level)
 
+    def on_running_cmd_updated(self, count):
+        self._widgets["commandIndicator"].set_count(count)
+
     def on_state_changed(self, state):
         self.tell("State: %s" % state, logging.DEBUG)
 
@@ -659,7 +665,7 @@ class Window(QtWidgets.QMainWindow):
             launch_btn.setEnabled(False)
             launch_btn.setText("Failed to resolve")
 
-        self._widgets["stateIndicator"].setText(str(state))
+        self._widgets["stateIndicator"].set_status(str(state))
         self.update_advanced_controls()
 
     def on_launch_clicked(self):
@@ -734,6 +740,69 @@ class Window(QtWidgets.QMainWindow):
         self._ctrl.state.store("geometry", self.saveGeometry())
         self._ctrl.state.store("windowState", self.saveState())
         return super(Window, self).closeEvent(event)
+
+
+class Indicator(QtWidgets.QWidget):
+    """Status bar indicator base class"""
+
+    def __init__(self, parent=None):
+        super(Indicator, self).__init__(parent)
+        widgets = {
+            "icon": QtWidgets.QLabel(),
+            "text": QtWidgets.QLabel(),
+        }
+        widgets["icon"].setObjectName("indicatorIcon")
+        widgets["text"].setObjectName("indicatorText")
+
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setContentsMargins(4, 2, 4, 2)
+        layout.addWidget(widgets["icon"])
+        layout.addWidget(widgets["text"])
+
+        self._widgets = widgets
+        self._size = QtCore.QSize(px(12), px(12))
+
+    def setToolTip(self, tip):
+        for widget in self._widgets.values():
+            widget.setToolTip(tip)
+        super(Indicator, self).setToolTip(tip)
+
+
+class StateIndicator(Indicator):
+
+    def __init__(self, parent=None):
+        super(StateIndicator, self).__init__(parent)
+
+        icons = {
+            "busy": res.icon("chat-square-dots-fill").pixmap(self._size),
+            "ready": res.icon("check-circle-fill").pixmap(self._size),
+            "error": res.icon("exclamation-circle-fill").pixmap(self._size),
+        }
+        self._icons = icons
+
+    def set_status(self, status):
+        if status in ["errored", "noapps", "noprofiles", "pkgnotfound"]:
+            key = "error"
+        elif status == "ready":
+            key = "ready"
+        else:
+            key = "busy"
+
+        self._widgets["icon"].setPixmap(self._icons[key])
+        self._widgets["text"].setText(status)
+        self.setToolTip("Current status: %s" % status)
+
+
+class CommandIndicator(Indicator):
+
+    def __init__(self, parent=None):
+        super(CommandIndicator, self).__init__(parent)
+        icon = res.icon("gear-fill")
+        self._widgets["icon"].setPixmap(icon.pixmap(self._size))
+
+    def set_count(self, count):
+        self._widgets["text"].setText(str(count))
+        self.setToolTip("%d running commands" % count)
 
 
 class FullCommand(QtWidgets.QWidget):

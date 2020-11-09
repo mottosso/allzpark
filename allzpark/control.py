@@ -198,6 +198,8 @@ class Controller(QtCore.QObject):
 
     patch_changed = QtCore.Signal(str)  # full patch string
 
+    running_cmd_updated = QtCore.Signal(int)
+
     states = [
         _State("booting", help="ALLZPARK is booting, hold on"),
         _State("resolving", help="Rez is busy resolving a context"),
@@ -356,7 +358,8 @@ class Controller(QtCore.QObject):
     # ----------------
 
     def on_tasks_polled(self):
-        self._models["commands"].poll()
+        running_count = self._models["commands"].poll()
+        self.running_cmd_updated.emit(running_count)
 
     def on_state_changed(self):
         state = self._name_to_state[self._state.state]
