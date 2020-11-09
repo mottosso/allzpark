@@ -611,6 +611,7 @@ class Context(AbstractDockWidget):
 
         self._ctrl = ctrl
         self._panels = panels
+        self._pages = pages
         self._widgets = widgets
         self._model = None
 

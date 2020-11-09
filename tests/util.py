@@ -26,6 +26,26 @@ class TestBase(unittest.TestCase):
         wait(timeout=500)
         self.window.close()
 
+    def show_advance_controls(self):
+        preferences = self.window._docks["preferences"]
+        arg = next(opt for opt in preferences.options
+                   if opt["name"] == "showAdvancedControls")
+        arg.write(True)
+
+    def show_dock(self, name, on_page=None):
+        dock = self.window._docks[name]
+        dock.toggle.setChecked(True)
+        dock.toggle.clicked.emit()
+        wait(timeout=200)
+
+        if on_page is not None:
+            tabs = dock._panels["central"]
+            page = dock._pages[on_page]
+            index = tabs.indexOf(page)
+            tabs.tabBar().setCurrentIndex(index)
+
+        return dock
+
 
 def memory_repository(packages):
     from allzpark import _rezapi as rez
