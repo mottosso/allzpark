@@ -531,13 +531,18 @@ class CommandsModel(AbstractTableModel):
     def poll(self):
         self.layoutAboutToBeChanged.emit()
 
+        running_count = 0
         for row in range(self.rowCount()):
             command = self.items[row]["object"]
-            value = "running" if command.is_running() else "killed"
+            is_running = command.is_running()
+            running_count += is_running
+            value = "running" if is_running else "killed"
             index = self.createIndex(row, 0, QtCore.QModelIndex())
             self.setData(index, value, "running")
 
         self.layoutChanged.emit()
+
+        return running_count
 
 
 class JsonModel(qjsonmodel.QJsonModel):

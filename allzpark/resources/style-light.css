@@ -251,6 +251,14 @@ Window #body QLineEdit {
     margin: 3px;
 }
 
+Window QStatusBar::item {
+    border-right: 1px solid %(dim)s;
+}
+
+Window QStatusBar #indicatorText {
+    font-family: "JetBrains Mono";
+}
+
 FullCommand QLineEdit {
   color: rgba(0, 0, 0, 0.2);
 }
