@@ -1078,56 +1078,54 @@ class Controller(QtCore.QObject):
 
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
+        patch_with_filter = self._state.retrieve("patchWithFilter", False)
         package_filter = self._package_filter()
+
+        def _try_finding_latest_app(req_str):
+            req_str = req_str.strip("~")
+            req = rez.PackageRequest(req_str)
+            try:
+                return rez.find_latest(req.name, range_=req.range)
+            except _missing as e_:
+                self.error(str(e_))
+                return model.BrokenPackage(req_str)
+
+        def _try_resolve_context(req, pkg_name, mode):
+            kwargs = dict()
+            if mode == "Patch":
+                kwargs["use_filter"] = patch_with_filter
+            try:
+                return self.env(req, **kwargs)
+            except _missing as e_:
+                self.error("%s failed: %s" % (mode, str(e_)))
+                return model.BrokenContext(pkg_name, req)
+
+        _missing = (rez.PackageFamilyNotFoundError, rez.PackageNotFoundError)
 
         contexts = odict()
         with util.timing() as t:
 
             for app_request in apps:
-                request_str = app_request.strip("~")
-                app_request = rez.PackageRequest(request_str)
 
-                try:
-                    app_package = rez.find_latest(app_request.name,
-                                                  range_=app_request.range)
-                except (rez.PackageFamilyNotFoundError,
-                        rez.PackageNotFoundError) as err:
-                    self.error(str(err))
-                    app_package = model.BrokenPackage(request_str)
-                else:
-                    if package_filter.excludes(app_package):
-                        continue
+                app_package = _try_finding_latest_app(app_request)
+                if package_filter.excludes(app_package):
+                    continue
 
                 app_request = "%s==%s" % (app_package.name,
                                           app_package.version)
 
                 request = [qualified_profile_name, app_request]
                 self.debug("Resolving request: %s" % " ".join(request))
-
-                try:
-                    context = self.env(request)
-                except (rez.PackageFamilyNotFoundError,
-                        rez.PackageNotFoundError) as err:
-                    self.error("Resolve failed: %s" % str(err))
-                    context = model.BrokenContext(app_package.name,
-                                                  request)
+                context = _try_resolve_context(request,
+                                               app_package.name,
+                                               mode="Resolve")
 
                 if context.success and patch:
                     self.debug("Patching request: %s" % " ".join(patch))
                     request = context.get_patched_request(patch)
-
-                    try:
-                        context = self.env(
-                            request,
-                            use_filter=self._state.retrieve(
-                                "patchWithFilter", False
-                            )
-                        )
-                    except (rez.PackageFamilyNotFoundError,
-                            rez.PackageNotFoundError) as err:
-                        self.error("Patch failed: %s" % str(err))
-                        context = model.BrokenContext(app_package.name,
-                                                      request)
+                    context = _try_resolve_context(request,
+                                                   app_package.name,
+                                                   mode="Patch")
 
                 contexts[app_request] = context
 
