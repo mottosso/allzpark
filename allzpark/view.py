@@ -25,7 +25,30 @@ class Applications(dock.SlimTableView):
         self.setEditTriggers(self.EditKeyPressed)
         self.setStretch(0)
 
+        # Block/Unblock view selection signal on version picking
+        # -
+        # We are using combobox widget as package version delegate editor,
+        # when user done picking version, may clicking on any place out
+        # side of the combobox widget instead of pressing return button to
+        # trigger editing finished signal. If user is clicking on application
+        # view, the application changed signal will also being emitted at the
+        # same time while the version editor already called context patching,
+        # race condition happened.
+        # To avoid that, we need to block view selection signal when editor
+        # is created, and unblock it depend on version changed or not.
+        # If version isn't changed, unblock it once editor is closed, and
+        # wait for controller reset signal after patch completed if changed.
+        delegate.editor_created.connect(self.on_editor_created)
+        delegate.editor_closed.connect(self.on_editor_done)
+        ctrl.resetted.connect(lambda: self.on_editor_done(False))
+
         self._selected_app_ok = False
+
+    def on_editor_created(self):
+        self.selectionModel().blockSignals(True)
+
+    def on_editor_done(self, block):
+        self.selectionModel().blockSignals(block)
 
     def on_state_appfailed(self):
         self._selected_app_ok = False
