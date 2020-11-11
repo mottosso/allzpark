@@ -919,6 +919,7 @@ class Controller(QtCore.QObject):
             active_profile = profile_versions[version_name]
 
             if profile_name:
+                # (TODO): this warning pops-up even profile actually exists
                 self.warning("%s was not found" % profile_name)
             else:
                 self.error("select_profile was passed an empty string")

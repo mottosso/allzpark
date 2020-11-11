@@ -351,6 +351,9 @@ class Packages(AbstractDockWidget):
             self._ctrl.reset()
 
         if arg["name"] == "patch":
+            # (TODO) This will be called twice since qargparse.String
+            #   may emit changed signal twice. And profile model item
+            #   will get doubled.
             self._ctrl.state.store("patch", arg.read())
             self._ctrl.reset()
 

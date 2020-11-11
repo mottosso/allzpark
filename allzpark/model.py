@@ -333,7 +333,7 @@ class ResolvedPackagesModel(AbstractTableModel):
             return "x" if re.findall(r".beta$", version) else ""
 
         if key == "latest":
-            # TODO: this is not the real latest
+            # (TODO): This is not the real latest
             version = data["override"] or data["version"]
             latest = data["versions"][-1]
             return "x" if version == latest else ""
