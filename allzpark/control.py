@@ -1216,7 +1216,7 @@ class Controller(QtCore.QObject):
                 key=util.natural_keys
             )
             resolved_packages = [
-                pkg for pkg in contexts[request].resolved_packages
+                pkg for pkg in contexts[request].resolved_packages or []
                 if pkg.name != package.name
             ]
             visible_apps[request] = {
