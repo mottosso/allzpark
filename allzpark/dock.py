@@ -343,15 +343,15 @@ class Packages(AbstractDockWidget):
 
     def on_argument_changed(self, arg):
         if arg["name"] == "useDevelopmentPackages":
-            self._ctrl._state.store("useDevelopmentPackages", arg.read())
+            self._ctrl.state.store("useDevelopmentPackages", arg.read())
             self._ctrl.reset()
 
         if arg["name"] == "useLocalizedPackages":
-            self._ctrl._state.store("useLocalizedPackages", arg.read())
+            self._ctrl.state.store("useLocalizedPackages", arg.read())
             self._ctrl.reset()
 
         if arg["name"] == "patch":
-            self._ctrl._state.store("patch", arg.read())
+            self._ctrl.state.store("patch", arg.read())
             self._ctrl.reset()
 
     def on_resetted(self):
