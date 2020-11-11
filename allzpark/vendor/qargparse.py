@@ -5,7 +5,7 @@ import logging
 from collections import OrderedDict as odict
 from Qt import QtCore, QtWidgets, QtGui
 
-__version__ = "0.5.5"
+__version__ = "0.5.6"
 _log = logging.getLogger(__name__)
 _type = type  # used as argument
 
@@ -269,7 +269,6 @@ class Boolean(QArgument):
     """
     def create(self):
         widget = QtWidgets.QCheckBox()
-        widget.clicked.connect(self.changed.emit)
 
         if isinstance(self, Tristate):
             self._read = lambda: widget.checkState()

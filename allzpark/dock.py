@@ -183,6 +183,16 @@ class App(AbstractDockWidget):
         if arg["name"] == "tool":
             ctrl.select_tool(value)
 
+    def on_state_appok(self):
+        launch_btn = self._widgets["launchBtn"]
+        launch_btn.setEnabled(True)
+        launch_btn.setText("Launch")
+
+    def on_state_appfailed(self):
+        launch_btn = self._widgets["launchBtn"]
+        launch_btn.setEnabled(False)
+        launch_btn.setText("Application Broken")
+
     def refresh(self, index):
         name = index.data(QtCore.Qt.DisplayRole)
         icon = index.data(QtCore.Qt.DecorationRole)
@@ -371,6 +381,12 @@ class Packages(AbstractDockWidget):
                 override_count,
                 disabled_count,
             ))
+
+    def on_state_appfailed(self):
+        self._widgets["view"].setEnabled(False)
+
+    def on_state_appok(self):
+        self._widgets["view"].setEnabled(True)
 
     def on_right_click(self, position):
         view = self._widgets["view"]
@@ -595,6 +611,7 @@ class Context(AbstractDockWidget):
 
         self._ctrl = ctrl
         self._panels = panels
+        self._pages = pages
         self._widgets = widgets
         self._model = None
 
@@ -606,6 +623,14 @@ class Context(AbstractDockWidget):
         proxy_model.setSourceModel(model_)
         self._widgets["view"].setModel(proxy_model)
         self._model = model_
+
+    def on_state_appfailed(self):
+        self._widgets["generateGraph"].setEnabled(False)
+        self._widgets["printCode"].setEnabled(False)
+
+    def on_state_appok(self):
+        self._widgets["generateGraph"].setEnabled(True)
+        self._widgets["printCode"].setEnabled(True)
 
     def on_generate_clicked(self):
         pixmap = self._ctrl.graph()
@@ -711,19 +736,33 @@ class Environment(AbstractDockWidget):
         self._panels = panels
         self._pages = pages
         self._widgets = widgets
+        self._models = {
+            "environ": None,
+            "parent": None,
+            "diagnose": None,
+        }
 
     def set_model(self, environ, parent, diagnose):
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(environ)
         self._widgets["view"].setModel(proxy_model)
+        self._models["environ"] = environ
 
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(parent)
         self._widgets["penv"].setModel(proxy_model)
+        self._models["parent"] = parent
 
         proxy_model = QtCore.QSortFilterProxyModel()
         proxy_model.setSourceModel(diagnose)
         self._widgets["test"].setModel(proxy_model)
+        self._models["diagnose"] = diagnose
+
+    def on_state_appfailed(self):
+        self._widgets["compute"].setEnabled(False)
+
+    def on_state_appok(self):
+        self._widgets["compute"].setEnabled(True)
 
     def on_env_applied(self, env):
         self._ctrl.state.store("userEnv", env)

@@ -255,6 +255,8 @@ class ApplicationModel(AbstractTableModel):
 
 
 class BrokenContext(object):
+    broken_dict = {"error": "Failed context"}
+
     def __init__(self, app_name, request):
         self.resolved_packages = [BrokenPackage(app_name)]
         self.success = False
@@ -265,11 +267,11 @@ class BrokenContext(object):
     def requested_packages(self):
         return self._request
 
-    def to_dict(self):
-        return {}
+    def to_dict(self, *args, **kwargs):
+        return self.broken_dict
 
-    def get_environ(self):
-        return {}
+    def get_environ(self, *args, **kwargs):
+        raise rez.ResolvedContextError("This is a broken context.")
 
 
 class BrokenPackage(object):
@@ -282,6 +284,7 @@ class BrokenPackage(object):
 
         self.name = request.name
         self.version = versions[-1]
+        self.qualified_name = "%s-%s" % (self.name, str(self.version))
         self.uri = ""
         self.root = ""
         self.relocatable = False
@@ -381,7 +384,7 @@ class PackagesModel(AbstractTableModel):
             versions = sorted(
                 [str(v.version) for v in versions],
                 key=util.natural_keys
-            )
+            ) or [version]  # broken package
 
             if localz:
                 relocatable = localz.is_relocatable(pkg)
@@ -580,7 +583,6 @@ class JsonModel(qjsonmodel.QJsonModel):
 
 class EnvironmentModel(JsonModel):
     def load(self, data):
-
         # Convert PATH environment variables to lists
         # for improved viewing experience
         for key, value in data.copy().items():

@@ -22,8 +22,10 @@ class TestProfiles(util.TestBase):
                 }
             }
         })
-        with util.wait_signal(self.ctrl.resetted):
+        with self.wait_signal(self.ctrl.resetted):
             self.ctrl.reset(["foo", "bar"])
+        self.wait(timeout=200)
+        self.assertEqual(self.ctrl.state.state, "noapps")
 
         # last profile will be selected by default
         self.assertEqual("bar", self.ctrl.state["profileName"])
@@ -46,10 +48,12 @@ class TestProfiles(util.TestBase):
                 }
             }
         })
-        with util.wait_signal(self.ctrl.resetted):
+        with self.wait_signal(self.ctrl.resetted):
             self.ctrl.reset(["foo", "bar"])
+        self.wait(timeout=200)
+        self.assertEqual(self.ctrl.state.state, "noapps")
 
-        with util.wait_signal(self.ctrl.state_changed, "noapps"):
+        with self.wait_signal(self.ctrl.state_changed, "noapps"):
             self.ctrl.select_profile("foo")
             # wait enter 'noapps' state
 
@@ -89,10 +93,12 @@ class TestProfiles(util.TestBase):
                 }
             },
         })
-        with util.wait_signal(self.ctrl.resetted):
+        with self.wait_signal(self.ctrl.resetted):
             self.ctrl.reset(["foo"])
+        self.wait(timeout=200)
+        self.assertEqual(self.ctrl.state.state, "ready")
 
-        with util.wait_signal(self.ctrl.state_changed, "ready"):
+        with self.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")
 
         self.assertEqual(

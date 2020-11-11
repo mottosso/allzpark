@@ -211,6 +211,8 @@ class Controller(QtCore.QObject):
         _State("noapps", help="There were no applications to choose from"),
         _State("notresolved", help="Rez couldn't resolve a request"),
         _State("pkgnotfound", help="One or more packages was not found"),
+        _State("appfailed", help="Selected application is broken"),
+        _State("appok", help="Selected application is available"),
     ]
 
     def __init__(self,
@@ -302,7 +304,7 @@ class Controller(QtCore.QObject):
         return self._state["tool"]
 
     def context(self, app_request):
-        return self._state["rezContexts"][app_request].to_dict()
+        return self._state["rezContexts"][app_request]
 
     def parent_environ(self):
         environ = self._state["parentEnviron"].copy()
@@ -347,9 +349,7 @@ class Controller(QtCore.QObject):
                 environ = context.get_environ(parent_environ=parent_env)
 
             except rez.ResolvedContextError:
-                return {
-                    "error": "Failed context"
-                }
+                return model.BrokenContext.broken_dict.copy()
             else:
                 env[app_request] = environ
                 return environ
@@ -603,6 +603,8 @@ class Controller(QtCore.QObject):
         root = root or self._state["root"]
         assert root, "Tried resetting without a root, this is a bug"
 
+        self._state.to_booting()
+
         def do():
             profiles = dict()
             default_profile = None
@@ -656,7 +658,7 @@ class Controller(QtCore.QObject):
             self._state.to_ready()
             self.resetted.emit()
 
-        def _on_success():
+        def _on_success(result=None):
             profile = not self._state["profileName"]
 
             if profile:
@@ -679,7 +681,7 @@ class Controller(QtCore.QObject):
         # so that we can pick up new packages.
         rez.clear_caches()
 
-        self._state.to_booting()
+        self._state.to_loading()
         util.defer(
             do,
             on_success=_on_success,
@@ -796,7 +798,7 @@ class Controller(QtCore.QObject):
                 self.debug("Cleaning up..")
                 shutil.rmtree(tempdir)
 
-        def on_success(result):
+        def on_success(result=None):
             self.repository_changed.emit()
 
         def on_failure(error, trace):
@@ -813,7 +815,7 @@ class Controller(QtCore.QObject):
             self.debug("Delocalizing %s" % package.root)
             localz.delocalize(package)
 
-        def on_success(result):
+        def on_success(result=None):
             self.repository_changed.emit()
 
         def on_failure(error, trace):
@@ -977,7 +979,7 @@ class Controller(QtCore.QObject):
             raise
 
         self._models["packages"].reset(packages)
-        self._models["context"].load(context)
+        self._models["context"].load(context.to_dict())
         self._models["environment"].load(environ)
         self._models["diagnose"].load(diagnose)
 
@@ -988,6 +990,13 @@ class Controller(QtCore.QObject):
         self.update_command()
         self._state.store("startupApplication", app_request)
         self.application_changed.emit()
+
+        if context.success:
+            self._state.to_appok()
+        else:
+            self._state.to_appfailed()
+
+        self._state.to_ready()
 
     def select_tool(self, tool_name):
         self._state["tool"] = tool_name
@@ -1017,6 +1026,34 @@ class Controller(QtCore.QObject):
     def _list_apps(self, profile):
         # Each app has a unique context relative the current profile
         # Find it, and keep track of it.
+
+        # Resolve profile
+
+        with util.timing() as t:
+            variants = list(profile.iter_variants())
+            profile_variant = variants[0]
+
+            if len(variants) > 1:
+                # Unsure of whether this is desirable. It would enable
+                # a profile per platform, or potentially other kinds
+                # of special-purpose situations. If you see this,
+                # and want this, submit an issue with your use case!
+                self.warning(
+                    "Profiles with multiple variants are unsupported. "
+                    "Using first found: %s" % profile_variant
+                )
+
+            qualified_profile_name = profile_variant.qualified_package_name
+            profile_request = [qualified_profile_name]
+            self.debug("Resolving request: %s" % qualified_profile_name)
+
+            # Before resolving apps, need to know whether this profile can
+            # be resolved or not.
+            self.env(profile_request)
+
+        self.debug("Resolved profile context in %.2f seconds" % t.duration)
+
+        # Resolve app with profile
 
         apps = []
         _apps = allzparkconfig.applications
@@ -1048,48 +1085,54 @@ class Controller(QtCore.QObject):
 
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
+        patch_with_filter = self._state.retrieve("patchWithFilter", False)
         package_filter = self._package_filter()
+
+        def _try_finding_latest_app(req_str):
+            req_str = req_str.strip("~")
+            req = rez.PackageRequest(req_str)
+            try:
+                return rez.find_latest(req.name, range_=req.range)
+            except _missing as e_:
+                self.error(str(e_))
+                return model.BrokenPackage(req_str)
+
+        def _try_resolve_context(req, pkg_name, mode):
+            kwargs = dict()
+            if mode == "Patch":
+                kwargs["use_filter"] = patch_with_filter
+            try:
+                return self.env(req, **kwargs)
+            except _missing as e_:
+                self.error("%s failed: %s" % (mode, str(e_)))
+                return model.BrokenContext(pkg_name, req)
+
+        _missing = (rez.PackageFamilyNotFoundError, rez.PackageNotFoundError)
 
         contexts = odict()
         with util.timing() as t:
-            for app_request in apps:
-                app_request = rez.PackageRequest(app_request.strip("~"))
-                app_package = rez.find_latest(app_request.name,
-                                              range_=app_request.range)
 
+            for app_request in apps:
+
+                app_package = _try_finding_latest_app(app_request)
                 if package_filter.excludes(app_package):
                     continue
-
-                variants = list(profile.iter_variants())
-                variant = variants[0]
-
-                if len(variants) > 1:
-                    # Unsure of whether this is desirable. It would enable
-                    # a profile per platform, or potentially other kinds
-                    # of special-purpose situations. If you see this,
-                    # and want this, submit an issue with your use case!
-                    self.warning(
-                        "Profiles with multiple variants are unsupported. "
-                        "Using first found: %s" % variant
-                    )
 
                 app_request = "%s==%s" % (app_package.name,
                                           app_package.version)
 
-                request = [variant.qualified_package_name, app_request]
+                request = [qualified_profile_name, app_request]
                 self.debug("Resolving request: %s" % " ".join(request))
-
-                context = self.env(request)
+                context = _try_resolve_context(request,
+                                               app_package.name,
+                                               mode="Resolve")
 
                 if context.success and patch:
-                    self.debug("Patching request: %s" % " ".join(request))
+                    self.debug("Patching request: %s" % " ".join(patch))
                     request = context.get_patched_request(patch)
-                    context = self.env(
-                        request,
-                        use_filter=self._state.retrieve(
-                            "patchWithFilter", False
-                        )
-                    )
+                    context = _try_resolve_context(request,
+                                                   app_package.name,
+                                                   mode="Patch")
 
                 contexts[app_request] = context
 
@@ -1123,12 +1166,18 @@ class Controller(QtCore.QObject):
                         "Please report this to "
                         "https://github.com/mottosso/allzpark/issues/66"
                     )
-
-                self.error(
-                    "Context for '%s' had no resolved packages, this is "
-                    "likely due to a version conflict and broken resolve. "
-                    "Try graphing it." % app_request
-                )
+                    self.error(
+                        "Context for '%s' had no resolved packages, this is "
+                        "likely due to a version conflict and broken resolve. "
+                        "Try graphing it." % app_request
+                    )
+                else:
+                    self.error(
+                        "Context for '%s' had no resolved packages, failure "
+                        "reason as follow:\n===\n%s\n===\nIf above description "
+                        "isn't clear, try graphing it." %
+                        (app_request, rez_context.failure_description)
+                    )
 
             self._state["rezApps"][app_request] = rez_pkg
 
