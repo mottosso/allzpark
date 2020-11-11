@@ -191,7 +191,7 @@ class Controller(QtCore.QObject):
     profile_changed = QtCore.Signal(
         str, object, bool)  # profile, version, refreshed
 
-    application_changed = QtCore.Signal()
+    application_changed = QtCore.Signal(str)
 
     # The current command to launch an application has changed
     command_changed = QtCore.Signal(str)  # command
@@ -227,12 +227,11 @@ class Controller(QtCore.QObject):
         state = State(self, storage, parent_environ)
 
         models = {
-            "apps": model.ApplicationModel(),
+            "resolved": model.ResolvedPackagesModel(),
             "profileVersions": QtCore.QStringListModel(),
 
             # Docks
             "profiles": model.ProfileModel(),
-            "packages": model.PackagesModel(self),
             "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
             "parentenv": model.EnvironmentModel(),
@@ -353,9 +352,6 @@ class Controller(QtCore.QObject):
             else:
                 env[app_request] = environ
                 return environ
-
-    def resolved_packages(self, app_request):
-        return self._state["rezContexts"][app_request].resolved_packages
 
     # ----------------
     # Events
@@ -719,7 +715,7 @@ class Controller(QtCore.QObject):
                 rez_app.name, rez_app.version
             ))
 
-            app_model = self._models["apps"]
+            app_model = self._models["resolved"]
             app_index = app_model.findIndex(app_request)
 
             tool_name = kwargs.get(
@@ -734,8 +730,8 @@ class Controller(QtCore.QObject):
                 "This is a bug"
             )
 
-            overrides = self._models["packages"]._overrides
-            disabled = self._models["packages"]._disabled
+            overrides = self._models["resolved"].overrides
+            disabled = self._models["resolved"].disabled
             environ = self.parent_environ()
 
             self.debug(
@@ -810,7 +806,7 @@ class Controller(QtCore.QObject):
 
     def delocalize(self, name):
         def do():
-            item = self._models["packages"].find(name)
+            item = self._models["resolved"].find(name)
             package = item["package"]
             self.debug("Delocalizing %s" % package.root)
             localz.delocalize(package)
@@ -872,11 +868,10 @@ class Controller(QtCore.QObject):
     def select_profile(self, profile_name, version_name=Latest):
 
         # Wipe existing data
-        self._models["apps"].reset()
+        self._models["resolved"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
         self._models["diagnose"].reset()
-        self._models["packages"].reset()
         self._models["profileVersions"].setStringList([])
 
         self._state["rezContexts"].clear()
@@ -884,8 +879,8 @@ class Controller(QtCore.QObject):
         self._state["testedEnvirons"].clear()
         self._state["rezApps"].clear()
 
-        def on_apps_found(apps):
-            if not apps:
+        def on_apps_found(packages):
+            if not packages:
                 self._state["error"] = """
                 <h2><font color=\"red\">:(</font></h2>
                 <br>
@@ -905,7 +900,7 @@ class Controller(QtCore.QObject):
                 self._state.to_noapps()
 
             else:
-                self._models["apps"].reset(apps)
+                self._models["resolved"].reset(packages)
                 self._state.to_ready()
 
         def on_apps_not_found(error, trace):
@@ -968,28 +963,32 @@ class Controller(QtCore.QObject):
         try:
             context = self.context(app_request)
             environ = self.environ(app_request)
-            packages = self.resolved_packages(app_request)
             diagnose = self._state["testedEnvirons"].get(app_request, {})
 
         except Exception:
-            self._models["packages"].reset()
             self._models["context"].reset()
             self._models["environment"].reset()
             self._models["diagnose"].reset()
             raise
 
-        self._models["packages"].reset(packages)
         self._models["context"].load(context.to_dict())
         self._models["environment"].load(environ)
         self._models["diagnose"].load(diagnose)
 
-        tools = self._models["apps"].find(app_request)["tools"]
+        tools = self._models["resolved"].find(app_request)["tools"]
         self._state["tool"] = tools[0]
 
         # Use this application on next launch or change of profile
         self.update_command()
         self._state.store("startupApplication", app_request)
-        self.application_changed.emit()
+        self.application_changed.emit(app_request)
+
+        if context.success:
+            self._state.to_appok()
+        else:
+            self._state.to_appfailed()
+
+        self._state.to_ready()
 
         if context.success:
             self._state.to_appok()
@@ -1088,9 +1087,12 @@ class Controller(QtCore.QObject):
         patch_with_filter = self._state.retrieve("patchWithFilter", False)
         package_filter = self._package_filter()
 
+        app_ranges = dict()
+
         def _try_finding_latest_app(req_str):
             req_str = req_str.strip("~")
             req = rez.PackageRequest(req_str)
+            app_ranges[req.name] = req.range
             try:
                 return rez.find_latest(req.name, range_=req.range)
             except _missing as e_:
@@ -1133,6 +1135,12 @@ class Controller(QtCore.QObject):
                     context = _try_resolve_context(request,
                                                    app_package.name,
                                                    mode="Patch")
+
+                    # update context key `app_request` if patched
+                    for pkg in context.resolved_packages or []:
+                        if pkg.name == app_package.name:
+                            app_request = "%s==%s" % (pkg.name, pkg.version)
+                            break
 
                 contexts[app_request] = context
 
@@ -1181,10 +1189,16 @@ class Controller(QtCore.QObject):
 
             self._state["rezApps"][app_request] = rez_pkg
 
+        self._state["rezContexts"] = contexts
+
         self.debug("Resolved all contexts in %.2f seconds" % t.duration)
 
-        # Hide hidden
-        visible_apps = []
+        visible_apps = dict()
+
+        # * Opt-out hidden application
+        # * Find application versions
+        # * Context resolved packages (latest only)
+        paths = self._package_paths()
         show_hidden = self._state.retrieve("showHiddenApps")
         for request, package in self._state["rezApps"].items():
             data = allzparkconfig.metadata_from_package(package)
@@ -1193,9 +1207,23 @@ class Controller(QtCore.QObject):
             if hidden and not show_hidden:
                 continue
 
-            visible_apps += [package]
+            versions = rez.find(package.name,
+                                range_=app_ranges[package.name],
+                                paths=paths)
+            versions = sorted(
+                [str(v.version) for v in versions],
+                key=util.natural_keys
+            )
+            resolved_packages = [
+                pkg for pkg in contexts[request].resolved_packages
+                if pkg.name != package.name
+            ]
+            visible_apps[request] = {
+                "app": package,
+                "versions": versions,
+                "packages": resolved_packages,
+            }
 
-        self._state["rezContexts"] = contexts
         return visible_apps
 
     def graph(self):

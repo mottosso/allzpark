@@ -163,7 +163,7 @@ def parse_icon(root, template):
     return QtGui.QIcon(fname)
 
 
-class ApplicationModel(AbstractTableModel):
+class ResolvedPackagesModel(AbstractTableModel):
     ColumnToKey = {
         0: {
             QtCore.Qt.DisplayRole: "label",
@@ -171,55 +171,95 @@ class ApplicationModel(AbstractTableModel):
         },
         1: {
             QtCore.Qt.DisplayRole: "version",
-        }
+        },
+        2: {
+            QtCore.Qt.DisplayRole: "state",
+        },
+        3: {
+            QtCore.Qt.DisplayRole: "latest",
+        },
+        4: {
+            QtCore.Qt.DisplayRole: "beta",
+        },
     }
 
-    Headers = [
-        "application",
-        "version"
-    ]
-
     def __init__(self, *args, **kwargs):
-        super(ApplicationModel, self).__init__(*args, **kwargs)
+        super(ResolvedPackagesModel, self).__init__(*args, **kwargs)
         self._broken_icon = res.icon("Action_Stop_1_32.png")
+        self._overrides = {}
+        self._disabled = {}
 
-    def reset(self, applications=None):
-        applications = applications or []
+    @property
+    def overrides(self):
+        return self._overrides
+
+    @property
+    def disabled(self):
+        return self._disabled
+
+    def reset(self, packages=None):
+        packages = packages or dict()
 
         self.beginResetModel()
         self.items[:] = []
 
-        for app in applications:
-            root = app.root
+        for app_request, app_data in packages.items():
+            app = app_data["app"]
+            versions = app_data["versions"]
 
-            data = allzparkconfig.metadata_from_package(app)
-            tools = getattr(app, "tools", None) or [app.name]
-            app_request = "%s==%s" % (app.name, app.version)
+            self._add_item(app_request, app_request, app, versions)
 
-            item = {
-                "name": app_request,
-                "label": data["label"],
-                "version": str(app.version),
-                "icon": parse_icon(root, template=data["icon"]),
-                "package": app,
-                "context": None,
-                "active": True,
-                "hidden": data["hidden"],
-                "broken": isinstance(app, BrokenPackage),
-
-                # Whether or not to open a separate console for this app
-                "detached": False,
-
-                # Current tool
-                "tool": None,
-
-                # All available tools
-                "tools": tools,
-            }
-
-            self.items.append(item)
+            for pkg in app_data["packages"]:
+                self._add_item(pkg.name, app_request, pkg)
 
         self.endResetModel()
+
+    def _add_item(self, name, app_request, pkg, versions=None):
+        root = pkg.root
+        is_app = versions is not None
+        data = allzparkconfig.metadata_from_package(pkg)
+        tools = getattr(pkg, "tools", None) or [pkg.name]
+        version = str(pkg.version)
+        relocatable = localz.is_relocatable(pkg) if localz else False
+        state = (
+            "(dev)" if is_local(pkg) else
+            "(localised)" if is_localised(pkg) else
+            ""
+        )
+
+        item = {
+            "_isApp": is_app,
+
+            "name": name,
+            "label": data["label"],
+            "version": version,
+            "versions": versions or [version],
+            "icon": parse_icon(root, template=data["icon"]),
+            "package": pkg,
+            "context": None,
+            "active": True,
+
+            "family": pkg.name,
+            "request": app_request,
+            "hidden": data["hidden"],
+            "broken": isinstance(pkg, BrokenPackage),
+
+            "default": version,
+            "override": self._overrides.get(pkg.name),
+            "disabled": self._disabled.get(pkg.name, False),
+            "state": state,
+            "relocatable": relocatable,
+            "localizing": False,  # in progress
+
+            # Whether or not to open a separate console for this app
+            "detached": False,
+            # Current tool
+            "tool": None,
+            # All available tools
+            "tools": tools,
+        }
+
+        self.items.append(item)
 
     def data(self, index, role):
         row = index.row()
@@ -251,7 +291,90 @@ class ApplicationModel(AbstractTableModel):
                 if col == 0:
                     return self._broken_icon
 
-        return super(ApplicationModel, self).data(index, role)
+        if data["override"]:
+            if role == QtCore.Qt.DisplayRole and col == 1:
+                return data["override"]
+
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
+
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("darkorange")
+
+        if data["disabled"] or data["localizing"]:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                font.setStrikeOut(True)
+                return font
+
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("darkorange")
+
+        try:
+            value = data[role]
+
+            if isinstance(value, list):
+                # Prevent edits
+                value = value[:]
+
+            return value
+
+        except KeyError:
+            try:
+                key = self.ColumnToKey[col][role]
+            except KeyError:
+                return None
+
+        if key == "beta":
+            version = data["override"] or data["version"]
+            return "x" if re.findall(r".beta$", version) else ""
+
+        if key == "latest":
+            # TODO: this is not the real latest
+            version = data["override"] or data["version"]
+            latest = data["versions"][-1]
+            return "x" if version == latest else ""
+
+        return data[key]
+
+    def setData(self, index, value, role):
+        if role == "override":
+            default = self.data(index, "default")
+            package = self.data(index, "package").name
+
+            if value and value != default:
+                log.info("Storing permanent override %s-%s" % (package, value))
+                self._overrides[package] = value
+            else:
+                log.info("Resetting to default")
+                self._overrides.pop(package, None)
+                value = None
+
+        if role == "disabled":
+            package = self.data(index, "package").name
+            value = bool(value)
+
+            if value:
+                log.info("Disabling %s" % package)
+            else:
+                log.info("Enabling %s" % package)
+
+            self._disabled[package] = value
+
+        return super(ResolvedPackagesModel, self).setData(index, value, role)
+
+    def flags(self, index):
+        if index.column() == 1:
+            return (
+                QtCore.Qt.ItemIsEnabled |
+                QtCore.Qt.ItemIsSelectable |
+                QtCore.Qt.ItemIsEditable
+            )
+
+        return super(ResolvedPackagesModel, self).flags(index)
 
 
 class BrokenContext(object):
@@ -320,182 +443,6 @@ def is_localised(pkg):
         return root.startswith(path)
     else:
         return False
-
-
-class PackagesModel(AbstractTableModel):
-    ColumnToKey = {
-        0: {
-            QtCore.Qt.DisplayRole: "label",
-            QtCore.Qt.DecorationRole: "icon",
-        },
-        1: {
-            QtCore.Qt.DisplayRole: "version",
-        },
-        2: {
-            QtCore.Qt.DisplayRole: "state",
-        },
-        3: {
-            QtCore.Qt.DisplayRole: "latest",
-        },
-        4: {
-            QtCore.Qt.DisplayRole: "beta",
-        },
-    }
-
-    Headers = [
-        "package",
-        "version",
-        "state",
-        "latest",
-        "beta",
-    ]
-
-    def __init__(self, ctrl, parent=None):
-        super(PackagesModel, self).__init__(parent)
-
-        self._ctrl = ctrl
-        self._overrides = {}
-        self._disabled = {}
-
-    def reset(self, packages=None):
-        packages = packages or []
-
-        self.beginResetModel()
-        self.items[:] = []
-
-        # TODO: This isn't nice. The model should
-        # not have to reach into the controller.
-        paths = self._ctrl._package_paths()
-
-        for pkg in packages:
-            root = pkg.root
-            data = allzparkconfig.metadata_from_package(pkg)
-            state = (
-                "(dev)" if is_local(pkg) else
-                "(localised)" if is_localised(pkg) else
-                ""
-            )
-            relocatable = False
-
-            version = str(pkg.version)
-
-            # Fetch all versions of package
-            versions = rez.find(pkg.name, paths=paths)
-            versions = sorted(
-                [str(v.version) for v in versions],
-                key=util.natural_keys
-            ) or [version]  # broken package
-
-            if localz:
-                relocatable = localz.is_relocatable(pkg)
-
-            item = {
-                "name": pkg.name,
-                "label": data["label"],
-                "version": version,
-                "default": version,
-                "icon": parse_icon(root, template=data["icon"]),
-                "package": pkg,
-                "override": self._overrides.get(pkg.name),
-                "disabled": self._disabled.get(pkg.name, False),
-                "context": None,
-                "active": True,
-                "versions": versions,
-                "state": state,
-                "relocatable": relocatable,
-                "localizing": False,  # in progress
-            }
-
-            self.items.append(item)
-
-        self.endResetModel()
-
-    def data(self, index, role):
-        row = index.row()
-        col = index.column()
-
-        try:
-            data = self.items[row]
-        except IndexError:
-            return None
-
-        if data["override"]:
-            if role == QtCore.Qt.DisplayRole and col == 1:
-                return data["override"]
-
-            if role == QtCore.Qt.FontRole:
-                font = QtGui.QFont()
-                font.setBold(True)
-                return font
-
-            if role == QtCore.Qt.ForegroundRole:
-                return QtGui.QColor("darkorange")
-
-        if data["disabled"] or data["localizing"]:
-            if role == QtCore.Qt.FontRole:
-                font = QtGui.QFont()
-                font.setBold(True)
-                font.setStrikeOut(True)
-                return font
-
-            if role == QtCore.Qt.ForegroundRole:
-                return QtGui.QColor("darkorange")
-
-        try:
-            return data[role]
-
-        except KeyError:
-            try:
-                key = self.ColumnToKey[col][role]
-            except KeyError:
-                return None
-
-        if key == "beta":
-            version = data["override"] or data["version"]
-            return "x" if re.findall(r".beta$", version) else ""
-
-        if key == "latest":
-            version = data["override"] or data["version"]
-            latest = data["versions"][-1]
-            return "x" if version == latest else ""
-
-        return data[key]
-
-    def setData(self, index, value, role):
-        if role == "override":
-            default = self.data(index, "default")
-            package = self.data(index, "package").name
-
-            if value and value != default:
-                log.info("Storing permanent override %s-%s" % (package, value))
-                self._overrides[package] = value
-            else:
-                log.info("Resetting to default")
-                self._overrides.pop(package, None)
-                value = None
-
-        if role == "disabled":
-            package = self.data(index, "package").name
-            value = bool(value)
-
-            if value:
-                log.info("Disabling %s" % package)
-            else:
-                log.info("Enabling %s" % package)
-
-            self._disabled[package] = value
-
-        return super(PackagesModel, self).setData(index, value, role)
-
-    def flags(self, index):
-        if index.column() == 1:
-            return (
-                QtCore.Qt.ItemIsEnabled |
-                QtCore.Qt.ItemIsSelectable |
-                QtCore.Qt.ItemIsEditable
-            )
-
-        return super(PackagesModel, self).flags(index)
 
 
 class CommandsModel(AbstractTableModel):
@@ -682,6 +629,42 @@ class ProxyModel(TriStateSortFilterProxyModel):
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return super(ProxyModel, self).rowCount(parent)
+
+
+class ApplicationProxyModel(ProxyModel):
+
+    Headers = [
+        "application",
+        "version"
+    ]
+
+    def columnCount(self, parent):
+        return len(self.Headers)
+
+    def headerData(self, section, orientation, role):
+        if orientation == QtCore.Qt.Vertical:
+            return
+
+        if role == QtCore.Qt.DisplayRole:
+            return self.Headers[section]
+
+
+class PackagesProxyModel(ProxyModel):
+
+    Headers = [
+        "package",
+        "version",
+        "state",
+        "latest",
+        "beta",
+    ]
+
+    def headerData(self, section, orientation, role):
+        if orientation == QtCore.Qt.Vertical:
+            return
+
+        if role == QtCore.Qt.DisplayRole:
+            return self.Headers[section]
 
 
 class TreeItem(dict):

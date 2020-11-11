@@ -24,7 +24,7 @@ class Package(QtWidgets.QStyledItemDelegate):
 
     def setModelData(self, editor, model, index):
         model = index.model()
-        package = model.data(index, "name")
+        package = model.data(index, "family")
         options = model.data(index, "versions")
         default = model.data(index, "default")
         version = options[editor.currentIndex()]

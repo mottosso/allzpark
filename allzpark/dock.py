@@ -174,7 +174,7 @@ class App(AbstractDockWidget):
             return
 
         ctrl = self._ctrl
-        model = ctrl.models["apps"]
+        model = ctrl.models["resolved"]
         app_name = ctrl.state["appRequest"]
         app_index = model.findIndex(app_name)
         value = arg.read()
@@ -361,19 +361,24 @@ class Packages(AbstractDockWidget):
         arg._previous = patch
 
     def set_model(self, model_):
-        proxy_model = model.ProxyModel(model_)
+        proxy_model = model.PackagesProxyModel(model_)
+        proxy_model.setup(include=[("request", None)])
         self._widgets["view"].setModel(proxy_model)
 
         model_.modelReset.connect(self.on_model_changed)
         model_.dataChanged.connect(self.on_model_changed)
 
-    def on_model_changed(self):
-        model = self._widgets["view"].model()
-        model = model.sourceModel()
+    def on_app_changed(self, app_request):
+        model_ = self._widgets["view"].model()
+        model_.setup(include=[("request", app_request)])
 
-        package_count = model.rowCount()
-        override_count = len([i for i in model.items if i["override"]])
-        disabled_count = len([i for i in model.items if i["disabled"]])
+    def on_model_changed(self):
+        model_ = self._widgets["view"].model()
+        model_ = model_.sourceModel()
+
+        package_count = model_.rowCount()
+        override_count = len([i for i in model_.items if i["override"]])
+        disabled_count = len([i for i in model_.items if i["disabled"]])
 
         self._widgets["status"].showMessage(
             "%d Packages, %d Overridden, %d Disabled" % (
@@ -662,7 +667,7 @@ class Context(AbstractDockWidget):
 
         self._widgets["code"].setText("<br>".join(pretty))
 
-    def on_application_changed(self):
+    def on_application_changed(self, app_request):
         self._widgets["code"].setPlainText("")
         if not self._widgets["graph"]._pixmapHandle:
             return
