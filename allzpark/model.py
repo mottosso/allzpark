@@ -284,6 +284,7 @@ class BrokenPackage(object):
 
         self.name = request.name
         self.version = versions[-1]
+        self.qualified_name = "%s-%s" % (self.name, str(self.version))
         self.uri = ""
         self.root = ""
         self.relocatable = False
