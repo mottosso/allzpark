@@ -1155,6 +1155,15 @@ class Preferences(AbstractDockWidget):
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("Preferences")
 
+        protected = allzparkconfig.protected_preferences()
+        for name, value in protected.items():
+            arg = next((a for a in self.options if a["name"] == name), None)
+            if arg is None:
+                print("Unknown preference setting: %s" % name)
+            else:
+                ctrl.state.store(name, value)
+                arg["enabled"] = False
+
         panels = {
             "central": QtWidgets.QTabWidget(),
         }
