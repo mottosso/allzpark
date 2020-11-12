@@ -18,7 +18,8 @@ class Package(QtWidgets.QStyledItemDelegate):
         self._ctrl = ctrl
 
     def createEditor(self, parent, option, index):
-        if index.column() != 1:
+        model = index.model()
+        if index.column() != 1 or not model.data(index, "_hasVersions"):
             return
 
         editor = QtWidgets.QComboBox(parent)

@@ -229,6 +229,7 @@ class ResolvedPackagesModel(AbstractTableModel):
 
         item = {
             "_isApp": is_app,
+            "_hasVersions": len(versions) > 1,
 
             "name": name,
             "label": data["label"],
@@ -312,6 +313,12 @@ class ResolvedPackagesModel(AbstractTableModel):
 
             if role == QtCore.Qt.ForegroundRole:
                 return QtGui.QColor("darkorange")
+
+        if data["_hasVersions"] and col == 1:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
 
         try:
             value = data[role]

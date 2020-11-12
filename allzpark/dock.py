@@ -465,8 +465,17 @@ class Packages(AbstractDockWidget):
             localize_all.setEnabled(False)
             localize_related.setEnabled(False)
 
+        versions = model_.data(index, "versions")
+        if len(versions) <= 1:
+            edit.setEnabled(False)
+            default.setEnabled(False)
+            earliest.setEnabled(False)
+            latest.setEnabled(False)
+
         def on_edit():
-            self._widgets["view"].edit(index)
+            # avoid sending index that is not editable
+            version_index = model_.index(index.row(), 1)
+            self._widgets["view"].edit(version_index)
 
         def on_default():
             package = model_.data(index, "package")
@@ -474,7 +483,6 @@ class Packages(AbstractDockWidget):
             self.message.emit("Package set to default")
 
         def on_earliest():
-            versions = model_.data(index, "versions")
             earliest = versions[0]
             package = model_.data(index, "package")
             self._ctrl.patch("%s==%s" % (package.name, earliest))
@@ -482,7 +490,6 @@ class Packages(AbstractDockWidget):
             self.message.emit("Package set to earliest")
 
         def on_latest():
-            versions = model_.data(index, "versions")
             latest = versions[-1]
             package = model_.data(index, "package")
             self._ctrl.patch("%s==%s" % (package.name, latest))
