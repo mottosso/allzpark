@@ -640,15 +640,16 @@ class Context(AbstractDockWidget):
         self._model = model_
 
     def on_state_appfailed(self):
-        self._widgets["generateGraph"].setEnabled(False)
         self._widgets["printCode"].setEnabled(False)
 
     def on_state_appok(self):
-        self._widgets["generateGraph"].setEnabled(True)
         self._widgets["printCode"].setEnabled(True)
 
     def on_generate_clicked(self):
         pixmap = self._ctrl.graph()
+
+        if pixmap is None:
+            return  # was graphing broken context
 
         if not pixmap:
             self._widgets["graphHotkeys"].setText(

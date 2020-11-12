@@ -699,11 +699,12 @@ class Window(QtWidgets.QMainWindow):
             for widget in self._docks.values():
                 widget.setEnabled(False)
 
-        if state in ("pkgnotfound", "errored"):
+        if state in ("pkgnotfound", "errored", "console"):
             console = self._docks["console"]
             console.show()
             self.on_dock_toggled(console, visible=True)
 
+        if state in ("pkgnotfound", "errored"):
             page = self._pages["errored"]
             self._panels["pages"].setCurrentWidget(page)
             self._widgets["apps"].setEnabled(False)

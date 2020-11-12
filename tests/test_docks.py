@@ -39,9 +39,6 @@ class TestDocks(util.TestBase):
             dock = self.show_dock("environment", on_page="diagnose")
             self.assertEqual(dock._widgets["compute"].isEnabled(), state)
 
-            dock = self.show_dock("context", on_page="graph")
-            self.assertEqual(dock._widgets["generateGraph"].isEnabled(), state)
-
             dock = self.show_dock("context", on_page="code")
             self.assertEqual(dock._widgets["printCode"].isEnabled(), state)
 

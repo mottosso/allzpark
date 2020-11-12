@@ -205,6 +205,7 @@ class Controller(QtCore.QObject):
         _State("resolving", help="Rez is busy resolving a context"),
         _State("loading", help="Something is taking a moment"),
         _State("errored", help="Something has gone wrong"),
+        _State("console", help="Something need you to read"),
         _State("launching", help="An application is launching"),
         _State("ready", help="Awaiting user input"),
         _State("noprofiles", help="Allzpark did not find any profiles at all"),
@@ -1237,6 +1238,12 @@ class Controller(QtCore.QObject):
 
     def graph(self):
         context = self._state["rezContexts"][self._state["appRequest"]]
+        if isinstance(context, model.BrokenContext):
+            self._state.to_console()
+            self._state.to_ready()
+            self.error("Can not graph a broken context.")
+            return
+
         graph_str = context.graph(as_dot=True)
 
         tempdir = tempfile.mkdtemp()
