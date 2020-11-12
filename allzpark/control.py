@@ -1093,12 +1093,19 @@ class Controller(QtCore.QObject):
         def _try_finding_latest_app(req_str):
             req_str = req_str.strip("~")
             req = rez.PackageRequest(req_str)
-            app_ranges[req.name] = req.range
             try:
-                return rez.find_latest(req.name, range_=req.range)
+                app_vers = list(self.find(req.name, range_=req.range))
+                latest = app_vers[-1]
+            except IndexError:
+                self.error("No package matched for request '%s', may have"
+                           "been excluded by package filter.")
+                return model.BrokenPackage(req_str)
             except _missing as e_:
                 self.error(str(e_))
                 return model.BrokenPackage(req_str)
+            else:
+                app_ranges[req.name] = app_vers
+                return latest
 
         def _try_resolve_context(req, pkg_name, mode):
             kwargs = dict()
@@ -1199,7 +1206,6 @@ class Controller(QtCore.QObject):
         # * Opt-out hidden application
         # * Find application versions
         # * Context resolved packages (latest only)
-        paths = self._package_paths()
         show_hidden = self._state.retrieve("showHiddenApps")
         for request, package in self._state["rezApps"].items():
             data = allzparkconfig.metadata_from_package(package)
@@ -1208,13 +1214,7 @@ class Controller(QtCore.QObject):
             if hidden and not show_hidden:
                 continue
 
-            versions = rez.find(package.name,
-                                range_=app_ranges[package.name],
-                                paths=paths)
-            versions = sorted(
-                [str(v.version) for v in versions],
-                key=util.natural_keys
-            )
+            versions = [str(v.version) for v in app_ranges[package.name]]
             resolved_packages = [
                 pkg for pkg in contexts[request].resolved_packages or []
                 if pkg.name != package.name
