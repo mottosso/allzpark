@@ -507,6 +507,7 @@ class Window(QtWidgets.QMainWindow):
 
         if key in ("showAllApps",
                    "showHiddenApps",
+                   "showAllVersions",
                    "patchWithFilter"):
             self._ctrl.reset()
 

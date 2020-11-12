@@ -1099,13 +1099,15 @@ class Controller(QtCore.QObject):
             except IndexError:
                 self.error("No package matched for request '%s', may have"
                            "been excluded by package filter.")
-                return model.BrokenPackage(req_str)
+                latest = model.BrokenPackage(req_str)
+                app_vers = [latest]
             except _missing as e_:
                 self.error(str(e_))
-                return model.BrokenPackage(req_str)
-            else:
-                app_ranges[req.name] = app_vers
-                return latest
+                latest = model.BrokenPackage(req_str)
+                app_vers = [latest]
+
+            app_ranges[req.name] = app_vers
+            return latest
 
         def _try_resolve_context(req, pkg_name, mode):
             kwargs = dict()
@@ -1206,22 +1208,28 @@ class Controller(QtCore.QObject):
         # * Opt-out hidden application
         # * Find application versions
         # * Context resolved packages (latest only)
+        all_vers = self._state.retrieve("showAllVersions", False)
         show_hidden = self._state.retrieve("showHiddenApps")
-        for request, package in self._state["rezApps"].items():
-            data = allzparkconfig.metadata_from_package(package)
+        for request, app_pkg in self._state["rezApps"].items():
+            data = allzparkconfig.metadata_from_package(app_pkg)
             hidden = data.get("hidden", False)
 
             if hidden and not show_hidden:
                 continue
 
-            versions = [str(v.version) for v in app_ranges[package.name]]
-            resolved_packages = [
-                pkg for pkg in contexts[request].resolved_packages or []
-                if pkg.name != package.name
-            ]
+            app_versions = [str(v.version) for v in app_ranges[app_pkg.name]]
+            resolved_packages = {
+                pkg: [str(p.version)
+                      for p in (self.find(pkg.name) if all_vers else [pkg])]
+                for pkg in contexts[request].resolved_packages or []
+                if pkg.name not in [app_pkg.name, profile_variant.name]
+            }
+            # profile version should not be changed in Packages view
+            resolved_packages[profile_variant] = [profile_variant]
+
             visible_apps[request] = {
-                "app": package,
-                "versions": versions,
+                "app": app_pkg,
+                "versions": app_versions,
                 "packages": resolved_packages,
             }
 

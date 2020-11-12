@@ -1093,7 +1093,12 @@ class Preferences(AbstractDockWidget):
         qargparse.Boolean("showHiddenApps", help=(
             "Show apps with metadata['hidden'] = True"
         )),
-
+        qargparse.Boolean("showAllVersions", help=(
+            "Show all package versions.\n"
+            "Profile requested application version range will still be \n"
+            "respected, but all versions of each dependency package will \n"
+            "be shown."
+        )),
         qargparse.Boolean("patchWithFilter", help=(
             "Use the current exclusion filter when patching.\n"
             "This enables patching of packages outside of a filter, \n"

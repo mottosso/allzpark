@@ -205,18 +205,18 @@ class ResolvedPackagesModel(AbstractTableModel):
 
         for app_request, app_data in packages.items():
             app = app_data["app"]
+            name = app_request
             versions = app_data["versions"]
+            self._add_item(name, app_request, app, versions, is_app=True)
 
-            self._add_item(app_request, app_request, app, versions)
-
-            for pkg in app_data["packages"]:
-                self._add_item(pkg.name, app_request, pkg)
+            for pkg, versions in app_data["packages"].items():
+                name = pkg.name
+                self._add_item(name, app_request, pkg, versions)
 
         self.endResetModel()
 
-    def _add_item(self, name, app_request, pkg, versions=None):
+    def _add_item(self, name, app_request, pkg, versions, is_app=False):
         root = pkg.root
-        is_app = versions is not None
         data = allzparkconfig.metadata_from_package(pkg)
         tools = getattr(pkg, "tools", None) or [pkg.name]
         version = str(pkg.version)
@@ -233,7 +233,7 @@ class ResolvedPackagesModel(AbstractTableModel):
             "name": name,
             "label": data["label"],
             "version": version,
-            "versions": versions or [version],
+            "versions": versions,
             "icon": parse_icon(root, template=data["icon"]),
             "package": pkg,
             "context": None,
@@ -333,7 +333,6 @@ class ResolvedPackagesModel(AbstractTableModel):
             return "x" if re.findall(r".beta$", version) else ""
 
         if key == "latest":
-            # (TODO): This is not the real latest
             version = data["override"] or data["version"]
             latest = data["versions"][-1]
             return "x" if version == latest else ""
