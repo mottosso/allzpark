@@ -31,10 +31,7 @@ class TestApps(util.TestBase):
                 }
             },
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         with self.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")
@@ -82,10 +79,7 @@ class TestApps(util.TestBase):
                 }
             },
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         with self.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")
@@ -134,10 +128,7 @@ class TestApps(util.TestBase):
             "app_A": {"1": {"name": "app_A", "version": "1"}},
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==1"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -160,10 +151,7 @@ class TestApps(util.TestBase):
             },
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==None"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -193,10 +181,7 @@ class TestApps(util.TestBase):
             },
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==1"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -220,10 +205,7 @@ class TestApps(util.TestBase):
             "app_A": {"1": {"name": "app_A", "version": "1"}},
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==2"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
