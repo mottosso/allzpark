@@ -362,10 +362,10 @@ class Controller(QtCore.QObject):
         packages = odict()  # keep resolved order
         for pkg in resolved or []:
             # profile version should not be changed in Packages view
-            _all_vers = pkg.name != profile_name
+            _all_vers = all_vers and pkg.name != profile_name
             versions = [
                 str(p.version)
-                for p in (self.find(pkg.name) if all_vers else [pkg])
+                for p in (self.find(pkg.name) if _all_vers else [pkg])
             ]
             packages[pkg.name] = {
                 "package": pkg,
