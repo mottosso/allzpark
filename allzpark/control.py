@@ -191,7 +191,7 @@ class Controller(QtCore.QObject):
     profile_changed = QtCore.Signal(
         str, object, bool)  # profile, version, refreshed
 
-    application_changed = QtCore.Signal(str)
+    application_changed = QtCore.Signal()
 
     # The current command to launch an application has changed
     command_changed = QtCore.Signal(str)  # command
@@ -228,11 +228,12 @@ class Controller(QtCore.QObject):
         state = State(self, storage, parent_environ)
 
         models = {
-            "resolved": model.ResolvedPackagesModel(),
+            "apps": model.ApplicationModel(),
             "profileVersions": QtCore.QStringListModel(),
 
             # Docks
             "profiles": model.ProfileModel(),
+            "packages": model.PackagesModel(),
             "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
             "parentenv": model.EnvironmentModel(),
@@ -353,6 +354,25 @@ class Controller(QtCore.QObject):
             else:
                 env[app_request] = environ
                 return environ
+
+    def resolved_packages(self, app_request):
+        all_vers = self._state.retrieve("showAllVersions", False)
+        profile_name = self._state["profileName"]
+        resolved = self._state["rezContexts"][app_request].resolved_packages
+        packages = odict()  # keep resolved order
+        for pkg in resolved or []:
+            # profile version should not be changed in Packages view
+            _all_vers = pkg.name != profile_name
+            versions = [
+                str(p.version)
+                for p in (self.find(pkg.name) if all_vers else [pkg])
+            ]
+            packages[pkg.name] = {
+                "package": pkg,
+                "versions": versions,
+            }
+
+        return packages
 
     # ----------------
     # Events
@@ -716,7 +736,7 @@ class Controller(QtCore.QObject):
                 rez_app.name, rez_app.version
             ))
 
-            app_model = self._models["resolved"]
+            app_model = self._models["apps"]
             app_index = app_model.findIndex(app_request)
 
             tool_name = kwargs.get(
@@ -731,8 +751,8 @@ class Controller(QtCore.QObject):
                 "This is a bug"
             )
 
-            overrides = self._models["resolved"].overrides
-            disabled = self._models["resolved"].disabled
+            overrides = self._models["packages"].overrides
+            disabled = self._models["packages"].disabled
             environ = self.parent_environ()
 
             self.debug(
@@ -807,7 +827,7 @@ class Controller(QtCore.QObject):
 
     def delocalize(self, name):
         def do():
-            item = self._models["resolved"].find(name)
+            item = self._models["packages"].find(name)
             package = item["package"]
             self.debug("Delocalizing %s" % package.root)
             localz.delocalize(package)
@@ -869,10 +889,11 @@ class Controller(QtCore.QObject):
     def select_profile(self, profile_name, version_name=Latest):
 
         # Wipe existing data
-        self._models["resolved"].reset()
+        self._models["apps"].reset()
         self._models["context"].reset()
         self._models["environment"].reset()
         self._models["diagnose"].reset()
+        self._models["packages"].reset()
         self._models["profileVersions"].setStringList([])
 
         self._state["rezContexts"].clear()
@@ -880,8 +901,8 @@ class Controller(QtCore.QObject):
         self._state["testedEnvirons"].clear()
         self._state["rezApps"].clear()
 
-        def on_apps_found(packages):
-            if not packages:
+        def on_apps_found(apps):
+            if not apps:
                 self._state["error"] = """
                 <h2><font color=\"red\">:(</font></h2>
                 <br>
@@ -901,7 +922,7 @@ class Controller(QtCore.QObject):
                 self._state.to_noapps()
 
             else:
-                self._models["resolved"].reset(packages)
+                self._models["apps"].reset(apps)
                 self._state.to_ready()
 
         def on_apps_not_found(error, trace):
@@ -965,25 +986,28 @@ class Controller(QtCore.QObject):
         try:
             context = self.context(app_request)
             environ = self.environ(app_request)
+            packages = self.resolved_packages(app_request)
             diagnose = self._state["testedEnvirons"].get(app_request, {})
 
         except Exception:
+            self._models["packages"].reset()
             self._models["context"].reset()
             self._models["environment"].reset()
             self._models["diagnose"].reset()
             raise
 
+        self._models["packages"].reset(packages)
         self._models["context"].load(context.to_dict())
         self._models["environment"].load(environ)
         self._models["diagnose"].load(diagnose)
 
-        tools = self._models["resolved"].find(app_request)["tools"]
+        tools = self._models["apps"].find(app_request)["tools"]
         self._state["tool"] = tools[0]
 
         # Use this application on next launch or change of profile
         self.update_command()
         self._state.store("startupApplication", app_request)
-        self.application_changed.emit(app_request)
+        self.application_changed.emit()
 
         if context.success:
             self._state.to_appok()
@@ -1208,8 +1232,6 @@ class Controller(QtCore.QObject):
 
         # * Opt-out hidden application
         # * Find application versions
-        # * Context resolved packages (latest only)
-        all_vers = self._state.retrieve("showAllVersions", False)
         show_hidden = self._state.retrieve("showHiddenApps")
         for request, app_pkg in self._state["rezApps"].items():
             data = allzparkconfig.metadata_from_package(app_pkg)
@@ -1219,19 +1241,9 @@ class Controller(QtCore.QObject):
                 continue
 
             app_versions = [str(v.version) for v in app_ranges[app_pkg.name]]
-            resolved_packages = {
-                pkg: [str(p.version)
-                      for p in (self.find(pkg.name) if all_vers else [pkg])]
-                for pkg in contexts[request].resolved_packages or []
-                if pkg.name not in [app_pkg.name, profile_variant.name]
-            }
-            # profile version should not be changed in Packages view
-            resolved_packages[profile_variant] = [profile_variant]
-
             visible_apps[request] = {
-                "app": app_pkg,
+                "package": app_pkg,
                 "versions": app_versions,
-                "packages": resolved_packages,
             }
 
         return visible_apps

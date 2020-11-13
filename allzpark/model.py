@@ -163,7 +163,68 @@ def parse_icon(root, template):
     return QtGui.QIcon(fname)
 
 
-class ResolvedPackagesModel(AbstractTableModel):
+class AbstractPackageItem(dict):
+
+    def __init__(self, name, package, versions, metadata):
+        super(AbstractPackageItem, self).__init__({
+            "name": name,
+            "label": metadata["label"],
+            "icon": parse_icon(package.root, template=metadata["icon"]),
+            "family": package.name,
+            "package": package,
+            "version": str(package.version),
+            "versions": versions,
+            "default": str(package.version),
+            "context": None,
+            "active": True,
+            "_hasVersions": len(versions) > 1,
+        })
+
+
+class ApplicationItem(AbstractPackageItem):
+
+    def __init__(self, app_request, app_pkg, versions):
+        metadata = allzparkconfig.metadata_from_package(app_pkg)
+        tools = getattr(app_pkg, "tools", None) or [app_pkg.name]
+
+        super(ApplicationItem, self).__init__(name=app_request,
+                                              package=app_pkg,
+                                              versions=versions,
+                                              metadata=metadata)
+        self.update({
+            "hidden": metadata["hidden"],
+            "broken": isinstance(app_pkg, BrokenPackage),
+            "tool": None,  # Current tool
+            "tools": tools,  # All available tools
+            "detached": False,  # Open in separate console or not
+        })
+
+
+class PackageItem(AbstractPackageItem):
+
+    def __init__(self, name, package, versions, override, disabled):
+        metadata = allzparkconfig.metadata_from_package(package)
+        relocatable = localz.is_relocatable(package) if localz else False
+        state = (
+            "(dev)" if is_local(package) else
+            "(localised)" if is_localised(package) else
+            ""
+        )
+
+        super(PackageItem, self).__init__(name=name,
+                                          package=package,
+                                          versions=versions,
+                                          metadata=metadata)
+        self.update({
+            "override": override,
+            "disabled": disabled,
+            "state": state,
+            "relocatable": relocatable,
+            "localizing": False,  # in progress
+        })
+
+
+class ApplicationModel(AbstractTableModel):
     ColumnToKey = {
         0: {
             QtCore.Qt.DisplayRole: "label",
@@ -171,96 +232,31 @@ class ResolvedPackagesModel(AbstractTableModel):
         },
         1: {
             QtCore.Qt.DisplayRole: "version",
-        },
-        2: {
-            QtCore.Qt.DisplayRole: "state",
-        },
-        3: {
-            QtCore.Qt.DisplayRole: "latest",
-        },
-        4: {
-            QtCore.Qt.DisplayRole: "beta",
-        },
+        }
     }
 
+    Headers = [
+        "application",
+        "version"
+    ]
+
     def __init__(self, *args, **kwargs):
-        super(ResolvedPackagesModel, self).__init__(*args, **kwargs)
+        super(ApplicationModel, self).__init__(*args, **kwargs)
         self._broken_icon = res.icon("Action_Stop_1_32.png")
-        self._overrides = {}
-        self._disabled = {}
 
-    @property
-    def overrides(self):
-        return self._overrides
-
-    @property
-    def disabled(self):
-        return self._disabled
-
-    def reset(self, packages=None):
-        packages = packages or dict()
+    def reset(self, applications=None):
+        applications = applications or dict()
 
         self.beginResetModel()
         self.items[:] = []
 
-        for app_request, app_data in packages.items():
-            app = app_data["app"]
-            name = app_request
-            versions = app_data["versions"]
-            self._add_item(name, app_request, app, versions, is_app=True)
-
-            for pkg, versions in app_data["packages"].items():
-                name = pkg.name
-                self._add_item(name, app_request, pkg, versions)
+        for app_request, data in applications.items():
+            app = data["package"]
+            versions = data["versions"]
+            item = ApplicationItem(app_request, app, versions)
+            self.items.append(item)
 
         self.endResetModel()
-
-    def _add_item(self, name, app_request, pkg, versions, is_app=False):
-        root = pkg.root
-        data = allzparkconfig.metadata_from_package(pkg)
-        tools = getattr(pkg, "tools", None) or [pkg.name]
-        version = str(pkg.version)
-        relocatable = localz.is_relocatable(pkg) if localz else False
-        state = (
-            "(dev)" if is_local(pkg) else
-            "(localised)" if is_localised(pkg) else
-            ""
-        )
-
-        item = {
-            "_isApp": is_app,
-            "_hasVersions": len(versions) > 1,
-
-            "name": name,
-            "label": data["label"],
-            "version": version,
-            "versions": versions,
-            "icon": parse_icon(root, template=data["icon"]),
-            "package": pkg,
-            "context": None,
-            "active": True,
-
-            "family": pkg.name,
-            "request": app_request,
-            "hidden": data["hidden"],
-            "broken": isinstance(pkg, BrokenPackage),
-
-            "default": version,
-            "override": self._overrides.get(pkg.name),
-            "disabled": self._disabled.get(pkg.name, False),
-            "state": state,
-            "relocatable": relocatable,
-            "localizing": False,  # in progress
-
-            # Whether or not to open a separate console for this app
-            "detached": False,
-            # Current tool
-            "tool": None,
-            # All available tools
-            "tools": tools,
-        }
-
-        self.items.append(item)
 
     def data(self, index, role):
         row = index.row()
@@ -292,85 +288,13 @@ class ResolvedPackagesModel(AbstractTableModel):
                 if col == 0:
                     return self._broken_icon
 
-        if data["override"]:
-            if role == QtCore.Qt.DisplayRole and col == 1:
-                return data["override"]
-
-            if role == QtCore.Qt.FontRole:
-                font = QtGui.QFont()
-                font.setBold(True)
-                return font
-
-            if role == QtCore.Qt.ForegroundRole:
-                return QtGui.QColor("darkorange")
-
-        if data["disabled"] or data["localizing"]:
-            if role == QtCore.Qt.FontRole:
-                font = QtGui.QFont()
-                font.setBold(True)
-                font.setStrikeOut(True)
-                return font
-
-            if role == QtCore.Qt.ForegroundRole:
-                return QtGui.QColor("darkorange")
-
         if data["_hasVersions"] and col == 1:
             if role == QtCore.Qt.FontRole:
                 font = QtGui.QFont()
                 font.setBold(True)
                 return font
 
-        try:
-            value = data[role]
-
-            if isinstance(value, list):
-                # Prevent edits
-                value = value[:]
-
-            return value
-
-        except KeyError:
-            try:
-                key = self.ColumnToKey[col][role]
-            except KeyError:
-                return None
-
-        if key == "beta":
-            version = data["override"] or data["version"]
-            return "x" if re.findall(r".beta$", version) else ""
-
-        if key == "latest":
-            version = data["override"] or data["version"]
-            latest = data["versions"][-1]
-            return "x" if version == latest else ""
-
-        return data[key]
-
-    def setData(self, index, value, role):
-        if role == "override":
-            default = self.data(index, "default")
-            package = self.data(index, "package").name
-
-            if value and value != default:
-                log.info("Storing permanent override %s-%s" % (package, value))
-                self._overrides[package] = value
-            else:
-                log.info("Resetting to default")
-                self._overrides.pop(package, None)
-                value = None
-
-        if role == "disabled":
-            package = self.data(index, "package").name
-            value = bool(value)
-
-            if value:
-                log.info("Disabling %s" % package)
-            else:
-                log.info("Enabling %s" % package)
-
-            self._disabled[package] = value
-
-        return super(ResolvedPackagesModel, self).setData(index, value, role)
+        return super(ApplicationModel, self).data(index, role)
 
     def flags(self, index):
         if index.column() == 1:
@@ -380,7 +304,7 @@ class ResolvedPackagesModel(AbstractTableModel):
                 QtCore.Qt.ItemIsEditable
             )
 
-        return super(ResolvedPackagesModel, self).flags(index)
+        return super(ApplicationModel, self).flags(index)
 
 
 class BrokenContext(object):
@@ -449,6 +373,150 @@ def is_localised(pkg):
         return root.startswith(path)
     else:
         return False
+
+
+class PackagesModel(AbstractTableModel):
+    ColumnToKey = {
+        0: {
+            QtCore.Qt.DisplayRole: "label",
+            QtCore.Qt.DecorationRole: "icon",
+        },
+        1: {
+            QtCore.Qt.DisplayRole: "version",
+        },
+        2: {
+            QtCore.Qt.DisplayRole: "state",
+        },
+        3: {
+            QtCore.Qt.DisplayRole: "latest",
+        },
+        4: {
+            QtCore.Qt.DisplayRole: "beta",
+        },
+    }
+
+    Headers = [
+        "package",
+        "version",
+        "state",
+        "latest",
+        "beta",
+    ]
+
+    def __init__(self, parent=None):
+        super(PackagesModel, self).__init__(parent)
+        self._overrides = {}
+        self._disabled = {}
+
+    def reset(self, packages=None):
+        packages = packages or dict()
+
+        self.beginResetModel()
+        self.items[:] = []
+
+        for name, data in packages.items():
+            pkg = data["package"]
+            versions = data["versions"]
+            override = self._overrides.get(pkg.name)
+            disabled = self._disabled.get(pkg.name, False)
+
+            item = PackageItem(name, pkg, versions, override, disabled)
+            self.items.append(item)
+
+        self.endResetModel()
+
+    def data(self, index, role):
+        row = index.row()
+        col = index.column()
+
+        try:
+            data = self.items[row]
+        except IndexError:
+            return None
+
+        if data["override"]:
+            if role == QtCore.Qt.DisplayRole and col == 1:
+                return data["override"]
+
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
+
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("darkorange")
+
+        if data["disabled"] or data["localizing"]:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                font.setStrikeOut(True)
+                return font
+
+            if role == QtCore.Qt.ForegroundRole:
+                return QtGui.QColor("darkorange")
+
+        if data["_hasVersions"] and col == 1:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
+
+        try:
+            return data[role]
+
+        except KeyError:
+            try:
+                key = self.ColumnToKey[col][role]
+            except KeyError:
+                return None
+
+        if key == "beta":
+            version = data["override"] or data["version"]
+            return "x" if re.findall(r".beta$", version) else ""
+
+        if key == "latest":
+            version = data["override"] or data["version"]
+            latest = data["versions"][-1]
+            return "x" if version == latest else ""
+
+        return data[key]
+
+    def setData(self, index, value, role):
+        if role == "override":
+            default = self.data(index, "default")
+            package = self.data(index, "package").name
+
+            if value and value != default:
+                log.info("Storing permanent override %s-%s" % (package, value))
+                self._overrides[package] = value
+            else:
+                log.info("Resetting to default")
+                self._overrides.pop(package, None)
+                value = None
+
+        if role == "disabled":
+            package = self.data(index, "package").name
+            value = bool(value)
+
+            if value:
+                log.info("Disabling %s" % package)
+            else:
+                log.info("Enabling %s" % package)
+
+            self._disabled[package] = value
+
+        return super(PackagesModel, self).setData(index, value, role)
+
+    def flags(self, index):
+        if index.column() == 1:
+            return (
+                QtCore.Qt.ItemIsEnabled |
+                QtCore.Qt.ItemIsSelectable |
+                QtCore.Qt.ItemIsEditable
+            )
+
+        return super(PackagesModel, self).flags(index)
 
 
 class CommandsModel(AbstractTableModel):
@@ -635,42 +703,6 @@ class ProxyModel(TriStateSortFilterProxyModel):
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         return super(ProxyModel, self).rowCount(parent)
-
-
-class ApplicationProxyModel(ProxyModel):
-
-    Headers = [
-        "application",
-        "version"
-    ]
-
-    def columnCount(self, parent):
-        return len(self.Headers)
-
-    def headerData(self, section, orientation, role):
-        if orientation == QtCore.Qt.Vertical:
-            return
-
-        if role == QtCore.Qt.DisplayRole:
-            return self.Headers[section]
-
-
-class PackagesProxyModel(ProxyModel):
-
-    Headers = [
-        "package",
-        "version",
-        "state",
-        "latest",
-        "beta",
-    ]
-
-    def headerData(self, section, orientation, role):
-        if orientation == QtCore.Qt.Vertical:
-            return
-
-        if role == QtCore.Qt.DisplayRole:
-            return self.Headers[section]
 
 
 class TreeItem(dict):

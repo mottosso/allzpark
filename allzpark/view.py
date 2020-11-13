@@ -59,13 +59,6 @@ class Applications(dock.SlimTableView):
     def is_selected_app_ok(self):
         return self._selected_app_ok
 
-    def setModel(self, model_):
-        proxy_model = model.ApplicationProxyModel(model_)
-        proxy_model.setup(include=[
-            ("_isApp", True)
-        ])
-        super(Applications, self).setModel(proxy_model)
-
 
 class Window(QtWidgets.QMainWindow):
     title = "Allzpark %s" % version
@@ -299,14 +292,15 @@ class Window(QtWidgets.QMainWindow):
 
         docks["profiles"].set_model(ctrl.models["profiles"],
                                     ctrl.models["profileVersions"])
-        docks["packages"].set_model(ctrl.models["resolved"])
+        docks["packages"].set_model(ctrl.models["packages"])
         docks["context"].set_model(ctrl.models["context"])
         docks["environment"].set_model(ctrl.models["environment"],
                                        ctrl.models["parentenv"],
                                        ctrl.models["diagnose"])
         docks["commands"].set_model(ctrl.models["commands"])
 
-        widgets["apps"].setModel(ctrl.models["resolved"])
+        proxy_model = model.ProxyModel(ctrl.models["apps"])
+        widgets["apps"].setModel(proxy_model)
 
         widgets["errorMessage"].setAlignment(QtCore.Qt.AlignHCenter)
 
@@ -329,7 +323,7 @@ class Window(QtWidgets.QMainWindow):
         selection_model = widgets["apps"].selectionModel()
         selection_model.selectionChanged.connect(self.on_app_selection_changed)
 
-        ctrl.models["resolved"].modelReset.connect(self.on_apps_reset)
+        ctrl.models["apps"].modelReset.connect(self.on_apps_reset)
         ctrl.models["profiles"].modelReset.connect(
             self.on_profilename_reset)
         ctrl.models["profileVersions"].modelReset.connect(
@@ -342,7 +336,6 @@ class Window(QtWidgets.QMainWindow):
         ctrl.repository_changed.connect(self.on_repository_changed)
         ctrl.command_changed.connect(self.on_command_changed)
         ctrl.application_changed.connect(self.on_app_changed)
-        ctrl.application_changed.connect(docks["packages"].on_app_changed)
 
         self._pages = pages
         self._widgets = widgets
@@ -739,7 +732,7 @@ class Window(QtWidgets.QMainWindow):
         app = self._ctrl.state.retrieve("startupApplication")
 
         row = 0
-        model = self._ctrl.models["resolved"]
+        model = self._ctrl.models["apps"]
 
         if app:
             for row_ in range(model.rowCount()):
@@ -782,7 +775,7 @@ class Window(QtWidgets.QMainWindow):
         app_request = model.data(index, "name")
         self._ctrl.select_application(app_request)
 
-    def on_app_changed(self, app_request):
+    def on_app_changed(self):
         selection_model = self._widgets["apps"].selectionModel()
         index = selection_model.selectedIndexes()[0]
         self._docks["app"].refresh(index)

@@ -174,7 +174,7 @@ class App(AbstractDockWidget):
             return
 
         ctrl = self._ctrl
-        model = ctrl.models["resolved"]
+        model = ctrl.models["apps"]
         app_name = ctrl.state["appRequest"]
         app_index = model.findIndex(app_name)
         value = arg.read()
@@ -364,16 +364,11 @@ class Packages(AbstractDockWidget):
         arg._previous = patch
 
     def set_model(self, model_):
-        proxy_model = model.PackagesProxyModel(model_)
-        proxy_model.setup(include=[("request", None)])
+        proxy_model = model.ProxyModel(model_)
         self._widgets["view"].setModel(proxy_model)
 
         model_.modelReset.connect(self.on_model_changed)
         model_.dataChanged.connect(self.on_model_changed)
-
-    def on_app_changed(self, app_request):
-        model_ = self._widgets["view"].model()
-        model_.setup(include=[("request", app_request)])
 
     def on_model_changed(self):
         model_ = self._widgets["view"].model()
@@ -678,7 +673,7 @@ class Context(AbstractDockWidget):
 
         self._widgets["code"].setText("<br>".join(pretty))
 
-    def on_application_changed(self, app_request):
+    def on_application_changed(self):
         self._widgets["code"].setPlainText("")
         if not self._widgets["graph"]._pixmapHandle:
             return
