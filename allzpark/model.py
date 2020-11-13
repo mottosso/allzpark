@@ -303,12 +303,10 @@ def is_local(pkg):
         return False
 
     local_path = rez.config.local_packages_path
-    local_path = os.path.abspath(local_path)
-    local_path = os.path.normpath(local_path)
+    local_path = util.normpath(local_path)
 
     pkg_path = pkg.resource.location
-    pkg_path = os.path.abspath(pkg_path)
-    pkg_path = os.path.normpath(pkg_path)
+    pkg_path = util.normpath(pkg_path)
 
     return pkg_path.startswith(local_path)
 
