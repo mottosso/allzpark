@@ -751,8 +751,8 @@ class Controller(QtCore.QObject):
                 "This is a bug"
             )
 
-            overrides = self._models["packages"].overrides
-            disabled = self._models["packages"].disabled
+            overrides = self._models["packages"]._overrides
+            disabled = self._models["packages"]._disabled
             environ = self.parent_environ()
 
             self.debug(
@@ -1008,13 +1008,6 @@ class Controller(QtCore.QObject):
         self.update_command()
         self._state.store("startupApplication", app_request)
         self.application_changed.emit()
-
-        if context.success:
-            self._state.to_appok()
-        else:
-            self._state.to_appfailed()
-
-        self._state.to_ready()
 
         if context.success:
             self._state.to_appok()
