@@ -1,4 +1,5 @@
 
+from unittest import mock
 from tests import util
 
 
@@ -212,3 +213,52 @@ class TestApps(util.TestBase):
 
         self.assertFalse(context_a.success)
         self.assertTrue(context_b.success)
+
+    def test_app_changing_version(self):
+        """Test application version can be changed in view"""
+        util.memory_repository({
+            "foo": {
+                "1": {"name": "foo", "version": "1",
+                      "requires": ["~app_A", "~app_B"]}
+            },
+            "app_A": {"1": {"name": "app_A", "version": "1"}},
+            "app_B": {"1": {"name": "app_B", "version": "1"},
+                      "2": {"name": "app_B", "version": "2"},}
+        })
+        self.ctrl_reset(["foo"])
+        self.show_dock("app")
+
+        apps = self.window._widgets["apps"]
+
+        def get_version_editor(app_request):
+            self.select_application(app_request)
+            proxy = apps.model()
+            model = proxy.sourceModel()
+            index = model.findIndex(app_request, column=1)
+            index = proxy.mapFromSource(index)
+            apps.edit(index)
+
+            return apps.indexWidget(index), apps.itemDelegate(index)
+
+        editor, delegate = get_version_editor("app_A==1")
+        self.assertIsNone(
+            editor, "No version editing if App has only one version.")
+
+        editor, delegate = get_version_editor("app_B==2")
+        self.assertIsNotNone(
+            editor, "Version should be editable if App has versions.")
+
+        # for visual
+        editor.showPopup()
+        self.wait(100)
+        view = editor.view()
+        index = view.model().index(0, 0)
+        sel_model = view.selectionModel()
+        sel_model.select(index, sel_model.ClearAndSelect)
+        self.wait(150)
+        # change version
+        editor.setCurrentIndex(0)
+        delegate.commitData.emit(editor)
+        self.wait(200)  # wait patch
+
+        self.assertEqual("app_B==1", self.ctrl.state["appRequest"])

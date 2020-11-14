@@ -79,10 +79,9 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
     def find(self, name):
         return next(i for i in self.items if i["name"] == name)
 
-    def findIndex(self, name):
-        return self.createIndex(
-            self.items.index(self.find(name)), 0, QtCore.QModelIndex()
-        )
+    def findIndex(self, name, column=0):
+        row = self.items.index(self.find(name))
+        return self.createIndex(row, column, QtCore.QModelIndex())
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         if parent.isValid():
