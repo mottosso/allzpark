@@ -53,6 +53,11 @@ class Package(QtWidgets.QStyledItemDelegate):
         if not version or version == default:
             return
 
-        app_request = "%s==%s" % (package, version)
-        self._ctrl.state.store("startupApplication", app_request)
-        self._ctrl.patch(app_request)
+        patch_request = "%s==%s" % (package, version)
+
+        for app_pkg in self._ctrl.state["rezApps"].values():
+            if app_pkg.name == package:
+                self._ctrl.state.store("startupApplication", patch_request)
+                break
+
+        self._ctrl.patch(patch_request)
