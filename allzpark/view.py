@@ -500,9 +500,11 @@ class Window(QtWidgets.QMainWindow):
 
         if key in ("showAllApps",
                    "showHiddenApps",
-                   "showAllVersions",
                    "patchWithFilter"):
             self._ctrl.reset()
+
+        if key == "showAllVersions":
+            self._ctrl.select_application(self._ctrl.state["appRequest"])
 
         if key == "exclusionFilter":
             allzparkconfig.exclude_filter = value
