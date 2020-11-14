@@ -45,6 +45,8 @@ class TestBase(unittest.TestCase):
     def tearDown(self):
         self.wait(timeout=500)
         self.window.close()
+        self.ctrl.deleteLater()
+        self.window.deleteLater()
         time.sleep(0.1)
 
     def set_preference(self, name, value):
