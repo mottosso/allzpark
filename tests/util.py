@@ -1,6 +1,5 @@
 
 import os
-import time
 import unittest
 import contextlib
 
@@ -43,45 +42,20 @@ class TestBase(unittest.TestCase):
         self.wait(timeout=50)
 
     def tearDown(self):
-        self.wait(timeout=500)
+        self.wait(timeout=200)
         self.window.close()
-        time.sleep(0.1)
 
     def set_preference(self, name, value):
-        """Setup preference
-
-        This should be called before ctrl reset.
-
-        (NOTE) Some preference change may calling ctrl.reset, so ctrl.reset
-            will be monkey-patched to do nothing, this is to prevent error
-            raised from resting without profile.
-            If not doing this, and setup preference after reset with test
-            profiles, calling reset again on preference changed may leads
-            to some weird profile model reset error. (item.internalPointer
-            returning random object and AttributeError raised)
-
-        Args:
-            name: preference name
-            value: preference value
-
-        Returns:
-            None
-
-        """
         preferences = self.window._docks["preferences"]
         arg = next((opt for opt in preferences.options
                     if opt["name"] == name), None)
         if not arg:
             self.fail("Preference doesn't have this setting: %s" % name)
 
-        origin_reset = getattr(self.ctrl, "reset")
-        setattr(self.ctrl, "reset", lambda: None)
         try:
             arg.write(value)
         except Exception as e:
             self.fail("Preference '%s' set failed: %s" % (name, str(e)))
-        finally:
-            setattr(self.ctrl, "reset", origin_reset)
 
     def show_dock(self, name, on_page=None):
         dock = self.window._docks[name]

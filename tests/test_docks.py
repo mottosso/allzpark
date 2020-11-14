@@ -6,8 +6,6 @@ class TestDocks(util.TestBase):
 
     def test_feature_blocked_on_failed_app(self):
         """Test feature blocked if application is broken"""
-        self.set_preference("showAdvancedControls", True)
-
         util.memory_repository({
             "foo": {
                 "1.0.0": {
@@ -22,6 +20,8 @@ class TestDocks(util.TestBase):
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
         self.ctrl_reset(["foo"])
+
+        self.set_preference("showAdvancedControls", True)
 
         context_a = self.ctrl.state["rezContexts"]["app_A==None"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -50,9 +50,6 @@ class TestDocks(util.TestBase):
         self._test_version_editable(show_all_version=False)
 
     def _test_version_editable(self, show_all_version):
-        self.set_preference("showAdvancedControls", True)
-        self.set_preference("showAllVersions", show_all_version)
-
         util.memory_repository({
             "foo": {
                 "1": {"name": "foo", "version": "1",
@@ -67,6 +64,11 @@ class TestDocks(util.TestBase):
                     "2": {"name": "bar", "version": "2"}}
         })
         self.ctrl_reset(["foo"])
+
+        self.set_preference("showAdvancedControls", True)
+        self.set_preference("showAllVersions", show_all_version)
+        self.wait(200)  # wait for reset
+
         self.select_application("app_B==1")
 
         dock = self.show_dock("packages")

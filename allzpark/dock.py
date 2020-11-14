@@ -1060,96 +1060,99 @@ class Preferences(AbstractDockWidget):
 
     icon = "Action_GoHome_32"
 
-    options = [
-        qargparse.Info("startupProfile", help=(
-            "Load this profile on startup"
-        )),
-        qargparse.Info("startupApplication", help=(
-            "Load this application on startup"
-        )),
-
-        qargparse.Separator("Appearance"),
-
-        qargparse.Enum("theme", items=res.theme_names(), help=(
-            "GUI skin. May need to restart Allzpark after changed."
-        )),
-
-        qargparse.Button("resetLayout", help=(
-            "Reset stored layout to their defaults"
-        )),
-
-        qargparse.Separator("Settings"),
-
-        qargparse.Boolean("smallIcons", enabled=False, help=(
-            "Draw small icons"
-        )),
-        qargparse.Boolean("allowMultipleDocks", help=(
-            "Allow more than one dock to exist at a time"
-        )),
-        qargparse.Boolean("showAdvancedControls", help=(
-            "Show developer-centric controls"
-        )),
-        qargparse.Boolean("showAllApps", help=(
-            "List everything from allzparkconfig:applications\n"
-            "not just the ones specified for a given profile."
-        )),
-        qargparse.Boolean("showHiddenApps", help=(
-            "Show apps with metadata['hidden'] = True"
-        )),
-        qargparse.Boolean("showAllVersions", help=(
-            "Show all package versions.\n"
-            "Profile requested application version range will still be \n"
-            "respected, but all versions of each dependency package will \n"
-            "be shown."
-        )),
-        qargparse.Boolean("patchWithFilter", help=(
-            "Use the current exclusion filter when patching.\n"
-            "This enables patching of packages outside of a filter, \n"
-            "such as *.beta packages, with every other package still \n"
-            "qualifying for that filter."
-        )),
-        qargparse.Integer("clearCacheTimeout", min=1, default=10, help=(
-            "Clear package repository cache at this interval, in seconds. \n\n"
-
-            "Default 10. (Requires restart)\n\n"
-
-            "Normally, filesystem calls like `os.listdir` are cached \n"
-            "so as to avoid unnecessary calls. However, whenever a new \n"
-            "version of a package is released, it will remain invisible \n"
-            "until this cache is cleared. \n\n"
-
-            "Clearing ths cache should have a very small impact on \n"
-            "performance and is safe to do frequently. It has no effect \n"
-            "on memcached which has a much greater impact on performanc."
-        )),
-
-        qargparse.String(
-            "exclusionFilter",
-            default=allzparkconfig.exclude_filter,
-            help="Exclude versions that match this expression"),
-
-        qargparse.Separator("System"),
-
-        # Provided by controller
-        qargparse.Info("pythonExe"),
-        qargparse.Info("pythonVersion"),
-        qargparse.Info("qtVersion"),
-        qargparse.Info("qtBinding"),
-        qargparse.Info("qtBindingVersion"),
-        qargparse.Info("rezLocation"),
-        qargparse.Info("rezVersion"),
-        qargparse.Info("rezConfigFile"),
-        qargparse.Info("memcachedURI"),
-        qargparse.InfoList("rezPackagesPath"),
-        qargparse.InfoList("rezLocalPath"),
-        qargparse.InfoList("rezReleasePath"),
-        qargparse.Info("settingsPath"),
-    ]
-
     def __init__(self, window, ctrl, parent=None):
         super(Preferences, self).__init__("Preferences", parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("Preferences")
+
+        self.options = [
+            qargparse.Info("startupProfile", help=(
+                "Load this profile on startup"
+            )),
+            qargparse.Info("startupApplication", help=(
+                "Load this application on startup"
+            )),
+
+            qargparse.Separator("Appearance"),
+
+            qargparse.Enum("theme", items=res.theme_names(), help=(
+                "GUI skin. May need to restart Allzpark after changed."
+            )),
+
+            qargparse.Button("resetLayout", help=(
+                "Reset stored layout to their defaults"
+            )),
+
+            qargparse.Separator("Settings"),
+
+            qargparse.Boolean("smallIcons", enabled=False, help=(
+                "Draw small icons"
+            )),
+            qargparse.Boolean("allowMultipleDocks", help=(
+                "Allow more than one dock to exist at a time"
+            )),
+            qargparse.Boolean("showAdvancedControls", help=(
+                "Show developer-centric controls"
+            )),
+            qargparse.Boolean("showAllApps", help=(
+                "List everything from allzparkconfig:applications\n"
+                "not just the ones specified for a given profile."
+            )),
+            qargparse.Boolean("showHiddenApps", help=(
+                "Show apps with metadata['hidden'] = True"
+            )),
+            qargparse.Boolean("showAllVersions", help=(
+                "Show all package versions.\n"
+                "Profile requested application version range will \n"
+                "still be respected, but all versions of each \n"
+                "dependency package will be shown."
+            )),
+            qargparse.Boolean("patchWithFilter", help=(
+                "Use the current exclusion filter when patching.\n"
+                "This enables patching of packages outside of a \n"
+                "filter, such as *.beta packages, with every other \n"
+                "package still qualifying for that filter."
+            )),
+            qargparse.Integer("clearCacheTimeout", min=1, default=10, help=(
+                "Clear package repository cache at this interval, in \n"
+                "seconds.\n\n"
+    
+                "Default 10. (Requires restart)\n\n"
+    
+                "Normally, filesystem calls like `os.listdir` are \n"
+                "cached so as to avoid unnecessary calls. However, \n"
+                "whenever a new version of a package is released, \n"
+                "it will remain invisible until this cache is \n"
+                "cleared. \n\n"
+    
+                "Clearing ths cache should have a very small impact \n"
+                "on performance and is safe to do frequently. It has \n"
+                "no effect on memcached which has a much greater \n"
+                "impact on performance."
+            )),
+
+            qargparse.String(
+                "exclusionFilter",
+                default=allzparkconfig.exclude_filter,
+                help="Exclude versions that match this expression"),
+
+            qargparse.Separator("System"),
+
+            # Provided by controller
+            qargparse.Info("pythonExe"),
+            qargparse.Info("pythonVersion"),
+            qargparse.Info("qtVersion"),
+            qargparse.Info("qtBinding"),
+            qargparse.Info("qtBindingVersion"),
+            qargparse.Info("rezLocation"),
+            qargparse.Info("rezVersion"),
+            qargparse.Info("rezConfigFile"),
+            qargparse.Info("memcachedURI"),
+            qargparse.InfoList("rezPackagesPath"),
+            qargparse.InfoList("rezLocalPath"),
+            qargparse.InfoList("rezReleasePath"),
+            qargparse.Info("settingsPath"),
+        ]
 
         protected = allzparkconfig.protected_preferences()
         for name, value in protected.items():
