@@ -1,5 +1,6 @@
 
 import os
+import time
 import unittest
 import contextlib
 
@@ -42,8 +43,9 @@ class TestBase(unittest.TestCase):
         self.wait(timeout=50)
 
     def tearDown(self):
-        self.wait(timeout=200)
+        self.wait(timeout=500)
         self.window.close()
+        time.sleep(0.1)
 
     def set_preference(self, name, value):
         preferences = self.window._docks["preferences"]
