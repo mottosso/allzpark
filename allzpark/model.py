@@ -182,7 +182,9 @@ class AbstractPackageItem(dict):
 
 class ApplicationItem(AbstractPackageItem):
 
-    def __init__(self, app_request, app_pkg, versions):
+    def __init__(self, app_request, data):
+        app_pkg = data["package"]
+        versions = data["versions"]
         metadata = allzparkconfig.metadata_from_package(app_pkg)
         tools = getattr(app_pkg, "tools", None) or [app_pkg.name]
 
@@ -201,7 +203,9 @@ class ApplicationItem(AbstractPackageItem):
 
 class PackageItem(AbstractPackageItem):
 
-    def __init__(self, name, package, versions, override, disabled):
+    def __init__(self, name, data):
+        package = data["package"]
+        versions = data["versions"]
         metadata = allzparkconfig.metadata_from_package(package)
         relocatable = localz.is_relocatable(package) if localz else False
         state = (
@@ -215,8 +219,8 @@ class PackageItem(AbstractPackageItem):
                                           versions=versions,
                                           metadata=metadata)
         self.update({
-            "override": override,
-            "disabled": disabled,
+            "override": data["override"],
+            "disabled": data["disabled"],
             "state": state,
             "relocatable": relocatable,
             "localizing": False,  # in progress
@@ -250,9 +254,7 @@ class ApplicationModel(AbstractTableModel):
         self.items[:] = []
 
         for app_request, data in applications.items():
-            app = data["package"]
-            versions = data["versions"]
-            item = ApplicationItem(app_request, app, versions)
+            item = ApplicationItem(app_request, data)
             self.items.append(item)
 
         self.endResetModel()
@@ -414,12 +416,10 @@ class PackagesModel(AbstractTableModel):
         self.items[:] = []
 
         for name, data in packages.items():
-            pkg = data["package"]
-            versions = data["versions"]
-            override = self._overrides.get(pkg.name)
-            disabled = self._disabled.get(pkg.name, False)
+            data["override"] = self._overrides.get(name)
+            data["disabled"] = self._disabled.get(name, False)
 
-            item = PackageItem(name, pkg, versions, override, disabled)
+            item = PackageItem(name, data)
             self.items.append(item)
 
         self.endResetModel()

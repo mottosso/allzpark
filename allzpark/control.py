@@ -356,16 +356,25 @@ class Controller(QtCore.QObject):
                 return environ
 
     def resolved_packages(self, app_request):
+        """Return context resolved packages and versions
+
+        If preference 'showAllVersions' is enabled, all packages' versions
+        will be collected, except profile. Profile version should not be
+        changed from Packages view, should be changed from Profile view.
+
+        """
         all_vers = self._state.retrieve("showAllVersions", False)
         profile_name = self._state["profileName"]
         resolved = self._state["rezContexts"][app_request].resolved_packages
+
         packages = odict()  # keep resolved order
         for pkg in resolved or []:
-            # profile version should not be changed in Packages view
-            _all_vers = all_vers and pkg.name != profile_name
+            is_profile = pkg.name == profile_name
+            all_vers_ = all_vers and not is_profile
+
             versions = [
                 str(p.version)
-                for p in (self.find(pkg.name) if _all_vers else [pkg])
+                for p in (self.find(pkg.name) if all_vers_ else [pkg])
             ]
             packages[pkg.name] = {
                 "package": pkg,
