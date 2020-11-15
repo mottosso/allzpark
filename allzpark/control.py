@@ -364,18 +364,26 @@ class Controller(QtCore.QObject):
 
         """
         all_vers = self._state.retrieve("showAllVersions", False)
+        app_vers = self._models["apps"].find(app_request)["versions"]
+        app_names = {app.name for app in self._state["rezApps"].values()}
         profile_name = self._state["profileName"]
         resolved = self._state["rezContexts"][app_request].resolved_packages
 
         packages = odict()  # keep resolved order
         for pkg in resolved or []:
             is_profile = pkg.name == profile_name
-            all_vers_ = all_vers and not is_profile
+            is_app = False if is_profile else pkg.name in app_names
 
-            versions = [
-                str(p.version)
-                for p in (self.find(pkg.name) if all_vers_ else [pkg])
-            ]
+            if is_profile:
+                versions = [str(pkg.version)]
+            elif is_app:
+                versions = app_vers[:]
+            else:
+                versions = [
+                    str(p.version)
+                    for p in (self.find(pkg.name) if all_vers else [pkg])
+                ]
+
             packages[pkg.name] = {
                 "package": pkg,
                 "versions": versions,
