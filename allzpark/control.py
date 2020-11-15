@@ -1188,13 +1188,14 @@ class Controller(QtCore.QObject):
                 # set back to default:
                 #   1. update context key `app_request`, and
                 #   2. update startup app
-                for pkg in context.resolved_packages or []:
-                    if pkg.name == app_package.name:
-                        app_request = "%s==%s" % (pkg.name, pkg.version)
-                        if pkg.name == current_app:
-                            self._state.store("startupApplication",
-                                              app_request)
-                        break
+                if context.success:
+                    for pkg in context.resolved_packages or []:
+                        if pkg.name == app_package.name:
+                            app_request = "%s==%s" % (pkg.name, pkg.version)
+                            if pkg.name == current_app:
+                                self._state.store("startupApplication",
+                                                  app_request)
+                            break
 
                 contexts[app_request] = context
 
