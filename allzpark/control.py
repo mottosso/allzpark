@@ -1159,6 +1159,9 @@ class Controller(QtCore.QObject):
         contexts = odict()
         with util.timing() as t:
 
+            current_app = self._state["appRequest"] or ""
+            current_app = current_app.split("==", 1)[0]
+
             for app_request in apps:
 
                 app_package = _try_finding_latest_app(app_request)
@@ -1181,10 +1184,14 @@ class Controller(QtCore.QObject):
                                                    app_package.name,
                                                    mode="Patch")
 
-                    # update context key `app_request` if patched
+                    # update context key `app_request` if patched, and
+                    # update startup app
                     for pkg in context.resolved_packages or []:
                         if pkg.name == app_package.name:
                             app_request = "%s==%s" % (pkg.name, pkg.version)
+                            if pkg.name == current_app:
+                                self._state.store("startupApplication",
+                                                  app_request)
                             break
 
                 contexts[app_request] = context
