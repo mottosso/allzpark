@@ -1,5 +1,4 @@
 
-from unittest import mock
 from tests import util
 
 
@@ -223,7 +222,7 @@ class TestApps(util.TestBase):
             },
             "app_A": {"1": {"name": "app_A", "version": "1"}},
             "app_B": {"1": {"name": "app_B", "version": "1"},
-                      "2": {"name": "app_B", "version": "2"},}
+                      "2": {"name": "app_B", "version": "2"}}
         })
         self.ctrl_reset(["foo"])
         self.show_dock("app")
@@ -262,3 +261,64 @@ class TestApps(util.TestBase):
         self.wait(200)  # wait patch
 
         self.assertEqual("app_B==1", self.ctrl.state["appRequest"])
+
+    def test_app_no_version_change_if_flattened(self):
+        """No version edit if versions are flattened with allzparkconfig"""
+
+        def applications_from_package(variant):
+            # From https://allzpark.com/gui/#multiple-application-versions
+            from allzpark import _rezapi as rez
+
+            requirements = variant.requires or []
+            apps = list(
+                str(req)
+                for req in requirements
+                if req.weak
+            )
+            apps = [rez.PackageRequest(req.strip("~")) for req in apps]
+            flattened = list()
+            for request in apps:
+                flattened += rez.find(
+                    request.name,
+                    range_=request.range,
+                )
+            apps = list(
+                "%s==%s" % (package.name, package.version)
+                for package in flattened
+            )
+            return apps
+
+        # patch config
+        self.patch_allzparkconfig("applications_from_package",
+                                  applications_from_package)
+        # start
+        util.memory_repository({
+            "foo": {
+                "1": {"name": "foo", "version": "1",
+                      "requires": ["~app_A"]}
+            },
+            "app_A": {"1": {"name": "app_A", "version": "1"},
+                      "2": {"name": "app_A", "version": "2"}}
+        })
+        self.ctrl_reset(["foo"])
+        self.show_dock("app")
+
+        apps = self.window._widgets["apps"]
+
+        def get_version_editor(app_request):
+            self.select_application(app_request)
+            proxy = apps.model()
+            model = proxy.sourceModel()
+            index = model.findIndex(app_request, column=1)
+            index = proxy.mapFromSource(index)
+            apps.edit(index)
+
+            return apps.indexWidget(index), apps.itemDelegate(index)
+
+        editor, delegate = get_version_editor("app_A==1")
+        self.assertIsNone(
+            editor, "No version editing if versions are flattened.")
+
+        editor, delegate = get_version_editor("app_A==2")
+        self.assertIsNone(
+            editor, "No version editing if versions are flattened.")

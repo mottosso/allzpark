@@ -39,6 +39,7 @@ class TestBase(unittest.TestCase):
         self.app = app
         self.ctrl = ctrl
         self.window = window
+        self.patched_allzparkconfig = dict()
 
         self.wait(timeout=50)
 
@@ -47,7 +48,25 @@ class TestBase(unittest.TestCase):
         self.window.close()
         self.ctrl.deleteLater()
         self.window.deleteLater()
+        self._restore_allzparkconfig()
         time.sleep(0.1)
+
+    def _restore_allzparkconfig(self):
+        from allzpark import allzparkconfig
+
+        for name, value in self.patched_allzparkconfig.items():
+            setattr(allzparkconfig, name, value)
+
+        self.patched_allzparkconfig.clear()
+
+    def patch_allzparkconfig(self, name, value):
+        from allzpark import allzparkconfig
+
+        if name not in self.patched_allzparkconfig:
+            original = getattr(allzparkconfig, name)
+            self.patched_allzparkconfig[name] = original
+
+        setattr(allzparkconfig, name, value)
 
     def set_preference(self, name, value):
         preferences = self.window._docks["preferences"]
