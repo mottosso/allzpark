@@ -32,7 +32,7 @@ def clear_caches():
 
 def find_one(name, range_=None, paths=None, package_filter=None):
     '''
-    Find latest package version
+    Find next package version
 
     Args:
         name (str): Name of the rez package
@@ -42,7 +42,7 @@ def find_one(name, range_=None, paths=None, package_filter=None):
                                                   that match package filter
 
     Returns:
-        Package
+        rez.packages_.Package
     '''
     if package_filter:
         return next(package_filter.iter_packages(name, range_, paths))
@@ -62,7 +62,7 @@ def find_latest(name, range_=None, paths=None, package_filter=None):
                                                   that match package filter
 
     Returns:
-        Package
+        rez.packages_.Package
     '''
     if package_filter:
         it = package_filter.iter_packages(name, range_, paths)
