@@ -1091,8 +1091,11 @@ class Controller(QtCore.QObject):
         def _try_finding_latest_app(req_str):
             req_str = req_str.strip("~")
             req = rez.PackageRequest(req_str)
+            package_filter = self._package_filter()
             try:
-                return rez.find_latest(req.name, range_=req.range)
+                return rez.find_latest(req.name,
+                                       range_=req.range,
+                                       package_filter=package_filter)
             except _missing as e_:
                 self.error(str(e_))
                 return model.BrokenPackage(req_str)
@@ -1115,8 +1118,6 @@ class Controller(QtCore.QObject):
             for app_request in apps:
 
                 app_package = _try_finding_latest_app(app_request)
-                if package_filter.excludes(app_package):
-                    continue
 
                 app_request = "%s==%s" % (app_package.name,
                                           app_package.version)
