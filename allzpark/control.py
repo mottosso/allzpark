@@ -1091,7 +1091,6 @@ class Controller(QtCore.QObject):
         def _try_finding_latest_app(req_str):
             req_str = req_str.strip("~")
             req = rez.PackageRequest(req_str)
-            package_filter = self._package_filter()
             try:
                 return rez.find_latest(req.name,
                                        range_=req.range,
