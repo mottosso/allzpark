@@ -322,3 +322,42 @@ class TestApps(util.TestBase):
         editor, delegate = get_version_editor("app_A==2")
         self.assertIsNone(
             editor, "No version editing if versions are flattened.")
+
+    def test_app_exclusion_filter(self):
+        """Test app is available when latest version excluded by filter"""
+        util.memory_repository({
+            "foo": {
+                "1.0.0": {
+                    "name": "foo",
+                    "version": "1.0.0",
+                    "requires": [
+                        "~app_A-1"
+                    ]
+                }
+            },
+            "app_A": {
+                "1.0.0": {
+                    "name": "app_A",
+                    "version": "1.0.0"
+                },
+                "1.0.0.beta": {
+                    "name": "app_A",
+                    "version": "1.0.0.beta"
+                    # latest app_A version matches exclusion filter
+                }
+            }
+        })
+        self.ctrl_reset(["foo"])
+
+        self.set_preference("exclusionFilter", "*.beta")
+        self.wait(200)  # wait for reset
+
+        # App was added
+        self.assertIn("app_A==1.0.0", self.ctrl.state["rezContexts"])
+        context_a = self.ctrl.state["rezContexts"]["app_A==1.0.0"]
+        self.assertTrue(context_a.success)
+
+        # Latest non-beta version was chosen
+        resolved_pkgs = [p for p in context_a.resolved_packages
+                         if "app_A" == p.name and "1.0.0" == str(p.version)]
+        self.assertEqual(1, len(resolved_pkgs))

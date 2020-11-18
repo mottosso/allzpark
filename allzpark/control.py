@@ -1121,7 +1121,6 @@ class Controller(QtCore.QObject):
         # Optional patch
         patch = self._state.retrieve("patch", "").split()
         patch_with_filter = self._state.retrieve("patchWithFilter", False)
-        package_filter = self._package_filter()
 
         app_ranges = dict()
 
@@ -1165,8 +1164,6 @@ class Controller(QtCore.QObject):
             for app_request in apps:
 
                 app_package = _try_finding_latest_app(app_request)
-                if package_filter.excludes(app_package):
-                    continue
 
                 app_request = "%s==%s" % (app_package.name,
                                           app_package.version)

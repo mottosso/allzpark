@@ -30,12 +30,45 @@ def clear_caches():
         repo.clear_caches()
 
 
-def find_one(name, range_=None, paths=None):
-    return next(find(name, range_, paths))
+def find_one(name, range_=None, paths=None, package_filter=None):
+    """
+    Find next package version
+
+    Args:
+        name (str): Name of the rez package
+        range_ (VersionRange or str, optional): Limits versions to range
+        paths (list of str, optional): Paths to search for packages
+        package_filter (PackageFilter, optional): Limits versions to those
+                                                  that match package filter
+
+    Returns:
+        rez.packages_.Package
+    """
+    if package_filter:
+        return next(package_filter.iter_packages(name, range_, paths))
+    else:
+        return next(find(name, range_, paths))
 
 
-def find_latest(name, range_=None, paths=None):
-    it = find(name, range_)
+def find_latest(name, range_=None, paths=None, package_filter=None):
+    """
+    Find latest package version
+
+    Args:
+        name (str): Name of the rez package
+        range_ (VersionRange or str, optional): Limits versions to range
+        paths (list of str, optional): Paths to search for packages
+        package_filter (PackageFilter, optional): Limits versions to those
+                                                  that match package filter
+
+    Returns:
+        rez.packages_.Package
+    """
+    if package_filter:
+        it = package_filter.iter_packages(name, range_, paths)
+    else:
+        it = find(name, range_, paths)
+
     it = sorted(it, key=lambda pkg: pkg.version)
 
     try:
