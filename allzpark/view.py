@@ -547,8 +547,8 @@ class Window(QtWidgets.QMainWindow):
         if ctrl_held or not allow_multiple:
             ignore_allow_multiple = [
                 # docks that are not restricted by this rule
-                self._docks["profiles"],
-                self._docks["plugin"],
+                self._docks[name] for name in ["profiles", "plugin"]
+                if name in self._docks
             ]
             all_docks = self._docks.values()
 
