@@ -15,6 +15,8 @@
     <br>
     <img src=https://img.shields.io/pypi/pyversions/allzpark?color=steelblue>
     <a href="https://github.com/mottosso/bleeding-rez/"><img src=https://img.shields.io/pypi/v/bleeding-rez?color=steelblue&label=bleeding-rez></a>
+    <br>
+    <a href="https://gitter.im/allzpark/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"><img src=https://badges.gitter.im/allzpark/community.svg></a>
 </div>
 
 <br>
