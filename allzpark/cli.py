@@ -243,10 +243,10 @@ def initialize(config_file=None,
                              "start anew")
 
         if clean:
-            tell("(clean) ")
+            tell("(clean) ", newlines=0)
             storage.clear()
         else:
-            tell("(%s)" % storage.fileName())
+            tell("(%s) " % storage.fileName(), newlines=0)
 
         defaults = {
             "memcachedURI": os.getenv("REZ_MEMCACHED_URI", "None"),
