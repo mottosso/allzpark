@@ -248,7 +248,7 @@ class TestApps(util.TestBase):
                         "~app-1"  # latest app_A version matches exclusion filter
                     ]
                 }
-            }
+            },
             "app_A": {
                 "1.0.0": {
                     "name": "app_A",
