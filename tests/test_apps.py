@@ -239,7 +239,7 @@ class TestApps(util.TestBase):
 
         self.assertEqual(allzparkconfig.exclude_filter, "*.beta")
 
-        utils.memory_repository({
+        util.memory_repository({
             "foo": {
                 "1.0.0": {
                     "name": "foo",
