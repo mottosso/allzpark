@@ -79,10 +79,9 @@ class AbstractTableModel(QtCore.QAbstractTableModel):
     def find(self, name):
         return next(i for i in self.items if i["name"] == name)
 
-    def findIndex(self, name):
-        return self.createIndex(
-            self.items.index(self.find(name)), 0, QtCore.QModelIndex()
-        )
+    def findIndex(self, name, column=0):
+        row = self.items.index(self.find(name))
+        return self.createIndex(row, column, QtCore.QModelIndex())
 
     def rowCount(self, parent=QtCore.QModelIndex()):
         if parent.isValid():
@@ -163,6 +162,71 @@ def parse_icon(root, template):
     return QtGui.QIcon(fname)
 
 
+class AbstractPackageItem(dict):
+
+    def __init__(self, name, package, versions, metadata):
+        super(AbstractPackageItem, self).__init__({
+            "name": name,
+            "label": metadata["label"],
+            "icon": parse_icon(package.root, template=metadata["icon"]),
+            "family": package.name,
+            "package": package,
+            "version": str(package.version),
+            "versions": versions,
+            "default": str(package.version),
+            "context": None,
+            "active": True,
+            "_hasVersions": len(versions) > 1,
+        })
+
+
+class ApplicationItem(AbstractPackageItem):
+
+    def __init__(self, app_request, data):
+        app_pkg = data["package"]
+        versions = data["versions"]
+        metadata = allzparkconfig.metadata_from_package(app_pkg)
+        tools = getattr(app_pkg, "tools", None) or [app_pkg.name]
+
+        super(ApplicationItem, self).__init__(name=app_request,
+                                              package=app_pkg,
+                                              versions=versions,
+                                              metadata=metadata)
+        self.update({
+            "hidden": metadata["hidden"],
+            "broken": isinstance(app_pkg, BrokenPackage),
+            "tool": None,  # Current tool
+            "tools": tools,  # All available tools
+            "detached": False,  # Open in separate console or not
+        })
+
+
+class PackageItem(AbstractPackageItem):
+
+    def __init__(self, name, data):
+        package = data["package"]
+        versions = data["versions"]
+        metadata = allzparkconfig.metadata_from_package(package)
+        relocatable = localz.is_relocatable(package) if localz else False
+        state = (
+            "(dev)" if is_local(package) else
+            "(localised)" if is_localised(package) else
+            ""
+        )
+
+        super(PackageItem, self).__init__(name=name,
+                                          package=package,
+                                          versions=versions,
+                                          metadata=metadata)
+        self.update({
+            "override": data["override"],
+            "disabled": data["disabled"],
+            "state": state,
+            "relocatable": relocatable,
+            "localizing": False,  # in progress
+        })
+
+
 class ApplicationModel(AbstractTableModel):
     ColumnToKey = {
         0: {
@@ -184,39 +248,13 @@ class ApplicationModel(AbstractTableModel):
         self._broken_icon = res.icon("Action_Stop_1_32.png")
 
     def reset(self, applications=None):
-        applications = applications or []
+        applications = applications or dict()
 
         self.beginResetModel()
         self.items[:] = []
 
-        for app in applications:
-            root = app.root
-
-            data = allzparkconfig.metadata_from_package(app)
-            tools = getattr(app, "tools", None) or [app.name]
-            app_request = "%s==%s" % (app.name, app.version)
-
-            item = {
-                "name": app_request,
-                "label": data["label"],
-                "version": str(app.version),
-                "icon": parse_icon(root, template=data["icon"]),
-                "package": app,
-                "context": None,
-                "active": True,
-                "hidden": data["hidden"],
-                "broken": isinstance(app, BrokenPackage),
-
-                # Whether or not to open a separate console for this app
-                "detached": False,
-
-                # Current tool
-                "tool": None,
-
-                # All available tools
-                "tools": tools,
-            }
-
+        for app_request, data in applications.items():
+            item = ApplicationItem(app_request, data)
             self.items.append(item)
 
         self.endResetModel()
@@ -251,7 +289,23 @@ class ApplicationModel(AbstractTableModel):
                 if col == 0:
                     return self._broken_icon
 
+        if data["_hasVersions"] and col == 1:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
+
         return super(ApplicationModel, self).data(index, role)
+
+    def flags(self, index):
+        if index.column() == 1:
+            return (
+                QtCore.Qt.ItemIsEnabled |
+                QtCore.Qt.ItemIsSelectable |
+                QtCore.Qt.ItemIsEditable
+            )
+
+        return super(ApplicationModel, self).flags(index)
 
 
 class BrokenContext(object):
@@ -303,12 +357,10 @@ def is_local(pkg):
         return False
 
     local_path = rez.config.local_packages_path
-    local_path = os.path.abspath(local_path)
-    local_path = os.path.normpath(local_path)
+    local_path = util.normpath(local_path)
 
     pkg_path = pkg.resource.location
-    pkg_path = os.path.abspath(pkg_path)
-    pkg_path = os.path.normpath(pkg_path)
+    pkg_path = util.normpath(pkg_path)
 
     return pkg_path.startswith(local_path)
 
@@ -350,62 +402,22 @@ class PackagesModel(AbstractTableModel):
         "beta",
     ]
 
-    def __init__(self, ctrl, parent=None):
+    def __init__(self, parent=None):
         super(PackagesModel, self).__init__(parent)
-
-        self._ctrl = ctrl
         self._overrides = {}
         self._disabled = {}
 
     def reset(self, packages=None):
-        packages = packages or []
+        packages = packages or dict()
 
         self.beginResetModel()
         self.items[:] = []
 
-        # TODO: This isn't nice. The model should
-        # not have to reach into the controller.
-        paths = self._ctrl._package_paths()
+        for name, data in packages.items():
+            data["override"] = self._overrides.get(name)
+            data["disabled"] = self._disabled.get(name, False)
 
-        for pkg in packages:
-            root = pkg.root
-            data = allzparkconfig.metadata_from_package(pkg)
-            state = (
-                "(dev)" if is_local(pkg) else
-                "(localised)" if is_localised(pkg) else
-                ""
-            )
-            relocatable = False
-
-            version = str(pkg.version)
-
-            # Fetch all versions of package
-            versions = rez.find(pkg.name, paths=paths)
-            versions = sorted(
-                [str(v.version) for v in versions],
-                key=util.natural_keys
-            ) or [version]  # broken package
-
-            if localz:
-                relocatable = localz.is_relocatable(pkg)
-
-            item = {
-                "name": pkg.name,
-                "label": data["label"],
-                "version": version,
-                "default": version,
-                "icon": parse_icon(root, template=data["icon"]),
-                "package": pkg,
-                "override": self._overrides.get(pkg.name),
-                "disabled": self._disabled.get(pkg.name, False),
-                "context": None,
-                "active": True,
-                "versions": versions,
-                "state": state,
-                "relocatable": relocatable,
-                "localizing": False,  # in progress
-            }
-
+            item = PackageItem(name, data)
             self.items.append(item)
 
         self.endResetModel()
@@ -440,6 +452,12 @@ class PackagesModel(AbstractTableModel):
 
             if role == QtCore.Qt.ForegroundRole:
                 return QtGui.QColor("darkorange")
+
+        if data["_hasVersions"] and col == 1:
+            if role == QtCore.Qt.FontRole:
+                font = QtGui.QFont()
+                font.setBold(True)
+                return font
 
         try:
             return data[role]

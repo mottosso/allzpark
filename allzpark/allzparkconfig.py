@@ -103,6 +103,29 @@ def metadata_from_package(variant):
     })
 
 
+def protected_preferences():
+    """Protect preference settings
+
+    Prevent clueless one from touching danger settings.
+
+    Following is a list of preference names that you may lock:
+    * showAllApps (bool)
+    * showHiddenApps (bool)
+    * showAllVersions (bool)
+    * patchWithFilter (bool)
+    * clearCacheTimeout (int)
+    * exclusionFilter (str)
+
+    This should return a preference name and default value paired
+    dict. For example: {"showAllVersions": False}
+
+    Returns:
+        dict
+
+    """
+    return dict()
+
+
 def themes():
     """Allzpark GUI theme list provider
 

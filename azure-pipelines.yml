@@ -85,6 +85,7 @@ jobs:
                                python3-pyside2.qtgui \
                                python3-pyside2.qtwidgets \
                                python3-pyside2.qtsvg
+          sudo pip install pyside2
           sudo python -c "from PySide2 import QtCore;print(QtCore.__version__)"
         condition: startsWith(variables['python.version'], '3.')
         displayName: "Install PySide2"

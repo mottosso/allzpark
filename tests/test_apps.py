@@ -31,10 +31,7 @@ class TestApps(util.TestBase):
                 }
             },
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         with self.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")
@@ -82,10 +79,7 @@ class TestApps(util.TestBase):
                 }
             },
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         with self.wait_signal(self.ctrl.state_changed, "ready"):
             self.ctrl.select_profile("foo")
@@ -134,10 +128,7 @@ class TestApps(util.TestBase):
             "app_A": {"1": {"name": "app_A", "version": "1"}},
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==1"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -160,10 +151,7 @@ class TestApps(util.TestBase):
             },
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==None"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -193,10 +181,7 @@ class TestApps(util.TestBase):
             },
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==1"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -220,10 +205,7 @@ class TestApps(util.TestBase):
             "app_A": {"1": {"name": "app_A", "version": "1"}},
             "app_B": {"1": {"name": "app_B", "version": "1"}},
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
 
         context_a = self.ctrl.state["rezContexts"]["app_A==2"]
         context_b = self.ctrl.state["rezContexts"]["app_B==1"]
@@ -231,21 +213,125 @@ class TestApps(util.TestBase):
         self.assertFalse(context_a.success)
         self.assertTrue(context_b.success)
 
+    def test_app_changing_version(self):
+        """Test application version can be changed in view"""
+        util.memory_repository({
+            "foo": {
+                "1": {"name": "foo", "version": "1",
+                      "requires": ["~app_A", "~app_B"]}
+            },
+            "app_A": {"1": {"name": "app_A", "version": "1"}},
+            "app_B": {"1": {"name": "app_B", "version": "1"},
+                      "2": {"name": "app_B", "version": "2"}}
+        })
+        self.ctrl_reset(["foo"])
+        self.show_dock("app")
+
+        apps = self.window._widgets["apps"]
+
+        def get_version_editor(app_request):
+            self.select_application(app_request)
+            proxy = apps.model()
+            model = proxy.sourceModel()
+            index = model.findIndex(app_request, column=1)
+            index = proxy.mapFromSource(index)
+            apps.edit(index)
+
+            return apps.indexWidget(index), apps.itemDelegate(index)
+
+        editor, delegate = get_version_editor("app_A==1")
+        self.assertIsNone(
+            editor, "No version editing if App has only one version.")
+
+        editor, delegate = get_version_editor("app_B==2")
+        self.assertIsNotNone(
+            editor, "Version should be editable if App has versions.")
+
+        # for visual
+        editor.showPopup()
+        self.wait(100)
+        view = editor.view()
+        index = view.model().index(0, 0)
+        sel_model = view.selectionModel()
+        sel_model.select(index, sel_model.ClearAndSelect)
+        self.wait(150)
+        # change version
+        editor.setCurrentIndex(0)
+        delegate.commitData.emit(editor)
+        self.wait(200)  # wait patch
+
+        self.assertEqual("app_B==1", self.ctrl.state["appRequest"])
+
+    def test_app_no_version_change_if_flattened(self):
+        """No version edit if versions are flattened with allzparkconfig"""
+
+        def applications_from_package(variant):
+            # From https://allzpark.com/gui/#multiple-application-versions
+            from allzpark import _rezapi as rez
+
+            requirements = variant.requires or []
+            apps = list(
+                str(req)
+                for req in requirements
+                if req.weak
+            )
+            apps = [rez.PackageRequest(req.strip("~")) for req in apps]
+            flattened = list()
+            for request in apps:
+                flattened += rez.find(
+                    request.name,
+                    range_=request.range,
+                )
+            apps = list(
+                "%s==%s" % (package.name, package.version)
+                for package in flattened
+            )
+            return apps
+
+        # patch config
+        self.patch_allzparkconfig("applications_from_package",
+                                  applications_from_package)
+        # start
+        util.memory_repository({
+            "foo": {
+                "1": {"name": "foo", "version": "1",
+                      "requires": ["~app_A"]}
+            },
+            "app_A": {"1": {"name": "app_A", "version": "1"},
+                      "2": {"name": "app_A", "version": "2"}}
+        })
+        self.ctrl_reset(["foo"])
+        self.show_dock("app")
+
+        apps = self.window._widgets["apps"]
+
+        def get_version_editor(app_request):
+            self.select_application(app_request)
+            proxy = apps.model()
+            model = proxy.sourceModel()
+            index = model.findIndex(app_request, column=1)
+            index = proxy.mapFromSource(index)
+            apps.edit(index)
+
+            return apps.indexWidget(index), apps.itemDelegate(index)
+
+        editor, delegate = get_version_editor("app_A==1")
+        self.assertIsNone(
+            editor, "No version editing if versions are flattened.")
+
+        editor, delegate = get_version_editor("app_A==2")
+        self.assertIsNone(
+            editor, "No version editing if versions are flattened.")
+
     def test_app_exclusion_filter(self):
-        """Test app is available when latest version matches rez
-        exclusion filter
-        """
-        from allzpark import allzparkconfig
-
-        self.assertEqual(allzparkconfig.exclude_filter, "*.beta")
-
+        """Test app is available when latest version excluded by filter"""
         util.memory_repository({
             "foo": {
                 "1.0.0": {
                     "name": "foo",
                     "version": "1.0.0",
                     "requires": [
-                        "~app_A-1"  # latest app_A version matches exclusion filter
+                        "~app_A-1"
                     ]
                 }
             },
@@ -257,13 +343,14 @@ class TestApps(util.TestBase):
                 "1.0.0.beta": {
                     "name": "app_A",
                     "version": "1.0.0.beta"
+                    # latest app_A version matches exclusion filter
                 }
             }
         })
-        with self.wait_signal(self.ctrl.resetted):
-            self.ctrl.reset(["foo"])
-        self.wait(timeout=200)
-        self.assertEqual(self.ctrl.state.state, "ready")
+        self.ctrl_reset(["foo"])
+
+        self.set_preference("exclusionFilter", "*.beta")
+        self.wait(200)  # wait for reset
 
         # App was added
         self.assertIn("app_A==1.0.0", self.ctrl.state["rezContexts"])
@@ -273,4 +360,4 @@ class TestApps(util.TestBase):
         # Latest non-beta version was chosen
         resolved_pkgs = [p for p in context_a.resolved_packages
                          if "app_A" == p.name and "1.0.0" == str(p.version)]
-        assert(resolved_pkgs)
+        self.assertEqual(1, len(resolved_pkgs))
