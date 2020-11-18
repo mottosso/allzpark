@@ -230,3 +230,47 @@ class TestApps(util.TestBase):
 
         self.assertFalse(context_a.success)
         self.assertTrue(context_b.success)
+
+    def test_app_exclusion_filter(self):
+        """Test app is available when latest version matches rez
+        exclusion filter
+        """
+        from allzpark import allzparkconfig
+
+        self.assertEqual(allzparkconfig.exclude_filter, "*.beta")
+
+        utils.memory_repository({
+            "foo": {
+                "1.0.0": {
+                    "name": "foo":
+                    "version": "1.0.0",
+                    "requires": [
+                        "~app-1"  # latest app_A version matches exclusion filter
+                    ]
+                }
+            }
+            "app_A": {
+                "1.0.0": {
+                    "name": "app_A",
+                    "version": "1.0.0"
+                },
+                "1.0.0.beta": {
+                    "name": "app_A",
+                    "version": "1.0.0.beta"
+                }
+            }
+        })
+        with self.wait_signal(self.ctrl.resetted):
+            self.ctrl.reset(["foo"])
+        self.wait(timeout=200)
+        self.assertEqual(self.ctrl.state.state, "ready")
+
+        # App was added
+        self.assertIn("appA-1", self.ctrl.state["rezContexts"])
+        context_a = self.ctrl.state["rezContexts"]["appA-1"]
+        self.assertTrue(context_a.success)
+
+        # Latest non-beta version was chosen
+        resolved_pkgs = [p for p in context_a.resolved_packages
+                         if "appA" == p.name and "1.0.0" == str(p.version)]
+        assert(resolved_pkgs)
