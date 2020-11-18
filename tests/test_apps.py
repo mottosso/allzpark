@@ -245,7 +245,7 @@ class TestApps(util.TestBase):
                     "name": "foo",
                     "version": "1.0.0",
                     "requires": [
-                        "~app-1"  # latest app_A version matches exclusion filter
+                        "~app_A-1"  # latest app_A version matches exclusion filter
                     ]
                 }
             },
@@ -266,11 +266,11 @@ class TestApps(util.TestBase):
         self.assertEqual(self.ctrl.state.state, "ready")
 
         # App was added
-        self.assertIn("appA-1", self.ctrl.state["rezContexts"])
-        context_a = self.ctrl.state["rezContexts"]["appA-1"]
+        self.assertIn("app_A-1", self.ctrl.state["rezContexts"])
+        context_a = self.ctrl.state["rezContexts"]["app_A-1"]
         self.assertTrue(context_a.success)
 
         # Latest non-beta version was chosen
         resolved_pkgs = [p for p in context_a.resolved_packages
-                         if "appA" == p.name and "1.0.0" == str(p.version)]
+                         if "app_A" == p.name and "1.0.0" == str(p.version)]
         assert(resolved_pkgs)
