@@ -266,8 +266,8 @@ class TestApps(util.TestBase):
         self.assertEqual(self.ctrl.state.state, "ready")
 
         # App was added
-        self.assertIn("app_A-1", self.ctrl.state["rezContexts"])
-        context_a = self.ctrl.state["rezContexts"]["app_A-1"]
+        self.assertIn("app_A==1.0.0", self.ctrl.state["rezContexts"])
+        context_a = self.ctrl.state["rezContexts"]["app_A==1.0.0"]
         self.assertTrue(context_a.success)
 
         # Latest non-beta version was chosen
