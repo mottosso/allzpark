@@ -205,6 +205,7 @@ class Controller(QtCore.QObject):
         _State("resolving", help="Rez is busy resolving a context"),
         _State("loading", help="Something is taking a moment"),
         _State("errored", help="Something has gone wrong"),
+        _State("console", help="Something need you to read"),
         _State("launching", help="An application is launching"),
         _State("ready", help="Awaiting user input"),
         _State("noprofiles", help="Allzpark did not find any profiles at all"),
@@ -232,7 +233,7 @@ class Controller(QtCore.QObject):
 
             # Docks
             "profiles": model.ProfileModel(),
-            "packages": model.PackagesModel(self),
+            "packages": model.PackagesModel(),
             "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
             "parentenv": model.EnvironmentModel(),
@@ -355,7 +356,40 @@ class Controller(QtCore.QObject):
                 return environ
 
     def resolved_packages(self, app_request):
-        return self._state["rezContexts"][app_request].resolved_packages
+        """Return context resolved packages and versions
+
+        If preference 'showAllVersions' is enabled, all packages' versions
+        will be collected, except profile. Profile version should not be
+        changed from Packages view, should be changed from Profile view.
+
+        """
+        all_vers = self._state.retrieve("showAllVersions", False)
+        app_vers = self._models["apps"].find(app_request)["versions"]
+        app_names = {app.name for app in self._state["rezApps"].values()}
+        profile_name = self._state["profileName"]
+        resolved = self._state["rezContexts"][app_request].resolved_packages
+
+        packages = odict()  # keep resolved order
+        for pkg in resolved or []:
+            is_profile = pkg.name == profile_name
+            is_app = False if is_profile else pkg.name in app_names
+
+            if is_profile:
+                versions = [str(pkg.version)]
+            elif is_app:
+                versions = app_vers[:]
+            else:
+                versions = [
+                    str(p.version)
+                    for p in (self.find(pkg.name) if all_vers else [pkg])
+                ]
+
+            packages[pkg.name] = {
+                "package": pkg,
+                "versions": versions,
+            }
+
+        return packages
 
     # ----------------
     # Events
@@ -924,6 +958,7 @@ class Controller(QtCore.QObject):
             active_profile = profile_versions[version_name]
 
             if profile_name:
+                # (TODO): this warning pops-up even profile actually exists
                 self.warning("%s was not found" % profile_name)
             else:
                 self.error("select_profile was passed an empty string")
@@ -1088,14 +1123,26 @@ class Controller(QtCore.QObject):
         patch_with_filter = self._state.retrieve("patchWithFilter", False)
         package_filter = self._package_filter()
 
+        app_ranges = dict()
+
         def _try_finding_latest_app(req_str):
             req_str = req_str.strip("~")
             req = rez.PackageRequest(req_str)
             try:
-                return rez.find_latest(req.name, range_=req.range)
+                app_vers = list(self.find(req.name, range_=req.range))
+                latest = app_vers[-1]
+            except IndexError:
+                self.error("No package matched for request '%s', may have"
+                           "been excluded by package filter.")
+                latest = model.BrokenPackage(req_str)
+                app_vers = [latest]
             except _missing as e_:
                 self.error(str(e_))
-                return model.BrokenPackage(req_str)
+                latest = model.BrokenPackage(req_str)
+                app_vers = [latest]
+
+            app_ranges[req.name] = app_vers
+            return latest
 
         def _try_resolve_context(req, pkg_name, mode):
             kwargs = dict()
@@ -1111,6 +1158,9 @@ class Controller(QtCore.QObject):
 
         contexts = odict()
         with util.timing() as t:
+
+            current_app = self._state["appRequest"] or ""
+            current_app = current_app.split("==", 1)[0]
 
             for app_request in apps:
 
@@ -1133,6 +1183,19 @@ class Controller(QtCore.QObject):
                     context = _try_resolve_context(request,
                                                    app_package.name,
                                                    mode="Patch")
+
+                # To avoid application selection change on patched or
+                # set back to default:
+                #   1. update context key `app_request`, and
+                #   2. update startup app
+                if context.success:
+                    for pkg in context.resolved_packages or []:
+                        if pkg.name == app_package.name:
+                            app_request = "%s==%s" % (pkg.name, pkg.version)
+                            if pkg.name == current_app:
+                                self._state.store("startupApplication",
+                                                  app_request)
+                            break
 
                 contexts[app_request] = context
 
@@ -1181,25 +1244,38 @@ class Controller(QtCore.QObject):
 
             self._state["rezApps"][app_request] = rez_pkg
 
+        self._state["rezContexts"] = contexts
+
         self.debug("Resolved all contexts in %.2f seconds" % t.duration)
 
-        # Hide hidden
-        visible_apps = []
+        visible_apps = dict()
+
+        # * Opt-out hidden application
+        # * Find application versions
         show_hidden = self._state.retrieve("showHiddenApps")
-        for request, package in self._state["rezApps"].items():
-            data = allzparkconfig.metadata_from_package(package)
+        for request, app_pkg in self._state["rezApps"].items():
+            data = allzparkconfig.metadata_from_package(app_pkg)
             hidden = data.get("hidden", False)
 
             if hidden and not show_hidden:
                 continue
 
-            visible_apps += [package]
+            app_versions = [str(v.version) for v in app_ranges[app_pkg.name]]
+            visible_apps[request] = {
+                "package": app_pkg,
+                "versions": app_versions,
+            }
 
-        self._state["rezContexts"] = contexts
         return visible_apps
 
     def graph(self):
         context = self._state["rezContexts"][self._state["appRequest"]]
+        if isinstance(context, model.BrokenContext):
+            self._state.to_console()
+            self._state.to_ready()
+            self.error("Can not graph a broken context.")
+            return
+
         graph_str = context.graph(as_dot=True)
 
         tempdir = tempfile.mkdtemp()

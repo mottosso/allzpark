@@ -343,15 +343,18 @@ class Packages(AbstractDockWidget):
 
     def on_argument_changed(self, arg):
         if arg["name"] == "useDevelopmentPackages":
-            self._ctrl._state.store("useDevelopmentPackages", arg.read())
+            self._ctrl.state.store("useDevelopmentPackages", arg.read())
             self._ctrl.reset()
 
         if arg["name"] == "useLocalizedPackages":
-            self._ctrl._state.store("useLocalizedPackages", arg.read())
+            self._ctrl.state.store("useLocalizedPackages", arg.read())
             self._ctrl.reset()
 
         if arg["name"] == "patch":
-            self._ctrl._state.store("patch", arg.read())
+            # (TODO) This will be called twice since qargparse.String
+            #   may emit changed signal twice. And profile model item
+            #   will get doubled.
+            self._ctrl.state.store("patch", arg.read())
             self._ctrl.reset()
 
     def on_resetted(self):
@@ -368,12 +371,12 @@ class Packages(AbstractDockWidget):
         model_.dataChanged.connect(self.on_model_changed)
 
     def on_model_changed(self):
-        model = self._widgets["view"].model()
-        model = model.sourceModel()
+        model_ = self._widgets["view"].model()
+        model_ = model_.sourceModel()
 
-        package_count = model.rowCount()
-        override_count = len([i for i in model.items if i["override"]])
-        disabled_count = len([i for i in model.items if i["disabled"]])
+        package_count = model_.rowCount()
+        override_count = len([i for i in model_.items if i["override"]])
+        disabled_count = len([i for i in model_.items if i["disabled"]])
 
         self._widgets["status"].showMessage(
             "%d Packages, %d Overridden, %d Disabled" % (
@@ -457,8 +460,17 @@ class Packages(AbstractDockWidget):
             localize_all.setEnabled(False)
             localize_related.setEnabled(False)
 
+        versions = model_.data(index, "versions")
+        if len(versions) <= 1:
+            edit.setEnabled(False)
+            default.setEnabled(False)
+            earliest.setEnabled(False)
+            latest.setEnabled(False)
+
         def on_edit():
-            self._widgets["view"].edit(index)
+            # avoid sending index that is not editable
+            version_index = model_.index(index.row(), 1)
+            self._widgets["view"].edit(version_index)
 
         def on_default():
             package = model_.data(index, "package")
@@ -466,7 +478,6 @@ class Packages(AbstractDockWidget):
             self.message.emit("Package set to default")
 
         def on_earliest():
-            versions = model_.data(index, "versions")
             earliest = versions[0]
             package = model_.data(index, "package")
             self._ctrl.patch("%s==%s" % (package.name, earliest))
@@ -474,7 +485,6 @@ class Packages(AbstractDockWidget):
             self.message.emit("Package set to earliest")
 
         def on_latest():
-            versions = model_.data(index, "versions")
             latest = versions[-1]
             package = model_.data(index, "package")
             self._ctrl.patch("%s==%s" % (package.name, latest))
@@ -625,15 +635,16 @@ class Context(AbstractDockWidget):
         self._model = model_
 
     def on_state_appfailed(self):
-        self._widgets["generateGraph"].setEnabled(False)
         self._widgets["printCode"].setEnabled(False)
 
     def on_state_appok(self):
-        self._widgets["generateGraph"].setEnabled(True)
         self._widgets["printCode"].setEnabled(True)
 
     def on_generate_clicked(self):
         pixmap = self._ctrl.graph()
+
+        if pixmap is None:
+            return  # was graphing broken context
 
         if not pixmap:
             self._widgets["graphHotkeys"].setText(
@@ -1049,91 +1060,108 @@ class Preferences(AbstractDockWidget):
 
     icon = "Action_GoHome_32"
 
-    options = [
-        qargparse.Info("startupProfile", help=(
-            "Load this profile on startup"
-        )),
-        qargparse.Info("startupApplication", help=(
-            "Load this application on startup"
-        )),
-
-        qargparse.Separator("Appearance"),
-
-        qargparse.Enum("theme", items=res.theme_names(), help=(
-            "GUI skin. May need to restart Allzpark after changed."
-        )),
-
-        qargparse.Button("resetLayout", help=(
-            "Reset stored layout to their defaults"
-        )),
-
-        qargparse.Separator("Settings"),
-
-        qargparse.Boolean("smallIcons", enabled=False, help=(
-            "Draw small icons"
-        )),
-        qargparse.Boolean("allowMultipleDocks", help=(
-            "Allow more than one dock to exist at a time"
-        )),
-        qargparse.Boolean("showAdvancedControls", help=(
-            "Show developer-centric controls"
-        )),
-        qargparse.Boolean("showAllApps", help=(
-            "List everything from allzparkconfig:applications\n"
-            "not just the ones specified for a given profile."
-        )),
-        qargparse.Boolean("showHiddenApps", help=(
-            "Show apps with metadata['hidden'] = True"
-        )),
-
-        qargparse.Boolean("patchWithFilter", help=(
-            "Use the current exclusion filter when patching.\n"
-            "This enables patching of packages outside of a filter, \n"
-            "such as *.beta packages, with every other package still \n"
-            "qualifying for that filter."
-        )),
-        qargparse.Integer("clearCacheTimeout", min=1, default=10, help=(
-            "Clear package repository cache at this interval, in seconds. \n\n"
-
-            "Default 10. (Requires restart)\n\n"
-
-            "Normally, filesystem calls like `os.listdir` are cached \n"
-            "so as to avoid unnecessary calls. However, whenever a new \n"
-            "version of a package is released, it will remain invisible \n"
-            "until this cache is cleared. \n\n"
-
-            "Clearing ths cache should have a very small impact on \n"
-            "performance and is safe to do frequently. It has no effect \n"
-            "on memcached which has a much greater impact on performanc."
-        )),
-
-        qargparse.String(
-            "exclusionFilter",
-            default=allzparkconfig.exclude_filter,
-            help="Exclude versions that match this expression"),
-
-        qargparse.Separator("System"),
-
-        # Provided by controller
-        qargparse.Info("pythonExe"),
-        qargparse.Info("pythonVersion"),
-        qargparse.Info("qtVersion"),
-        qargparse.Info("qtBinding"),
-        qargparse.Info("qtBindingVersion"),
-        qargparse.Info("rezLocation"),
-        qargparse.Info("rezVersion"),
-        qargparse.Info("rezConfigFile"),
-        qargparse.Info("memcachedURI"),
-        qargparse.InfoList("rezPackagesPath"),
-        qargparse.InfoList("rezLocalPath"),
-        qargparse.InfoList("rezReleasePath"),
-        qargparse.Info("settingsPath"),
-    ]
-
     def __init__(self, window, ctrl, parent=None):
         super(Preferences, self).__init__("Preferences", parent)
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
         self.setObjectName("Preferences")
+
+        self.options = [
+            qargparse.Info("startupProfile", help=(
+                "Load this profile on startup"
+            )),
+            qargparse.Info("startupApplication", help=(
+                "Load this application on startup"
+            )),
+
+            qargparse.Separator("Appearance"),
+
+            qargparse.Enum("theme", items=res.theme_names(), help=(
+                "GUI skin. May need to restart Allzpark after changed."
+            )),
+
+            qargparse.Button("resetLayout", help=(
+                "Reset stored layout to their defaults"
+            )),
+
+            qargparse.Separator("Settings"),
+
+            qargparse.Boolean("smallIcons", enabled=False, help=(
+                "Draw small icons"
+            )),
+            qargparse.Boolean("allowMultipleDocks", help=(
+                "Allow more than one dock to exist at a time"
+            )),
+            qargparse.Boolean("showAdvancedControls", help=(
+                "Show developer-centric controls"
+            )),
+            qargparse.Boolean("showAllApps", help=(
+                "List everything from allzparkconfig:applications\n"
+                "not just the ones specified for a given profile."
+            )),
+            qargparse.Boolean("showHiddenApps", help=(
+                "Show apps with metadata['hidden'] = True"
+            )),
+            qargparse.Boolean("showAllVersions", help=(
+                "Show all package versions.\n"
+                "Profile requested application version range will \n"
+                "still be respected, but all versions of each \n"
+                "dependency package will be shown."
+            )),
+            qargparse.Boolean("patchWithFilter", help=(
+                "Use the current exclusion filter when patching.\n"
+                "This enables patching of packages outside of a \n"
+                "filter, such as *.beta packages, with every other \n"
+                "package still qualifying for that filter."
+            )),
+            qargparse.Integer("clearCacheTimeout", min=1, default=10, help=(
+                "Clear package repository cache at this interval, in \n"
+                "seconds.\n\n"
+    
+                "Default 10. (Requires restart)\n\n"
+    
+                "Normally, filesystem calls like `os.listdir` are \n"
+                "cached so as to avoid unnecessary calls. However, \n"
+                "whenever a new version of a package is released, \n"
+                "it will remain invisible until this cache is \n"
+                "cleared. \n\n"
+    
+                "Clearing ths cache should have a very small impact \n"
+                "on performance and is safe to do frequently. It has \n"
+                "no effect on memcached which has a much greater \n"
+                "impact on performance."
+            )),
+
+            qargparse.String(
+                "exclusionFilter",
+                default=allzparkconfig.exclude_filter,
+                help="Exclude versions that match this expression"),
+
+            qargparse.Separator("System"),
+
+            # Provided by controller
+            qargparse.Info("pythonExe"),
+            qargparse.Info("pythonVersion"),
+            qargparse.Info("qtVersion"),
+            qargparse.Info("qtBinding"),
+            qargparse.Info("qtBindingVersion"),
+            qargparse.Info("rezLocation"),
+            qargparse.Info("rezVersion"),
+            qargparse.Info("rezConfigFile"),
+            qargparse.Info("memcachedURI"),
+            qargparse.InfoList("rezPackagesPath"),
+            qargparse.InfoList("rezLocalPath"),
+            qargparse.InfoList("rezReleasePath"),
+            qargparse.Info("settingsPath"),
+        ]
+
+        protected = allzparkconfig.protected_preferences()
+        for name, value in protected.items():
+            arg = next((a for a in self.options if a["name"] == name), None)
+            if arg is None:
+                print("Unknown preference setting: %s" % name)
+            else:
+                ctrl.state.store(name, value)
+                arg["enabled"] = False
 
         panels = {
             "central": QtWidgets.QTabWidget(),

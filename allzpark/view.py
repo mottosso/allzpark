@@ -11,16 +11,44 @@ from .vendor.Qt import QtWidgets, QtCore, QtGui
 from .vendor import qargparse
 from .version import version
 from . import resources as res, dock, model
-from . import allzparkconfig
+from . import allzparkconfig, delegates
 
 px = res.px
 
 
 class Applications(dock.SlimTableView):
 
-    def __init__(self, parent=None):
+    def __init__(self, ctrl, parent=None):
         super(Applications, self).__init__(parent)
+        delegate = delegates.Package(ctrl, self)
+        self.setItemDelegate(delegate)
+        self.setEditTriggers(self.EditKeyPressed)
+        self.setStretch(0)
+
+        # Block/Unblock view selection signal on version picking
+        # -
+        # We are using combobox widget as package version delegate editor,
+        # when user done picking version, may clicking on any place out
+        # side of the combobox widget instead of pressing return button to
+        # trigger editing finished signal. If user is clicking on application
+        # view, the application changed signal will also being emitted at the
+        # same time while the version editor already called context patching,
+        # race condition happened.
+        # To avoid that, we need to block view selection signal when editor
+        # is created, and unblock it depend on version changed or not.
+        # If version isn't changed, unblock it once editor is closed, and
+        # wait for controller reset signal after patch completed if changed.
+        delegate.editor_created.connect(self.on_editor_created)
+        delegate.editor_closed.connect(self.on_editor_done)
+        ctrl.resetted.connect(lambda: self.on_editor_done(False))
+
         self._selected_app_ok = False
+
+    def on_editor_created(self):
+        self.selectionModel().blockSignals(True)
+
+    def on_editor_done(self, block):
+        self.selectionModel().blockSignals(block)
 
     def on_state_appfailed(self):
         self._selected_app_ok = False
@@ -76,7 +104,7 @@ class Window(QtWidgets.QMainWindow):
             "logo": QtWidgets.QToolButton(),
             "appVersion": QtWidgets.QLabel(version),
 
-            "apps": Applications(),
+            "apps": Applications(ctrl),
             "fullCommand": FullCommand(ctrl),
 
             # Error page
@@ -475,6 +503,9 @@ class Window(QtWidgets.QMainWindow):
                    "patchWithFilter"):
             self._ctrl.reset()
 
+        if key == "showAllVersions":
+            self._ctrl.select_application(self._ctrl.state["appRequest"])
+
         if key == "exclusionFilter":
             allzparkconfig.exclude_filter = value
             self._ctrl.reset()
@@ -663,11 +694,12 @@ class Window(QtWidgets.QMainWindow):
             for widget in self._docks.values():
                 widget.setEnabled(False)
 
-        if state in ("pkgnotfound", "errored"):
+        if state in ("pkgnotfound", "errored", "console"):
             console = self._docks["console"]
             console.show()
             self.on_dock_toggled(console, visible=True)
 
+        if state in ("pkgnotfound", "errored"):
             page = self._pages["errored"]
             self._panels["pages"].setCurrentWidget(page)
             self._widgets["apps"].setEnabled(False)
@@ -722,6 +754,9 @@ class Window(QtWidgets.QMainWindow):
         app = self._docks["app"]
         app.show()
         self.on_dock_toggled(app, visible=True)
+
+        if index.column() == 1:
+            self._widgets["apps"].edit(index)
 
     def on_app_selection_changed(self, selected, deselected):
         """The current app was changed
