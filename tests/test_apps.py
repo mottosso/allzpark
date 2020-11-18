@@ -242,7 +242,7 @@ class TestApps(util.TestBase):
         utils.memory_repository({
             "foo": {
                 "1.0.0": {
-                    "name": "foo":
+                    "name": "foo",
                     "version": "1.0.0",
                     "requires": [
                         "~app-1"  # latest app_A version matches exclusion filter
