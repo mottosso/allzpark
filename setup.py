@@ -63,6 +63,7 @@ setup(
     install_requires=[
         "bleeding-rez>=2.38.2",
         "allzparkdemo>=1",
+        "six",
 
         # Specifically for Python 2..
         "PySide; python_version<'3'",
