@@ -35,6 +35,7 @@ but not vice versa as that would implicate a view when using it standalone.
 
 import re
 import os
+import six
 import logging
 import itertools
 
@@ -42,7 +43,7 @@ from . import allzparkconfig, util, resources as res
 from . import _rezapi as rez
 
 from .vendor.Qt import QtCore, QtGui, QtCompat
-from .vendor import qjsonmodel, six
+from .vendor import qjsonmodel
 
 # Optional third-party dependencies
 try:
