@@ -189,12 +189,10 @@ def initialize(config_file=None,
                 "such as PySide, PySide2, PyQt4 or PyQt5.\n"
             )
 
-        from .vendor import six
         from .vendor.Qt import QtWidgets, QtCore
 
     # Provide for vendor dependencies
     sys.modules["Qt"] = Qt
-    sys.modules["six"] = six
 
     with timings("- Loading allzpark.. ") as msg:
         from . import view, control, resources, util
