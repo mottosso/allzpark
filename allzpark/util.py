@@ -1,6 +1,5 @@
 import os
 import re
-import six
 import time
 import traceback
 import functools
@@ -10,6 +9,7 @@ import collections
 import webbrowser
 import subprocess
 
+from .vendor import six
 from .vendor.Qt import QtCore
 
 _lru_cache = {}

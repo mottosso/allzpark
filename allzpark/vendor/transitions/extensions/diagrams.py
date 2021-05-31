@@ -9,7 +9,7 @@
 import logging
 from functools import partial
 import itertools
-from six import string_types, iteritems
+from ...six import string_types, iteritems
 
 from ..core import Machine
 from ..core import Transition

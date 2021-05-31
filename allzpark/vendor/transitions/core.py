@@ -20,7 +20,7 @@ import warnings
 
 from collections import OrderedDict, defaultdict, deque
 from functools import partial
-from six import string_types
+from ..six import string_types
 
 # make deprecation warnings of transition visible for module users
 warnings.filterwarnings(action='default', message=r"Starting from transitions version 0\.6\.0 .*")

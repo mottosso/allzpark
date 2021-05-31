@@ -91,8 +91,8 @@ jobs:
         displayName: "Install PySide2"
 
       - script: |
-          sudo pip install nose six
-        displayName: "Install dependency and test tool"
+          sudo pip install nose
+        displayName: "Install test tools"
 
       - script: |
           sudo pip install . --no-deps
@@ -152,8 +152,8 @@ jobs:
         displayName: "Install PySide2"
 
       - script: |
-          pip install nose six
-        displayName: "Install dependency and test tool"
+          pip install nose
+        displayName: "Install test tools"
 
       - script: |
           pip install . --no-deps
@@ -205,8 +205,8 @@ jobs:
         displayName: "Install PySide2"
 
       - script: |
-          pip install nose six
-        displayName: "Install dependency and test tool"
+          pip install nose
+        displayName: "Install test tools"
 
       - script: |
           pip install . --no-deps
