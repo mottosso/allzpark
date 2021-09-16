@@ -238,6 +238,35 @@ Preview the environment, prior to launching an application. Make changes interac
     </div>    
 </div>
 
+<div class="space"></div>
+<div class="space"></div>
+
+<!-- 
+
+    Profiles
+
+-->
+
+<div class="hboxlayout justify-left">
+    <div class="flex-item">
+    <div class="vboxlayout">
+        <h2>Profiles</h2>
+<p>
+
+Manage multiple projects with "profiles".
+
+</p>
+</div>
+</div>
+    <div class="smallspace"></div>
+<div class="flex-item">
+    <img class="poster" src=https://user-images.githubusercontent.com/90282974/133529630-ed1522de-ff65-486b-b175-d8d0e3521c06.gif>
+</div>
+</div>
+
+<div class="space"></div>
+<div class="space"></div>
+
 
 <br>
 <br>
