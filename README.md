@@ -36,7 +36,12 @@
 
 It's an application launcher, for when you need control over what software and which versions of software belong to a given project. It builds on the self-hosted package manager and environment management framework [bleeding-rez](https://github.com/mottosso/bleeding-rez), providing both a visual and textual interface for launching software in a reproducible way.
 
-![](https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif)
+<table>
+<tr>
+<td><img src=https://user-images.githubusercontent.com/2152766/61705822-7d1ad980-ad3e-11e9-81b3-473e8ac4e7c6.gif></td>
+<td><img src=https://user-images.githubusercontent.com/90282974/133529630-ed1522de-ff65-486b-b175-d8d0e3521c06.gif></td>
+</tr>
+</table>
 
 <br>
 
