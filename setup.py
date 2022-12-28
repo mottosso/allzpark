@@ -5,7 +5,8 @@ from setuptools import setup, find_packages
 from allzpark.version import version
 
 # Git is required for deployment
-assert len(version.split(".")) == 3, (
+main_version, local_version = version.split("+")
+assert len(main_version.split(".")) == 3, (
     "Could not compute patch version, make sure `git` is\n"
     "available and see version.py for details")
 
@@ -62,7 +63,7 @@ setup(
     classifiers=classifiers,
     install_requires=[
         "bleeding-rez>=2.38.2",
-        "allzparkdemo>=1",
+        "allzparkcontents>=1",
 
         # Specifically for Python 2..
         "PySide; python_version<'3'",

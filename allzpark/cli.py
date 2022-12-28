@@ -124,7 +124,6 @@ def warn(msg, newlines=1):
 def initialize(config_file=None,
                no_config=False,
                clean=False,
-               demo=False,
                verbose=0):
 
     tell("=" * 30)
@@ -150,23 +149,21 @@ def initialize(config_file=None,
 
     logging.getLogger("allzpark.vendor").setLevel(logging.CRITICAL)
 
-    if demo:
-        with timings("- Loading demo..") as msg:
-            try:
-                import allzparkdemo
-            except ImportError:
-                msg["failure"] = (
-                    " fail\n"
-                    "ERROR: The --demo flag requires allzparkdemo, "
-                    "try running `pip install allzparkdemo`\n"
-                )
-                raise
+    with timings("- Loading contents..") as msg:
+        try:
+            import allzparkcontents
+        except ImportError:
+            msg["failure"] = (
+                " fail\n"
+                "ERROR: allzpark requires allzparkcontents"
+            )
+            raise
 
-            os.environ["REZ_CONFIG_FILE"] = allzparkdemo.rezconfig
-            config_file = allzparkdemo.allzparkconfig
+        os.environ["REZ_CONFIG_FILE"] = allzparkcontents.rezconfig
+        config_file = allzparkcontents.allzparkconfig
 
-        tell("  - %s" % allzparkdemo.rezconfig)
-        tell("  - %s" % allzparkdemo.allzparkconfig)
+    tell("  - %s" % allzparkcontents.rezconfig)
+    tell("  - %s" % allzparkcontents.allzparkconfig)
 
     with timings("- Loading Rez.. ") as msg:
         try:
@@ -271,11 +268,6 @@ def initialize(config_file=None,
         if allzparkconfig.startup_application:
             storage.setValue("startupApp", allzparkconfig.startup_application)
 
-        if demo:
-            # Normally unsafe, but for the purposes of a demo
-            # a convenient location for installed packages
-            storage.setValue("useDevelopmentPackages", True)
-
     try:
         __import__("localz")
         allzparkconfig._localz_enabled = True
@@ -366,8 +358,6 @@ def main():
         "over ALLZPARK_CONFIG_FILE"))
     parser.add_argument("--no-config", action="store_true", help=(
         "Do not load custom allzparkconfig.py"))
-    parser.add_argument("--demo", action="store_true", help=(
-        "Run demo material"))
     parser.add_argument("--root", help=(
         "(DEPRECATED) Path to where profiles live on disk, "
         "defaults to allzparkconfig.profiles"))
@@ -403,7 +393,6 @@ def main():
         config_file=opts.config_file,
         verbose=opts.verbose,
         clean=opts.clean,
-        demo=opts.demo,
         no_config=opts.no_config,
     )
 
