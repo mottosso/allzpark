@@ -45,7 +45,7 @@ Everything ok?
     ```bash
     $ python -m venv allzpark-venv
     $ allzpark-venv\Scripts\activate
-    (allzpark-venv) $ pip install allzpark
+    (allzpark-venv) $ pip install allzpark --upgrade
     ```
 
     **Python 2**
@@ -54,7 +54,7 @@ Everything ok?
     $ python -m pip install virtualenv
     $ python -m virtualenv allzpark-venv
     $ allzpark-venv\Scripts\activate
-    (allzpark-venv) $ pip install allzpark
+    (allzpark-venv) $ pip install allzpark --upgrade
     ```
 
 ??? quote "rez not found"
