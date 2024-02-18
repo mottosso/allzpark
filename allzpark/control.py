@@ -1015,7 +1015,7 @@ class Controller(QtCore.QObject):
 
         self._models["packages"].reset(packages)
         self._models["context"].load(context.to_dict())
-        self._models["environment"].load(environ)
+        self._models["environment"].load(environ.copy())
         self._models["diagnose"].load(diagnose)
 
         tools = self._models["apps"].find(app_request)["tools"]
@@ -1300,12 +1300,14 @@ class Controller(QtCore.QObject):
 
     def test_environment(self):
         app_request = self._state["appRequest"]
+        environ = self.environ(app_request)
+        has_python = bool(rez.which("python", env=environ))
 
         command = (
             '%s -c "'
             'import os,sys,json;'
             'sys.stdout.write(json.dumps(os.environ.copy(),ensure_ascii=0))"'
-        ) % sys.executable
+        ) % ("python" if has_python else sys.executable)
 
         def load(message):
             try:
@@ -1316,6 +1318,7 @@ class Controller(QtCore.QObject):
                 self._state["testedEnvirons"][app_request] = env
                 self._models["diagnose"].load(env)
 
+        self._models["diagnose"].clear()
         self.launch(command=command, stdout=load)
 
 
