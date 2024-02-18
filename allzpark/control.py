@@ -74,6 +74,8 @@ class State(dict):
             # Cache environment testing result
             "testedEnvirons": {},
 
+            "pluginEnvironValidator": lambda *args: None,
+
             "rezApps": odict(),
             "fullCommand": "rez env",
             "serialisationMode": (
@@ -237,6 +239,7 @@ class Controller(QtCore.QObject):
             "context": model.ContextModel(),
             "environment": model.EnvironmentModel(),
             "parentenv": model.EnvironmentModel(),
+            "plugin": model.EnvironmentModel(),
             "diagnose": model.EnvironmentModel(),
             "commands": model.CommandsModel(),
         }
@@ -309,6 +312,8 @@ class Controller(QtCore.QObject):
 
     def parent_environ(self):
         environ = self._state["parentEnviron"].copy()
+        # Inject plugin environment
+        environ = dict(environ, **(self._models["plugin"].json() or {}))
         # Inject user environment
         #
         # NOTE: Rez takes precendence on environment, so a user
@@ -510,6 +515,9 @@ class Controller(QtCore.QObject):
     # ----------------
     # Methods
     # ----------------
+
+    def register_environment_validator(self, validator):
+        self._state["pluginEnvironValidator"] = validator
 
     def stdio(self, stream, level=logging.INFO):
         return _Stream(self, stream, level)
@@ -771,6 +779,13 @@ class Controller(QtCore.QObject):
             overrides = self._models["packages"]._overrides
             disabled = self._models["packages"]._disabled
             environ = self.parent_environ()
+
+            validator = self._state["pluginEnvironValidator"]
+            invalid = validator(environ, rez_app)
+            if invalid:
+                self.error("Plugin environment validation failed:\n"
+                           "%s" % invalid)
+                return
 
             self.debug(
                 "Launching %s%s.." % (
@@ -1269,7 +1284,6 @@ class Controller(QtCore.QObject):
         context = self._state["rezContexts"][self._state["appRequest"]]
         if isinstance(context, model.BrokenContext):
             self._state.to_console()
-            self._state.to_ready()
             self.error("Can not graph a broken context.")
             return
 

@@ -241,10 +241,10 @@ def initialize(config_file=None,
                              "start anew")
 
         if clean:
-            tell("(clean) ")
+            tell("(clean) ", newlines=0)
             storage.clear()
         else:
-            tell("(%s)" % storage.fileName())
+            tell("(%s) " % storage.fileName(), newlines=0)
 
         defaults = {
             "memcachedURI": os.getenv("REZ_MEMCACHED_URI", "None"),
@@ -291,7 +291,7 @@ def initialize(config_file=None,
 
 
 def launch(ctrl):
-    from . import view, resources, util
+    from . import view, dock, resources, util
 
     # Handle stdio from within the application if necessary
     if hasattr(allzparkconfig, "__noconsole__"):
@@ -316,7 +316,16 @@ def launch(ctrl):
     with timings("- Loading themes.. "):
         resources.load_themes()
 
-    window = view.Window(ctrl)
+    with timings("- Loading environment plugin.. ") as msg:
+        plugin_cls = allzparkconfig.environment_plugin()
+        if plugin_cls is None:
+            plugin = None
+            msg["success"] = "no plugin - ok\n"
+        else:
+            plugin = dock.EnvironmentPlugin(ctrl, plugin_cls)
+            msg["success"] = "%s loaded - ok {:.2f}\n" % plugin.name
+
+    window = view.Window(ctrl, plugin)
     user_css = ctrl.state.retrieve("userCss", "")
     originalcss = resources.load_theme(ctrl.state.retrieve("theme"))
     # Store for CSS Editor

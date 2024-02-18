@@ -126,6 +126,27 @@ def protected_preferences():
     return dict()
 
 
+def environment_plugin():
+    """Custom widget for adding extra environment variables
+
+    In some scenario, e.g. production pipeline involved workflow, may
+    require passing additional arguments as environment variables to
+    application that is being launched. And those environment variables,
+    like shot numbers, may change regularly so can't be fixed in Rez
+    package.
+
+    To adopt that, one could subclass `allzpark.plugin.EnvPluginBase`
+    to implement a custom widget that can be hooked with Allzpark, as
+    an additional interface for user to make production decisions, and
+    parse those inputs into application's launching environment.
+
+    Returns:
+        None or subclass of `allzpark.plugin.EnvPluginBase`
+
+    """
+    return None
+
+
 def themes():
     """Allzpark GUI theme list provider
 

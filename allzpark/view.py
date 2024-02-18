@@ -63,7 +63,7 @@ class Applications(dock.SlimTableView):
 class Window(QtWidgets.QMainWindow):
     title = "Allzpark %s" % version
 
-    def __init__(self, ctrl, parent=None):
+    def __init__(self, ctrl, plugin=None, parent=None):
         super(Window, self).__init__(parent)
         self.setWindowTitle(self.title)
         self.setAttribute(QtCore.Qt.WA_StyledBackground)
@@ -129,6 +129,9 @@ class Window(QtWidgets.QMainWindow):
             ("commands", dock.Commands()),
             ("preferences", dock.Preferences(self, ctrl)),
         ))
+        if plugin is not None:
+            docks["plugin"] = plugin
+            docks["environment"].enable_plugin()
 
         # Expose to CSS
         for name, widget in chain(panels.items(),
@@ -226,8 +229,10 @@ class Window(QtWidgets.QMainWindow):
 
         for name, widget in docks.items():
             has_menu = hasattr(widget, "on_context_menu")
-            BtnCls = (dock.PushButtonWithMenu
-                      if has_menu else QtWidgets.QPushButton)
+            BtnCls = (dock.PushButtonWithMenu if has_menu
+                      else QtWidgets.QPushButton)
+            btn_icon = (widget.icon if isinstance(widget.icon, QtGui.QIcon)
+                        else res.icon(widget.icon))
             toggle = BtnCls()
             toggle.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
                                  QtWidgets.QSizePolicy.Expanding)
@@ -235,7 +240,7 @@ class Window(QtWidgets.QMainWindow):
             toggle.setCheckable(True)
             toggle.setFlat(True)
             toggle.setProperty("type", "toggle")
-            toggle.setIcon(res.icon(widget.icon))
+            toggle.setIcon(btn_icon)
             toggle.setIconSize(QtCore.QSize(px(32), px(32)))
             toggle.setToolTip("\n".join([
                 type(widget).__name__, widget.__doc__ or ""]))
@@ -267,7 +272,7 @@ class Window(QtWidgets.QMainWindow):
             # Forward any messages
             widget.message.connect(self.tell)
 
-            _section = "left" if name == "profiles" else "dock"
+            _section = "left" if name in ["profiles", "plugin"] else "dock"
             _layouts[_section].addWidget(toggle)
 
         layout = QtWidgets.QVBoxLayout(panels["body"])
@@ -296,6 +301,7 @@ class Window(QtWidgets.QMainWindow):
         docks["context"].set_model(ctrl.models["context"])
         docks["environment"].set_model(ctrl.models["environment"],
                                        ctrl.models["parentenv"],
+                                       ctrl.models["plugin"],
                                        ctrl.models["diagnose"])
         docks["commands"].set_model(ctrl.models["commands"])
 
@@ -313,6 +319,13 @@ class Window(QtWidgets.QMainWindow):
         docks["profiles"].version_changed.connect(
             self.on_profileversion_changed)
         docks["profiles"].reset.connect(self.reset)
+
+        if "plugin" in docks:
+            def on_reveal_plugin():
+                docks["plugin"].show()
+                self.on_dock_toggled(docks["plugin"], visible=True)
+            docks["plugin"].connect_plugin()
+            docks["plugin"].revealed.connect(on_reveal_plugin)
 
         widgets["reset"].clicked.connect(self.on_reset_clicked)
         widgets["continue"].clicked.connect(self.on_continue_clicked)
@@ -404,14 +417,18 @@ class Window(QtWidgets.QMainWindow):
         profile = docks[0]
         self.addDockWidget(area, profile)
 
+        if "plugin" in self._docks:
+            plugin = docks[-1]
+            self.addDockWidget(area, plugin)
+            right_docks = docks[1:-1]
+        else:
+            right_docks = docks[1:]
+
         area = QtCore.Qt.RightDockWidgetArea
-        first = docks[1]
+        first = right_docks[0]
         self.addDockWidget(area, first)
 
-        for widget in docks[2:]:
-            if widget is first:
-                continue
-
+        for widget in right_docks[1:]:
             self.addDockWidget(area, widget)
             self.tabifyDockWidget(first, widget)
 
@@ -530,15 +547,20 @@ class Window(QtWidgets.QMainWindow):
         if ctrl_held or not allow_multiple:
             ignore_allow_multiple = [
                 # docks that are not restricted by this rule
-                "profiles",
+                self._docks[name] for name in ["profiles", "plugin"]
+                if name in self._docks
             ]
+            all_docks = self._docks.values()
 
-            for name, d in self._docks.items():
-                if name in ignore_allow_multiple:
-                    continue
-                d.setVisible(d == dock)
+            if dock in ignore_allow_multiple:
+                dock.setVisible(True)
+            else:
+                for d in all_docks:
+                    if d in ignore_allow_multiple:
+                        continue
+                    d.setVisible(d == dock)
 
-            if len([d for d in self._docks.values() if d.isVisible()]) <= 1:
+            if len([d for d in all_docks if d.isVisible()]) <= 1:
                 # Only one or no visible dock
                 return
 
@@ -704,6 +726,9 @@ class Window(QtWidgets.QMainWindow):
             self._panels["pages"].setCurrentWidget(page)
             self._widgets["apps"].setEnabled(False)
             self._docks["app"].on_state_appfailed()
+
+        if state == "console":
+            self._widgets["apps"].setEnabled(True)
 
         if state == "notresolved":
             pass
