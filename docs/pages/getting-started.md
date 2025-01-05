@@ -105,7 +105,7 @@ In Allzpark, the profile dictates what applications are available to the user, i
     - [Piper](http://www.piperpipeline.com)
     - [Mango Pipeline](https://www.mangopipeline.com/)
     - [AnimationDNA](https://github.com/kiryha/AnimationDNA)
-    - [Tik Manager4](https://github.com/masqu3rad3/tik_manager4)
+    - [Tik Manager](https://tik-manager.com)
 
 An application typically consists of these components.
 
